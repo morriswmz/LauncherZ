@@ -1,0 +1,25 @@
+﻿<UserControl
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:task="clr-namespace:LauncherZ.Task"
+             xmlns:local="clr-namespace:LauncherZ.Controls"
+             x:Class="LauncherZ.Controls.TaskDataEntry" 
+             mc:Ignorable="d" 
+             d:DesignHeight="80" d:DesignWidth="460"
+             d:DataContext="{d:DesignInstance {x:Type task:TaskDataDesignTime}, IsDesignTimeCreatable = True}">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="64"/>
+            <ColumnDefinition Width="100*"/>
+        </Grid.ColumnDefinitions>
+        <Image x:Name="CtlIcon" Height="48" Margin="8" Width="48" Grid.Column="0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+        <StackPanel Grid.Column="1" Margin="10,8,10,0" VerticalAlignment="Top">
+            <TextBlock x:Name="CtlTitleText" local:FormattedTextBehavior.FormattedText="{Binding Title}" VerticalAlignment="Top" Width="376" Height="22" Style="{DynamicResource TaskTitleStyle}" TextTrimming="CharacterEllipsis" TextWrapping="Wrap" Padding="0,0,0,3" Margin="0" Visibility="{Binding IsTitleVisible}"/>
+            <TextBlock x:Name="CtlDescriptionText" local:FormattedTextBehavior.FormattedText="{Binding Description}"  Style="{DynamicResource TaskDescriptionStyle}" Margin="0,2,0,0" Visibility="{Binding IsDescriptionVisible}" />
+            <Canvas x:Name="CtlCanvas" MinHeight="10" Margin="0,4,0,0" />
+        </StackPanel>
+
+    </Grid>
+</UserControl>
