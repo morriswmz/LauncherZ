@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LauncherZ.Plugin
+namespace LauncherZ.Controls
 {
-    
-    class PluginContainer
+    public class TaskCustomRenderEventArgs : EventArgs
     {
+        
+
     }
 }

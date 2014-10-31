@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using System.ComponentModel;
+using System.Globalization;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace LauncherZ.Controls
@@ -10,7 +12,7 @@ namespace LauncherZ.Controls
     {
 
 
-
+        [Description("Gets or sets the text above the input text box.")]
         public string HintText
         {
             get { return (string)GetValue(HintTextProperty); }
@@ -22,7 +24,7 @@ namespace LauncherZ.Controls
             DependencyProperty.Register("HintText", typeof(string), typeof(TaskInput), new PropertyMetadata(""));
 
 
-
+        [Description("Gets or sets the content of the input text box.")]
         public string Text
         {
             get { return (string)GetValue(TextProperty); }
@@ -38,6 +40,7 @@ namespace LauncherZ.Controls
         public TaskInput()
         {
             InitializeComponent();
+            
         }
 
         public void FocusText()

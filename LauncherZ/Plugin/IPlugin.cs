@@ -3,10 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LauncherZLib.API;
 
-namespace LauncherZ.Task
+namespace LauncherZ.Plugin
 {
-    interface ITaskProvider
+    interface IPlugin
     {
+
+        IEnumerable<ITaskProvider> GetTaskProviders();
+
     }
 }

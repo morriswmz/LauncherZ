@@ -1,10 +1,34 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Color x:Key="BorderColor">#FFCCCCCC</Color>
-    <SolidColorBrush x:Key="BorderBrush" Color="#FFCCCCCC"/>
-    <SolidColorBrush x:Key="InputBackground" Color="#19FFFFFF"/>
-    <SolidColorBrush x:Key="TitleBrush" Color="White"/>
-    <SolidColorBrush x:Key="InputTextBrush" Color="#FFEEEEEE"/>
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:PresentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
+                    xmlns:controls="clr-namespace:LauncherZ.Controls">
+    
+    <SolidColorBrush x:Key="DefaultBorderBrush" Color="#FFCCCCCC"/>
+    <SolidColorBrush x:Key="DefaultTextBrush" Color="White"/>
+    
+    <!-- Style for all window borders.  -->
+    <Style x:Key="WindowBorderStyle" TargetType="Border">
+        <Setter Property="Margin" Value="10"></Setter>
+        <Setter Property="Background" Value="#99000000"></Setter>
+        <Setter Property="BorderBrush" Value="#FFCCCCCC"></Setter>
+        <Setter Property="BorderThickness" Value="1"></Setter>
+        <Setter Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect ShadowDepth="0" BlurRadius="8" Opacity="0.8"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    <!-- Style for input. -->
+    <Style x:Key="InputTextBoxStyle" TargetType="TextBox">
+        <Setter Property="BorderBrush" Value="{StaticResource DefaultBorderBrush}"></Setter>
+        <Setter Property="Background" Value="#19FFFFFF"></Setter>
+        <Setter Property="Foreground" Value="#FFEEEEEE"></Setter>
+        <Setter Property="CaretBrush" Value="#FFEEEEEE"></Setter>
+        <Setter Property="FontSize" Value="16"></Setter>
+    </Style>
+    
+    <!-- Styles for task data entry. -->
     <Style x:Key="TaskTitleStyle" TargetType="TextBlock">
         <Setter Property="FontSize" Value="16"></Setter>
         <Setter Property="Foreground" Value="White"></Setter>
@@ -14,5 +38,28 @@
         <Setter Property="Foreground" Value="#FFEEEEEE"></Setter>
     </Style>
     
+    <!-- Style for list box. -->
+    <Style x:Key="TaskListBoxItemContainerStyle" TargetType="ListBoxItem">
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"></Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListBoxItem">
+                    <Border x:Name="ListItemBorder" SnapsToDevicePixels="True" BorderThickness="1" BorderBrush="Transparent">
+                        <ContentPresenter></ContentPresenter>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="ListItemBorder" Property="BorderBrush" Value="{StaticResource DefaultBorderBrush}"></Setter>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
     
+    <!-- Icons -->
+    <BitmapImage x:Key="IconProgram" UriSource="../Assets/IconProgram.png" PresentationOptions:Freeze="True"></BitmapImage>
+    <BitmapImage x:Key="IconGear" UriSource="../Assets/IconGear.png" PresentationOptions:Freeze="True"></BitmapImage>
+    <BitmapImage x:Key="IconNetwork" UriSource="../Assets/IconNetwork.png" PresentationOptions:Freeze="True"></BitmapImage>
+    <BitmapImage x:Key="IconCalculator" UriSource="../Assets/IconCalculator.png" PresentationOptions:Freeze="True"></BitmapImage>
 </ResourceDictionary>

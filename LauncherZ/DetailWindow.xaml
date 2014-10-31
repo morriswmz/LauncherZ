@@ -1,0 +1,12 @@
+﻿<Window x:Class="LauncherZ.DetailWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="DetailWindow" Height="300" Width="300" ShowInTaskbar="False" WindowStyle="None" AllowsTransparency="True" Background="Transparent" ShowActivated="False">
+    <Border Style="{DynamicResource WindowBorderStyle}">
+        <Grid >
+            <TextBlock x:Name="CtlDetailText" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Height="44" Width="258"/>
+            
+        </Grid>
+    </Border>
+
+</Window>

@@ -3,11 +3,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:Task="clr-namespace:LauncherZ.Task" x:Class="LauncherZ.Controls.TaskList" 
+             x:Name="TaskListControl" x:Class="LauncherZ.Controls.TaskList" 
              mc:Ignorable="d" 
-             d:DesignHeight="80" d:DesignWidth="480">
+             d:DesignWidth="480">
     <Grid>
-        <ScrollViewer x:Name="CtlScrollViewer" VerticalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch">
+        <ScrollViewer x:Name="CtlScrollViewer" VerticalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch" MaxHeight="{Binding MaxViewPortHeight, ElementName=TaskListControl}" MinHeight="80">
             <StackPanel x:Name="CtlTaskPanel"/>
         </ScrollViewer>
 

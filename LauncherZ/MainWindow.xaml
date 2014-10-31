@@ -1,24 +1,33 @@
-﻿<Window
+﻿<Window xml:lang="en-US"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:LauncherZ.Controls"
         xmlns:controls="clr-namespace:LauncherZ.Controls"
+        xmlns:task="clr-namespace:LauncherZLib.Task;assembly=LauncherZLib"
         mc:Ignorable="d" x:Class="LauncherZ.MainWindow"
-        Title="LauncherX" Height="140" Width="500" WindowStartupLocation="CenterScreen"
+        Title="LauncherX" Width="500" WindowStartupLocation="CenterScreen"
         SizeToContent="Height" ResizeMode="NoResize" WindowStyle="None"
-        Background="Transparent" AllowsTransparency="True">
+        Background="Transparent" AllowsTransparency="True"
+        PreviewKeyDown="MainWindow_OnPreviewKeyDown"
+        >
     <Grid Margin="0,0,0,0">
         <Grid.RowDefinitions>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <Border BorderThickness="1" Margin="10" Background="#99000000" MinHeight="120" BorderBrush="{DynamicResource BorderBrush}">
-            <Border.Effect>
-                <DropShadowEffect ShadowDepth="0" BlurRadius="8" Opacity="0.8"/>
-            </Border.Effect>
+        <Border MinHeight="120" Style="{DynamicResource WindowBorderStyle}">
             <StackPanel>
-                <controls:TaskInput x:Name="CtlTaskInput" HintText="LaunchZ" Height="76" PreviewKeyUp="CtlTaskInput_PreviewKeyUp"/>
-                <TextBlock Foreground="{DynamicResource TitleBrush}"  Text="{Binding Text, ElementName=CtlTaskInput}" />
+                <controls:TaskInput x:Name="CtlTaskInput" HintText="LaucherZ" Height="76" PreviewKeyUp="CtlTaskInput_PreviewKeyUp"/>
+                <TextBlock Foreground="{DynamicResource DefaultTextBrush}"  Text="{Binding Text, ElementName=CtlTaskInput}" />
+                <!--
+                <controls:TaskList x:Name="CtlTaskList" d:DataContext="{d:DesignInstance {x:Type Task:TaskDataListDesignTime}, IsDesignTimeCreatable=True}" Margin="10,0,10,10" />
+                -->
+                <ListBox x:Name="CtlTaskListBox" d:DataContext="{d:DesignInstance {x:Type task:TaskDataListDesignTime}, IsDesignTimeCreatable=True}" ItemsSource="{Binding Mode=OneWay}" Background="{x:Null}" BorderThickness="0" BorderBrush="{x:Null}" Margin="10,0,10,10" MaxHeight="200" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" SourceUpdated="CtlTaskListBox_SourceUpdated" SelectionChanged="CtlTaskListBox_SelectionChanged" FocusVisualStyle="{x:Null}" ItemContainerStyle="{DynamicResource TaskListBoxItemContainerStyle}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <controls:TaskDataEntry></controls:TaskDataEntry>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
             </StackPanel>
         </Border>
     </Grid>

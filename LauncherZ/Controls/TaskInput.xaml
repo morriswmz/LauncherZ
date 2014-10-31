@@ -13,8 +13,8 @@
             <RowDefinition Height="30"/>
             <RowDefinition Height="100*"/>
         </Grid.RowDefinitions>
-        <TextBlock x:Name="CtlHintText" Margin="14,10,10,0" TextWrapping="Wrap" Text="{Binding HintText, ElementName=TaskInputControl}" Foreground="{DynamicResource TitleBrush}" Grid.Row="0" FontSize="14"/>
-        <TextBox x:Name="CtlTextBox" Padding="2,4" Margin="10,4,10,10" Text="{Binding Text, ElementName=TaskInputControl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsUndoEnabled="False" Grid.Row="1" BorderBrush="{DynamicResource BorderBrush}" Background="{DynamicResource InputBackground}" Foreground="{DynamicResource InputTextBrush}" CaretBrush="{DynamicResource InputTextBrush}" FontSize="16"/>
+        <TextBlock x:Name="CtlHintText" Margin="14,10,10,0" TextWrapping="Wrap" Text="{Binding HintText, ElementName=TaskInputControl}" Foreground="{DynamicResource DefaultTextBrush}" Grid.Row="0" FontSize="14" FlowDirection="LeftToRight"/>
+        <TextBox x:Name="CtlTextBox" Padding="2,4" Margin="10,4,10,10" Text="{Binding Text, ElementName=TaskInputControl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsUndoEnabled="False" Grid.Row="1" Style="{DynamicResource InputTextBoxStyle}" FlowDirection="LeftToRight"/>
 
     </Grid>
 </UserControl>
