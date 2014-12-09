@@ -10,6 +10,9 @@
              mc:Ignorable="d"
              d:DesignWidth="460"
              d:DataContext="{d:DesignInstance {x:Type task:TaskDataDesignTime}, IsDesignTimeCreatable = True}">
+    <UserControl.Resources>
+        <task:VisibilityConverter x:Key="VisibilityConverter"/>
+    </UserControl.Resources>
     <Border>
         <Grid Margin="0" FlowDirection="LeftToRight">
             <Grid.ColumnDefinitions>
@@ -18,8 +21,8 @@
             </Grid.ColumnDefinitions>
             <Image x:Name="CtlIcon" local:TaskIconBehavior.IconLocation="{Binding IconLocation}" Height="48" Margin="5" Width="48" Grid.Column="0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
             <StackPanel Grid.Column="1" Margin="0,4,5,0" VerticalAlignment="Top">
-                <TextBlock x:Name="CtlTitleText" local:FormattedTextBehavior.FormattedText="{Binding Title}" VerticalAlignment="Top" Style="{DynamicResource TaskTitleStyle}" TextTrimming="CharacterEllipsis" TextWrapping="Wrap" Padding="0,0,0,3" Margin="0" Visibility="{Binding IsTitleVisible}" FlowDirection="LeftToRight"/>
-                <TextBlock x:Name="CtlDescriptionText" local:FormattedTextBehavior.FormattedText="{Binding Description}"  Style="{DynamicResource TaskDescriptionStyle}" Margin="0,0,0,5" Visibility="{Binding IsDescriptionVisible}" FlowDirection="LeftToRight" />
+                <TextBlock x:Name="CtlTitleText" local:FormattedTextBehavior.FormattedText="{Binding Title}" VerticalAlignment="Top" Style="{DynamicResource TaskTitleStyle}" TextTrimming="CharacterEllipsis" TextWrapping="Wrap" Padding="0,0,0,3" Margin="0" Visibility="{Binding IsTitleVisible, Converter={StaticResource VisibilityConverter}}" FlowDirection="LeftToRight"/>
+                <TextBlock x:Name="CtlDescriptionText" local:FormattedTextBehavior.FormattedText="{Binding Description}"  Style="{DynamicResource TaskDescriptionStyle}" Margin="0,0,0,5" Visibility="{Binding IsDescriptionVisible, Converter={StaticResource VisibilityConverter}}" FlowDirection="LeftToRight" />
             </StackPanel>
         </Grid> 
     </Border>

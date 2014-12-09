@@ -6,7 +6,7 @@ namespace LauncherZLib.API
     public interface ITaskProvider
     {
 
-        void Initialize();
+        void Initialize(IEventBus eventBus);
 
         void Terminate();
 

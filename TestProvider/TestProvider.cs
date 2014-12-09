@@ -9,12 +9,8 @@ using LauncherZLib.Task;
 
 namespace TestProvider
 {
-    [TaskProvider("TestProvider", Name = "TestProvider", Authors = "morriswmz", Version = "0.0.0.1")]
-    [Description("For testing purpose only.")]
-    
     public class TestProvider : ITaskProvider
     {
-        [LauncherZEventHandler]
         public void FooEventHandler(object sender, EventArgs e)
         {
             
@@ -32,7 +28,7 @@ namespace TestProvider
             throw new NotImplementedException();
         }
 
-        public void Initialize()
+        public void Initialize(IEventBus eventBus)
         {
             throw new NotImplementedException();
         }

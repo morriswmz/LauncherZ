@@ -21,7 +21,7 @@
                 <!--
                 <controls:TaskList x:Name="CtlTaskList" d:DataContext="{d:DesignInstance {x:Type Task:TaskDataListDesignTime}, IsDesignTimeCreatable=True}" Margin="10,0,10,10" />
                 -->
-                <ListBox x:Name="CtlTaskListBox" d:DataContext="{d:DesignInstance {x:Type task:TaskDataListDesignTime}, IsDesignTimeCreatable=True}" ItemsSource="{Binding Mode=OneWay}" Background="{x:Null}" BorderThickness="0" BorderBrush="{x:Null}" Margin="10,0,10,10" MaxHeight="200" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" SourceUpdated="CtlTaskListBox_SourceUpdated" SelectionChanged="CtlTaskListBox_SelectionChanged" FocusVisualStyle="{x:Null}" ItemContainerStyle="{DynamicResource TaskListBoxItemContainerStyle}">
+                <ListBox x:Name="CtlTaskListBox" d:DataContext="{d:DesignInstance {x:Type task:TaskDataListDesignTime}, IsDesignTimeCreatable=True}" ItemsSource="{Binding Mode=OneWay}" Background="{x:Null}" BorderThickness="0" BorderBrush="{x:Null}" Margin="10,0,10,10" MaxHeight="200" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" SourceUpdated="CtlTaskListBox_SourceUpdated" SelectionChanged="CtlTaskListBox_SelectionChanged" FocusVisualStyle="{x:Null}" ItemContainerStyle="{DynamicResource TaskListBoxItemContainerStyle}" IsSynchronizedWithCurrentItem="True" Focusable="False">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <controls:TaskDataEntry></controls:TaskDataEntry>

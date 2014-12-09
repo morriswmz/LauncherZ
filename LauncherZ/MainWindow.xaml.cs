@@ -36,7 +36,7 @@ namespace LauncherZ
             CtlTaskListBox.ItemsSource = sampleList;
             CtlTaskListBox.SelectedIndex = 0;
             var loader = new TaskProviderLoader();
-            loader.LoadAll();
+            loader.LoadAllFrom(@".\Providers");
             var cultureInfo = Thread.CurrentThread.CurrentCulture;
 
         }

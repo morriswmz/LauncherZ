@@ -7,6 +7,9 @@ namespace LauncherZLib.API
     interface ITaskProviderAsync : ITaskProvider
     {
 
+        /// <summary>
+        /// Raised when new results are available.
+        /// </summary>
         event EventHandler<UpdateEventArgs> Update;
 
     }

@@ -1,63 +1,55 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Reflection;
+using System.Windows.Documents;
 using LauncherZLib.API;
 
 namespace LauncherZLib.Task.Provider
 {
     
-    internal sealed class TaskProviderContainer
+    public sealed class TaskProviderContainer
     {
 
-        private ITaskProvider _provider;
+        private readonly ITaskProvider _provider;
+        private readonly string _id;
+        private readonly string _name;
+        private readonly List<string> _authors;
+        private readonly Version _version;
+        private readonly string _description;
+        private readonly double _priority;
 
-        public string Id { get; private set; }
+        private readonly TaskProviderEventBus _eventBus;
 
-        public string Name { get; private set; }
+        public string Id { get { return _id; } }
 
-        public string[] Authors { get; private set; }
+        public string Name { get { return _name; } }
 
-        public string Description { get; private set; }
+        public ReadOnlyCollection<string> Authors { get { return _authors.AsReadOnly(); } }
 
-        public static TaskProviderContainer Create(Type providerType)
+        public Version Version { get { return _version; } }
+
+        public string Description { get { return _description; } }
+
+        public double Priority { get { return _priority; } }
+
+        public IEventBus EventBus { get { return _eventBus; } }
+
+        public TaskProviderContainer(ITaskProvider provider, string id, string name, List<string> authors, Version version, string description, double priority)
         {
-            if (!(typeof (ITaskProvider).IsAssignableFrom(providerType)))
-                return null;
-            // read plugin attribute
-            var providerAttr =
-                Attribute.GetCustomAttribute(providerType, typeof (TaskProviderAttribute)) as TaskProviderAttribute;
-            if (providerAttr == null)
-                throw new CustomAttributeFormatException("Missing TaskProvider attribute.");
-            string[] authors = ParseAuthors(providerAttr.Authors);
-            
-            // read description attribute
-            var descriptionAttr =
-                Attribute.GetCustomAttribute(providerType, typeof (DescriptionAttribute)) as DescriptionAttribute;
-            var description = descriptionAttr == null ? "" : descriptionAttr.Description;
-            
-            // read priority attribute
-            var priorityAttr =
-                Attribute.GetCustomAttribute(providerType, typeof (PriorityAttribute)) as PriorityAttribute;
-            var priority = priorityAttr == null ? 0.0 : priorityAttr.Priority;
-
-            // try create
-
-            var container = new TaskProviderContainer
-            {
-                Id = providerAttr.Id,
-                Authors = ParseAuthors(providerAttr.Authors),
-                Name = providerAttr.Name
-            };
-            return container;
+            _provider = provider;
+            _id = id;
+            _name = name;
+            _authors = authors;
+            _version = version;
+            _description = description;
+            _priority = priority;
+            _eventBus = new TaskProviderEventBus();
         }
 
-        private static string[] ParseAuthors(string authors)
-        {
-            string[] result = authors.Split(',');
-            for (int i = 0; i < result.Length; i++)
-                result[i] = result[i].Trim();
-            return result;
-        }
-
+        public TaskProviderContainer(ITaskProvider provider, TaskProviderInfo info)
+            : this(provider, info.Id, info.Name, info.Authors, new Version(info.Version), info.Description, info.Priority)
+        { }
     }
 }
