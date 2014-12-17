@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 
-namespace LauncherZLib.Task
+namespace LauncherZLib.LauncherTask
 {
     public class TaskDataList : ICollection<TaskData>, INotifyCollectionChanged
     {

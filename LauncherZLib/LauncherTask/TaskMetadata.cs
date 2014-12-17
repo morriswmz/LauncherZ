@@ -1,4 +1,4 @@
-﻿namespace LauncherZLib.Task
+﻿namespace LauncherZLib.LauncherTask
 {
 
     public class TaskMetadata

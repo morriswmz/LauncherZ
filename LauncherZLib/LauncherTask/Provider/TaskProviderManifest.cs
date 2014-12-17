@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace LauncherZLib.Task.Provider
+namespace LauncherZLib.LauncherTask.Provider
 {
     public class TaskProviderManifest
     {
@@ -48,6 +44,12 @@ namespace LauncherZLib.Task.Provider
 
         [JsonProperty(PropertyName = "command_line")]
         public string CommandLine { get; set; }
+
+        [JsonIgnore]
+        public string SourceDirectory { get; set; }
+
+        [JsonIgnore]
+        public string DataDirectory { get; set; }
 
         public TaskProviderInfo()
         {

@@ -3,13 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LauncherZLib.Event;
 
 namespace LauncherZLib.API
 {
-    /// <summary>
-    /// A place for task providers to subscribe events raised by LauncherZ application.
-    /// </summary>
+
     public interface IEventBus
     {
+        void Register(object obj);
+
+        void Unregister(object obj);
+
+        void UnregisterAll();
+
+        void Post(EventBase e);
     }
 }

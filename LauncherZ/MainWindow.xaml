@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:controls="clr-namespace:LauncherZ.Controls"
-        xmlns:task="clr-namespace:LauncherZLib.Task;assembly=LauncherZLib"
+        xmlns:task="clr-namespace:LauncherZLib.LauncherTask;assembly=LauncherZLib"
         mc:Ignorable="d" x:Class="LauncherZ.MainWindow"
         Title="LauncherX" Width="500" WindowStartupLocation="CenterScreen"
         SizeToContent="Height" ResizeMode="NoResize" WindowStyle="None"

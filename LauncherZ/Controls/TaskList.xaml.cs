@@ -6,7 +6,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using LauncherZLib.Task;
+using LauncherZLib.LauncherTask;
 
 namespace LauncherZ.Controls
 {

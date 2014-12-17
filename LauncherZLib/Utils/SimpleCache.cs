@@ -9,20 +9,21 @@ namespace LauncherZLib.Utils
     /// <summary>
     /// A simple thread-safe cache implementation.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public class SimpleCache<T>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TValue"></typeparam>
+    public class SimpleCache<TKey, TValue>
     {
 
         private readonly object _lock = new object();
         private readonly int _capacity;
-        private readonly Dictionary<string, CacheEntry> _entries;
+        private readonly Dictionary<TKey, CacheEntry> _entries;
         private readonly CacheEntry _head;
         private readonly CacheEntry _tail;
 
         public SimpleCache(int capacity)
         {
             _capacity = capacity;
-            _entries = new Dictionary<string, CacheEntry>(capacity);
+            _entries = new Dictionary<TKey, CacheEntry>(capacity);
             _head = new CacheEntry();
             _tail = new CacheEntry();
             _head.Next = _tail;
@@ -35,17 +36,23 @@ namespace LauncherZLib.Utils
         /// <param name="key"></param>
         /// <returns></returns>
         /// <exception cref="KeyNotFoundException"></exception>
-        public T this[string key]
+        public TValue this[TKey key]
         {
             get { return Get(key); }
             set { Put(key, value); }
         }
 
+        /// <summary>
+        /// Gets the capacity of the cache.
+        /// </summary>
         public int Capacity
         {
             get { return _capacity; }
         }
 
+        /// <summary>
+        /// Gets the number of cached entries.
+        /// </summary>
         public int Count
         {
             get
@@ -57,7 +64,12 @@ namespace LauncherZLib.Utils
             }
         }
 
-        public bool Contains(string key)
+        /// <summary>
+        /// Checks if given entry exists.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public bool ContainsKey(TKey key)
         {
             lock (_lock)
             {
@@ -65,7 +77,13 @@ namespace LauncherZLib.Utils
             }
         }
 
-        public void Put(string key, T value)
+        /// <summary>
+        /// Adds a new entry to the cache.
+        /// If the key already exists, the corresponding entry will be updated.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        public void Put(TKey key, TValue value)
         {
             lock (_lock)
             {
@@ -101,7 +119,13 @@ namespace LauncherZLib.Utils
             }
         }
 
-        public T Get(string key)
+        /// <summary>
+        /// Retrieves a cache entry.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        /// <exception cref="KeyNotFoundException"></exception>
+        public TValue Get(TKey key)
         {
             lock (_lock)
             {
@@ -112,7 +136,39 @@ namespace LauncherZLib.Utils
             }
         }
 
-        public void Refresh(string key)
+        /// <summary>
+        /// Safely retrieves a cache entry.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value">
+        /// Retrieved data.
+        /// Will be the default value of TValue if given key is not found.
+        /// </param>
+        /// <returns>True is key exists.</returns>
+        public bool SafeGet(TKey key, out TValue value)
+        {
+            lock (_lock)
+            {
+                if (_entries.ContainsKey(key))
+                {
+                    value = _entries[key].Value;
+                    RefreshImpl(key);
+                    return true;
+                }
+                else
+                {
+                    value = default(TValue);
+                    return false;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Refreshes specified entry.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <exception cref="KeyNotFoundException"></exception>
+        public void Refresh(TKey key)
         {
             lock (_lock)
             {
@@ -122,6 +178,9 @@ namespace LauncherZLib.Utils
             }
         }
 
+        /// <summary>
+        /// Clear all cache entries.
+        /// </summary>
         public void Clear()
         {
             lock (_lock)
@@ -132,7 +191,11 @@ namespace LauncherZLib.Utils
             }
         }
         
-        private void RefreshImpl(string key)
+        /// <summary>
+        /// Internal implementation of refresh function.
+        /// </summary>
+        /// <param name="key"></param>
+        private void RefreshImpl(TKey key)
         {
             CacheEntry entry = _entries[key];
             if (entry != _head.Next)
@@ -147,10 +210,14 @@ namespace LauncherZLib.Utils
             }
         }
 
+        /// <summary>
+        /// Represents a cache entry.
+        /// Also functions as a linked list node.
+        /// </summary>
         class CacheEntry
         {
-            public string Key { get; set; }
-            public T Value { get; set; }
+            public TKey Key { get; set; }
+            public TValue Value { get; set; }
             public CacheEntry Prev { get; set; }
             public CacheEntry Next { get; set; }
         }

@@ -20,6 +20,7 @@ using System.Windows;
 // to COM components.  If you need to access a type in this assembly from 
 // COM, set the ComVisible attribute to true on that type.
 [assembly: ComVisible(false)]
+[assembly: Guid("abaf6981-a7b9-4280-b2d3-6a206302bc44")]
 
 //In order to begin building localizable applications, set 
 //<UICulture>CultureYouAreCodingWith</UICulture> in your .csproj file
@@ -54,3 +55,4 @@ using System.Windows;
 [assembly: AssemblyVersion("0.1.0.1")]
 [assembly: AssemblyFileVersion("0.1.0.1")]
 
+[assembly: NeutralResourcesLanguageAttribute("en-US")]

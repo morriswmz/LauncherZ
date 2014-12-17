@@ -13,8 +13,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using LauncherZLib.Task;
-using LauncherZLib.Task.Provider;
+using LauncherZLib.Icon;
+using LauncherZLib.LauncherTask;
+using LauncherZLib.LauncherTask.Provider;
 
 namespace LauncherZ
 {
@@ -27,6 +28,7 @@ namespace LauncherZ
         private Stack<string> _commanStack = new Stack<string>();
         private DetailWindow detailWindow;
         private TaskDataList sampleList = new TaskDataListDesignTime();
+        private QueryController _queryController;
 
         public MainWindow()
         {
@@ -35,11 +37,11 @@ namespace LauncherZ
             //CtlTaskList.DataContext = new TaskDataListDesignTime();
             CtlTaskListBox.ItemsSource = sampleList;
             CtlTaskListBox.SelectedIndex = 0;
-            var loader = new TaskProviderLoader();
-            loader.LoadAllFrom(@".\Providers");
+            
             var cultureInfo = Thread.CurrentThread.CurrentCulture;
-
         }
+
+        
 
         private void Label_MouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -68,6 +70,10 @@ namespace LauncherZ
                 }
                 detailWindow.CtlDetailText.Text = CtlTaskInput.Text;
                 e.Handled = true;
+            }
+            else if (e.Key.Equals(Key.Escape))
+            {
+                Close();
             }
         }
 

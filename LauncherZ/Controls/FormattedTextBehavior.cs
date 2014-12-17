@@ -9,7 +9,7 @@ using System.Windows.Documents;
 
 namespace LauncherZ.Controls
 {
-    public class FormattedTextBehavior
+    public static class FormattedTextBehavior
     {
 
 

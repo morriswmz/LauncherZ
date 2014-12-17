@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:LauncherZ.Controls"
-             xmlns:task="clr-namespace:LauncherZLib.Task;assembly=LauncherZLib"
+             xmlns:task="clr-namespace:LauncherZLib.LauncherTask;assembly=LauncherZLib"
              x:Class="LauncherZ.Controls.TaskDataEntry"
              x:Name="TaskDataEntryControl"
              mc:Ignorable="d"

@@ -5,11 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using LauncherZ.Icon;
+using LauncherZLib.Icon;
 
 namespace LauncherZ.Controls
 {
-    class TaskIconBehavior
+    public static class TaskIconBehavior
     {
 
 
@@ -29,30 +29,38 @@ namespace LauncherZ.Controls
 
         private static void OnIconLocationChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var iconPath = e.NewValue as string;
+            IconManager iconManager = LauncherZApp.Instance == null ? null : LauncherZApp.Instance.IconManager;
+            if (iconManager == null)
+            {
+                return;
+            }
+
+            var iconLocationStr = e.NewValue as string;
             var image = d as Image;
             
             if (image == null)
                 return;
 
-            if (string.IsNullOrEmpty(iconPath))
+            if (string.IsNullOrEmpty(iconLocationStr))
             {
-                image.Source = IconManager.DefaultIcon;
+                image.Source = iconManager.DefaultIcon;
                 return;
             }
 
-            if (!IconManager.ContainsIcon(iconPath))
+            var iconLocation = new IconLocation(iconLocationStr);
+
+            if (!iconManager.ContainsIcon(iconLocation))
             {
-                image.Source = IconManager.DefaultIcon;
-                IconManager.ResolveIcon(iconPath, (success, icon) =>
+                image.Source = iconManager.DefaultIcon;
+                iconManager.LoadAsync(iconLocation, false, (location, icon) =>
                 {
-                    if (success)
+                    if (location.ToString() == GetIconLocation(image))
                         image.Source = icon;
                 });
             }
             else
             {
-                image.Source = IconManager.GetIcon(iconPath);
+                image.Source = iconManager.GetIcon(iconLocation);
             }
         }
     }

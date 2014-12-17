@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using LauncherZLib.API;
-using LauncherZLib.Task;
+using LauncherZLib.LauncherTask;
 
 namespace TestProvider
 {
@@ -30,7 +30,7 @@ namespace TestProvider
 
         public void Initialize(IEventBus eventBus)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
         public void Terminate()

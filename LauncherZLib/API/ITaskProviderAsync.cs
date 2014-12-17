@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using LauncherZLib.Task;
+using LauncherZLib.LauncherTask;
 
 namespace LauncherZLib.API
 {
