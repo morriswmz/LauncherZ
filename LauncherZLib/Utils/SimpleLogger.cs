@@ -10,6 +10,9 @@ using System.Windows.Media.Converters;
 
 namespace LauncherZLib.Utils
 {
+    /// <summary>
+    /// Provides simple logging functionality.
+    /// </summary>
     public class SimpleLogger
     {
 

@@ -118,6 +118,7 @@ namespace LauncherZ
 
             // load plugins
             ProviderManager.LoadAllFrom(Path.GetFullPath(@".\Providers"), ProviderDataPath, Logger);
+            ProviderManager.LoadAllFrom(string.Format("{0}{1}Providers", AppDataBasePath, Path.DirectorySeparatorChar), ProviderDataPath, Logger);
 
             _appInitialized = true;
         }
@@ -133,7 +134,7 @@ namespace LauncherZ
 #endif
             if (!Directory.Exists(appDataBasePath))
                 Directory.CreateDirectory(appDataBasePath);
-            string providerDataPath = appDataBasePath + "\\Providers";
+            string providerDataPath = appDataBasePath + "\\Data";
             if (!Directory.Exists(providerDataPath))
                 Directory.CreateDirectory(providerDataPath);
             string logPath = appDataBasePath + "\\Logs";

@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 
 namespace LauncherZLib.LauncherTask.Provider
 {
-    public class TaskProviderManager : IAutoCompletionProvider, IIconLocationResolver
+    public sealed class TaskProviderManager : IAutoCompletionProvider, IIconLocationResolver
     {
         private readonly Dictionary<string, TaskProviderContainer> _loadedProviders = new Dictionary<string, TaskProviderContainer>();
         private readonly List<TaskProviderContainer> _sortedActiveProviders = new List<TaskProviderContainer>(); 

@@ -15,9 +15,6 @@ namespace LauncherZLib.LauncherTask.Provider
         [JsonProperty(PropertyName = "id", Required = Required.Always)]
         public string Id { get; set; }
 
-        [JsonProperty(PropertyName = "name", Required = Required.Always)]
-        public string Name { get; set; }
-
         [JsonProperty(PropertyName = "authors", Required = Required.Always)]
         public List<string> Authors { get; set; }
 

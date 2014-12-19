@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using LauncherZLib.API;
+using LauncherZLib.LauncherTask;
 using LauncherZLib.LauncherTask.Provider;
 
-namespace LauncherZLib.LauncherTask
+namespace LauncherZLib
 {
     public class QueryController
     {
