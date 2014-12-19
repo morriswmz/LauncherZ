@@ -59,6 +59,9 @@ namespace LauncherZLib.LauncherTask.Provider
                         TaskProviderContainer container = LoadProvider(info);
                         if (container != null)
                         {
+                            // load localization files
+
+                            // initialize
                             container.Provider.Initialize(container.EventBus);
                             _loadedProviders.Add(container.Id, container);
                         }

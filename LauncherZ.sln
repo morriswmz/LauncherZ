@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestProvider", "TestProvide
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LauncherZLib", "LauncherZLib\LauncherZLib.csproj", "{9614226F-538A-4E19-A4C8-82DB831D3218}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestLauncherZ", "TestLauncherZ\TestLauncherZ.csproj", "{2C46C4E2-35B2-4EE3-8EF7-C363E40719B5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LauncherZTests", "LauncherZTests\LauncherZTests.csproj", "{2C46C4E2-35B2-4EE3-8EF7-C363E40719B5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

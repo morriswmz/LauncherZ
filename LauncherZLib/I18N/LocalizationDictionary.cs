@@ -12,10 +12,11 @@ namespace LauncherZLib.I18N
     /// </summary>
     public class LocalizationDictionary
     {
-
-        private readonly List<Tuple<string, string>> _loadedLanguageFiles = new List<Tuple<string, string>>();
-        private readonly Dictionary<string, Dictionary<string, string>> _strings = new Dictionary<string, Dictionary<string, string>>();
         private static readonly List<string> PossibleCultureNames;
+
+        private readonly List<string> _loadedLanguageFiles = new List<string>();
+        private readonly Dictionary<string, string> _strings = new Dictionary<string, string>();
+        
 
         private CultureInfo _culture = CultureInfo.CurrentCulture;
 
@@ -34,6 +35,14 @@ namespace LauncherZLib.I18N
 
         }
 
+        public string this[string strName]
+        {
+            get { return Translate(strName); }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public CultureInfo CurrentCulture
         {
             get { return _culture; }
@@ -51,27 +60,52 @@ namespace LauncherZLib.I18N
             }
         }
 
-        public string Translate(string domain, string strName)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="strName"></param>
+        /// <returns></returns>
+        public string Translate(string strName)
         {
-            if (!_strings.ContainsKey(domain))
+            if (!_strings.ContainsKey(strName))
                 return strName;
-            if (!_strings[domain].ContainsKey(strName))
-                return strName;
-            return _strings[domain][strName];
+            return _strings[strName];
         }
 
-        public void LoadLanguageFile(string domain, string fileName)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="strName"></param>
+        /// <returns></returns>
+        public bool CanTranslate(string strName)
         {
-            LoadLanguageFile(domain, fileName, true);
+            return _strings.ContainsKey(strName);
         }
 
-        public void LoadLanguageFile(string domain, string fileName, bool fallback)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="fileName"></param>
+        public void LoadLanguageFile(string fileName)
+        {
+            LoadLanguageFile(fileName, true);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="fallback"></param>
+        public void LoadLanguageFile(string fileName, bool fallback)
         {
             string baseFileName = TrimCultureNameFromPath(fileName);
+            if (_loadedLanguageFiles.Contains(baseFileName))
+                return;
+            
             string expectedFileName = AddCultureNameToPath(baseFileName, _culture);
             if (File.Exists(expectedFileName))
             {
-                LoadLanguageFileImpl(domain, expectedFileName);
+                LoadLanguageFileImpl(expectedFileName);
                 return;
             }
             if (!fallback)
@@ -84,13 +118,13 @@ namespace LauncherZLib.I18N
             var fallbackFileName = AddCultureNameToPath(baseFileName, _culture.GetConsoleFallbackUICulture());
             if (File.Exists(fallbackFileName))
             {
-                LoadLanguageFileImpl(domain, fallbackFileName);
+                LoadLanguageFileImpl(fallbackFileName);
             }
             // check en-US as last resort
             fallbackFileName = AddCultureNameToPath(baseFileName, CultureInfo.InvariantCulture);
             if (File.Exists(fallbackFileName))
             {
-                LoadLanguageFileImpl(domain, fallbackFileName);
+                LoadLanguageFileImpl(fallbackFileName);
             }
 
             // cannot load
@@ -98,13 +132,20 @@ namespace LauncherZLib.I18N
                 "Unable to find localization file: {0}. Fallback files not found.", expectedFileName));
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public void ReloadAllLanguageFiles()
         {
             _strings.Clear();
-            _loadedLanguageFiles.ForEach(t => LoadLanguageFile(t.Item1, t.Item2));
+            _loadedLanguageFiles.ForEach(LoadLanguageFile);
         }
 
-        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         public static string TrimCultureNameFromPath(string path)
         {
             string fileName = Path.GetFileName(path);
@@ -142,6 +183,12 @@ namespace LauncherZLib.I18N
             return path;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="culture"></param>
+        /// <returns></returns>
         public static string AddCultureNameToPath(string path, CultureInfo culture)
         {
             string fileName = Path.GetFileName(path);
@@ -171,7 +218,7 @@ namespace LauncherZLib.I18N
             }
         }
 
-        private void LoadLanguageFileImpl(string domain, string fileName)
+        private void LoadLanguageFileImpl(string fileName)
         {
             using (var sr = new StreamReader(fileName))
             {
@@ -195,9 +242,7 @@ namespace LauncherZLib.I18N
                         if (jr.TokenType != JsonToken.String)
                             throw new FormatException(string.Format("None string value at line {0}:{1}.",
                                 jr.LineNumber, jr.LinePosition));
-                        if (!_strings.ContainsKey(domain))
-                            _strings.Add(domain, new Dictionary<string, string>());
-                        _strings[domain][propName] = (string)jr.Value;
+                        _strings[propName] = (string)jr.Value;
                     }
                     else
                     {

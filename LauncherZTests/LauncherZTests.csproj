@@ -6,8 +6,8 @@
     <ProjectGuid>{2C46C4E2-35B2-4EE3-8EF7-C363E40719B5}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TestLauncherZ</RootNamespace>
-    <AssemblyName>TestLauncherZ</AssemblyName>
+    <RootNamespace>LauncherZTests</RootNamespace>
+    <AssemblyName>LauncherZTests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="TestEventBus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestLocalizationDictionary.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LauncherZLib\LauncherZLib.csproj">

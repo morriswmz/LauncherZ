@@ -2,7 +2,7 @@
 using LauncherZLib.Event;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace TestLauncherZ
+namespace LauncherZTests
 {
     [TestClass]
     public class TestEventBus
