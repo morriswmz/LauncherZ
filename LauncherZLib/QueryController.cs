@@ -1,73 +1,199 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Configuration;
+using System.Diagnostics.Contracts;
+using System.Linq;
+using System.Windows.Threading;
 using LauncherZLib.API;
-using LauncherZLib.LauncherTask;
-using LauncherZLib.LauncherTask.Provider;
+using LauncherZLib.Event;
+using LauncherZLib.Launcher;
+using LauncherZLib.Plugin;
 
 namespace LauncherZLib
 {
-    public class QueryController
+    public sealed class QueryController
     {
 
-        private readonly TaskProviderManager _providerManager;
-        private Dictionary<string, TaskProviderContainer> _taskProviderMap;
-        private Dictionary<string, double> _priorityMap;
+        private readonly PluginManager _pluginManager;
+        private readonly Dispatcher _dispatcher;
+        private readonly DispatcherTimer _tickTimer;
+        private int _divider = 0;
         private int _maxResults;
 
-        private ObservableCollection<TaskData> _results;
-        private ReadOnlyObservableCollection<TaskData> _resultsReadOnly;
+        private LauncherList _results;
+        private ReadOnlyObservableCollection<LauncherData> _resultsReadOnly;
+        private LauncherQuery _currentQuery;
+        private Dictionary<string, bool> _asyncCompleteFlags = new Dictionary<string, bool>(); 
+        
 
-        public QueryController(TaskProviderManager manager, int maxResults)
+        public QueryController(PluginManager manager, int maxResults)
         {
-            _providerManager = manager;
+            if (manager == null)
+                throw new ArgumentNullException("manager");
+
+            _pluginManager = manager;
+            _dispatcher = Dispatcher.CurrentDispatcher;
+            _tickTimer = new DispatcherTimer(DispatcherPriority.Normal, _dispatcher);
+            _tickTimer.Interval = new TimeSpan(0, 0, 0, 0, 50);
+            _tickTimer.Tick += TickTimer_Tick;
             _maxResults = maxResults;
-            _results = new ObservableCollection<TaskData>();
-            _resultsReadOnly = new ReadOnlyObservableCollection<TaskData>(_results);
+            _results = new LauncherList(new LauncherDataComparer(manager));
             
+            foreach (var pluginContainer in _pluginManager.SortedActivePlugins)
+            {
+                if (pluginContainer.IsAsync)
+                {
+                    pluginContainer.AsyncUpdate += Plugin_AsyncUpdate;
+                }
+            }
+
+            _pluginManager.PluginActivated += PluginManager_PluginActivated;
+            _pluginManager.PluginDeactivated += PluginManager_PluginDeactivated;
         }
 
-        public ReadOnlyObservableCollection<TaskData> Results { get { return _resultsReadOnly; } }
+        
 
-        public void DistributeQuery(TaskQuery query)
+        public LauncherList Results { get { return _results; } }
+
+        public void DistributeQuery(LauncherQuery query)
         {
             _results.Clear();
-            foreach (var container in _providerManager.ActiveProviders)
+            _currentQuery = query;
+            foreach (var container in _pluginManager.SortedActivePlugins)
             {
                 if (_results.Count > _maxResults)
-                    break;;
-                
+                    break;
+                // assign plugin id
+                var immResults = container.Query(query);
+                foreach (var commandData in immResults)
+                {
+                    commandData.PluginId = container.Id;
+                }
+                _results.AddRange(immResults);
             }
+            if (_results.Count > 0)
+                _tickTimer.Start();
         }
 
         public void ClearCurrentQuery()
         {
             _results.Clear();
+            _currentQuery = null;
         }
 
-        public bool RegisterTaskProvider(TaskProviderContainer provider)
+        #region Event Handling
+
+        private void TickTimer_Tick(object sender, EventArgs e)
         {
-            if (_taskProviderMap.ContainsKey(provider.Id))
-                return false;
-            _taskProviderMap.Add(provider.Id, provider);
-            return true;
+            if (_results.Count == 0)
+            {
+                _tickTimer.Stop();
+                _divider = 0;
+                return;
+            }
+            _divider++;
+            bool tickNormal = _divider%5 == 0;
+            bool tickSlow = false;
+            if (_divider == 20)
+            {
+                _divider = 0;
+                tickSlow = true;
+            }
+            foreach (var cmd in _results.Where(cmd => cmd.ExtendedProperties.Tickable))
+            {
+                bool shouldTick = cmd.ExtendedProperties.CurrentTickRate == TickRate.Fast;
+                shouldTick = shouldTick || (tickNormal && cmd.ExtendedProperties.CurrentTickRate == TickRate.Normal);
+                shouldTick = shouldTick || (tickSlow && cmd.ExtendedProperties.CurrentTickRate == TickRate.Slow);
+                if (shouldTick)
+                {
+                    _pluginManager.DistributeEventTo(cmd.PluginId, new LauncherTickEvent(cmd));
+                }    
+            }
         }
 
-        public double GetPriority(string providerId)
+
+        private void PluginManager_PluginDeactivated(object sender, PluginManagerEventArgs e)
         {
-            double p = -1.0;
-            _priorityMap.TryGetValue(providerId, out p);
-            return p;
+            PluginContainer container = _pluginManager.GetPluginContainer(e.PluginId);
+            if (container.IsAsync)
+            {
+                container.AsyncUpdate -= Plugin_AsyncUpdate;
+            }
         }
 
+        private void PluginManager_PluginActivated(object sender, PluginManagerEventArgs e)
+        {
+            PluginContainer container = _pluginManager.GetPluginContainer(e.PluginId);
+            if (container.IsAsync)
+            {
+                container.AsyncUpdate += Plugin_AsyncUpdate;
+            }
+        }
+        
         /// <summary>
         /// Handles asynchrounous results.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void AysncResultHandler(object sender, UpdateEventArgs e)
+        private void Plugin_AsyncUpdate(object sender, AsyncUpdateEventArgs e)
         {
-            
+            if (_dispatcher.CheckAccess())
+            {
+                DoAsyncUpdate((PluginContainer) sender, e);
+            }
+            else
+            {
+                _dispatcher.InvokeAsync(() => DoAsyncUpdate((PluginContainer) sender, e));
+            }
         }
 
+        private void DoAsyncUpdate(PluginContainer container, AsyncUpdateEventArgs e)
+        {
+            if (_currentQuery == null || _currentQuery.QueryId != e.QueryId)
+                return;
+            // assign plugin id;
+            foreach (var commandData in e.Results)
+            {
+                commandData.PluginId = container.Id;
+            }
+            _results.AddRange(e.Results);
+            // check final flag
+            if (e.IsFinal)
+                _asyncCompleteFlags[container.Id] = true;
+            // check timer
+            if (!_tickTimer.IsEnabled)
+                _tickTimer.Start();
+        }
+
+        #endregion
+
+        
+
+        sealed class LauncherDataComparer : IComparer<LauncherData>
+        {
+            private readonly PluginManager _pluginManager;
+
+            public LauncherDataComparer(PluginManager pluginManager)
+            {
+                _pluginManager = pluginManager;
+            }
+
+            public int Compare(LauncherData x, LauncherData y)
+            {
+                if (x.Relevance > y.Relevance)
+                    return 1;
+
+                if (x.Relevance < y.Relevance)
+                    return -1;
+
+                double xp = _pluginManager.GetPriorityOf(x.PluginId);
+                double yp = _pluginManager.GetPriorityOf(y.PluginId);
+                return xp.CompareTo(yp);
+            }
+        }
     }
+
+    
+
 }

@@ -1,0 +1,26 @@
+﻿{
+    "plugins": [
+        {
+            "id": "TestPlugin",
+            "name": "TestPlugin",
+            "authors": [ "morriswmz" ],
+            "version": "1.0.0.0",
+            "description": "For test purpose only.",
+            "priority": 0.0,
+            "plugin_type": "assembly",
+            "assembly": "CorePlugins.dll",
+            "plugin_class": "CorePlugins.TestPlugin"
+        },
+        {
+            "id": "LZCoreCommands",
+            "name": "LauncherZ Core Commands",
+            "authors": [ "morriswmz" ],
+            "version": "1.0.0.0",
+            "description": "Provide basic commands.",
+            "priority": 1.0,
+            "plugin_type": "assembly",
+            "assembly": "CorePlugins.dll",
+            "plugin_class": "CorePlugins.CoreCommands"
+        }
+    ]
+}

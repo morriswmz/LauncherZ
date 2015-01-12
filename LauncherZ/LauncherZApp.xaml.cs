@@ -11,8 +11,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using LauncherZLib.Icon;
-using LauncherZLib.LauncherTask.Provider;
+using LauncherZLib.Plugin;
 using LauncherZLib.Utils;
 
 namespace LauncherZ
@@ -42,7 +43,7 @@ namespace LauncherZ
 
         public SimpleLogger Logger { get; private set; }
 
-        internal TaskProviderManager ProviderManager { get; private set; }
+        internal PluginManager PluginManager { get; private set; }
         
         /// <summary>
         /// GUID of LauncherZ.
@@ -50,7 +51,7 @@ namespace LauncherZ
         public string AppGuid { get; private set; }
 
         public string AppDataBasePath { get; private set; }
-        public string ProviderDataPath { get; private set; }
+        public string PluginDataPath { get; private set; }
         public string LogPath { get; private set; }
 
         private void Application_Startup(object sender, StartupEventArgs e)
@@ -101,6 +102,7 @@ namespace LauncherZ
 
         private void InitilizeApp()
         {
+            AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
             // create app data files
             CreateAppDataFiles();
             // initialize logger
@@ -108,19 +110,27 @@ namespace LauncherZ
             // load configurations
             Logger.Info("Initialized.");
             // initialize components
-            ProviderManager = new TaskProviderManager();
-            IconManager = new IconManager(512, ProviderManager);
-            RegisterInternalIcon("IconProgram");
-            RegisterInternalIcon("IconGear");
-            RegisterInternalIcon("IconNetwork");
-            RegisterInternalIcon("IconCalculator");
-            IconManager.DefaultIcon = IconManager.GetIcon(new IconLocation("LauncherZ", "IconProgram"));
-
+            PluginManager = new PluginManager(Logger);
+            IconManager = new IconManager(512, PluginManager);
+            RegitserInternalIcons();
             // load plugins
-            ProviderManager.LoadAllFrom(Path.GetFullPath(@".\Providers"), ProviderDataPath, Logger);
-            ProviderManager.LoadAllFrom(string.Format("{0}{1}Providers", AppDataBasePath, Path.DirectorySeparatorChar), ProviderDataPath, Logger);
+            PluginManager.LoadAllFrom(Path.GetFullPath(@".\Plugins"), PluginDataPath);
+            PluginManager.LoadAllFrom(string.Format("{0}{1}Plugins", AppDataBasePath, Path.DirectorySeparatorChar), PluginDataPath);
 
             _appInitialized = true;
+        }
+
+        private void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            Logger.Severe(string.Format(
+                "An unhandled exception occurred. Application is unstable and terminating. Details: {0}{1}",
+                Environment.NewLine, e.ExceptionObject));
+            // emergency clean up
+            if (_appInitialized)
+            {
+                Logger.Close();
+            }
+            // leave it unhandled
         }
 
         private void CreateAppDataFiles()
@@ -130,26 +140,31 @@ namespace LauncherZ
 #if DEBUG
             string appDataBasePath = string.Format("{0}\\LauncherZ.Debug.{1}", userAppDataPath, AppGuid.Substring(0,8));
 #else
-            string appDataBasePath = string.Format("{0}\\LauncherZ.{1}", appDataPath, AppGuid.Substring(0,8));
+            string appDataBasePath = string.Format("{0}\\LauncherZ.{1}", userAppDataPath, AppGuid.Substring(0, 8));
 #endif
             if (!Directory.Exists(appDataBasePath))
                 Directory.CreateDirectory(appDataBasePath);
-            string providerDataPath = appDataBasePath + "\\Data";
-            if (!Directory.Exists(providerDataPath))
-                Directory.CreateDirectory(providerDataPath);
+            string pluginDataPath = appDataBasePath + "\\PluginData";
+            if (!Directory.Exists(pluginDataPath))
+                Directory.CreateDirectory(pluginDataPath);
             string logPath = appDataBasePath + "\\Logs";
             if (!Directory.Exists(logPath))
                 Directory.CreateDirectory(logPath);
 
             AppDataBasePath = appDataBasePath;
-            ProviderDataPath = providerDataPath;
+            PluginDataPath = pluginDataPath;
             LogPath = logPath;
         }
 
-        private void RegisterInternalIcon(string name)
+        private void RegitserInternalIcons()
         {
-            var bitmapImage = FindResource(name) as BitmapImage;
-            IconManager.RegisterPersistentIcon(new IconLocation("LauncherZ", name), bitmapImage);
+            string[] internalIconName = { "IconProgram", "IconGear", "IconNetwork", "IconCalculator", "IconFolder", "IconBlank" };
+            foreach (var s in internalIconName)
+            {
+                var bitmapImage = FindResource(s) as BitmapImage;
+                IconManager.RegisterPersistentIcon(new IconLocation("LauncherZ", s), bitmapImage);
+            }
+            IconManager.DefaultIcon = IconManager.GetIcon(new IconLocation("LauncherZ", "IconBlank"));
         }
 
         private void InitializeLogger()
@@ -162,7 +177,7 @@ namespace LauncherZ
                 .ToList()
                 .ForEach(f => f.Delete());
             // create new one
-            Logger = new SimpleLogger(string.Format("{0}\\{1}.log", LogPath, DateTime.Now.ToString("yyyy-MM-dd hh-mm-ss")));
+            Logger = new SimpleLogger(string.Format("{0}\\{1}.log", LogPath, DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")));
         }
         
         

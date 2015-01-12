@@ -67,9 +67,7 @@ namespace LauncherZLib.I18N
         /// <returns></returns>
         public string Translate(string strName)
         {
-            if (!_strings.ContainsKey(strName))
-                return strName;
-            return _strings[strName];
+            return !_strings.ContainsKey(strName) ? strName : _strings[strName];
         }
 
         /// <summary>
@@ -119,12 +117,14 @@ namespace LauncherZLib.I18N
             if (File.Exists(fallbackFileName))
             {
                 LoadLanguageFileImpl(fallbackFileName);
+                return;
             }
             // check en-US as last resort
-            fallbackFileName = AddCultureNameToPath(baseFileName, CultureInfo.InvariantCulture);
+            fallbackFileName = AddCultureNameToPath(baseFileName, CultureInfo.CreateSpecificCulture("en-US"));
             if (File.Exists(fallbackFileName))
             {
                 LoadLanguageFileImpl(fallbackFileName);
+                return;
             }
 
             // cannot load
@@ -154,7 +154,7 @@ namespace LauncherZLib.I18N
             // check existing extension
             if (string.IsNullOrEmpty(ext))
                 return path;
-            if (PossibleCultureNames.IndexOf(ext.ToLowerInvariant()) >= 0)
+            if (PossibleCultureNames.IndexOf(ext.TrimStart('.').ToLowerInvariant()) >= 0)
             {
                 // file extension is culture name
                 if (string.IsNullOrEmpty(dirName))
@@ -169,14 +169,14 @@ namespace LauncherZLib.I18N
             string cultureName = Path.GetExtension(fileNameNoLastExt);
             if (string.IsNullOrEmpty(cultureName))
                 return path;
-            if (PossibleCultureNames.IndexOf(cultureName.ToLowerInvariant()) >= 0)
+            if (PossibleCultureNames.IndexOf(cultureName.TrimStart('.').ToLowerInvariant()) >= 0)
             {
                 // file name is of format fff.en-US.xxx
                 if (string.IsNullOrEmpty(dirName))
                 {
-                    return string.Format("{0}.{1}", Path.GetFileNameWithoutExtension(fileNameNoLastExt), ext);
+                    return string.Format("{0}{1}", Path.GetFileNameWithoutExtension(fileNameNoLastExt), ext);
                 }
-                return string.Format("{0}{1}{2}.{3}",
+                return string.Format("{0}{1}{2}{3}",
                     dirName, Path.DirectorySeparatorChar,
                     Path.GetFileNameWithoutExtension(fileNameNoLastExt), ext);
             }
@@ -193,7 +193,7 @@ namespace LauncherZLib.I18N
         {
             string fileName = Path.GetFileName(path);
             string dirName = Path.GetDirectoryName(path);
-            string ext = Path.GetExtension(fileName);
+            string ext = Path.GetExtension(fileName); // note the dot is not removed!
             if (string.IsNullOrEmpty(ext))
             {
                 // no extension
@@ -208,10 +208,10 @@ namespace LauncherZLib.I18N
             {
                 // has extension
                 if (string.IsNullOrEmpty(dirName))
-                    return string.Format("{0}.{1}.{2}",
+                    return string.Format("{0}.{1}{2}",
                         Path.GetFileNameWithoutExtension(fileName),
                         culture.Name, ext);
-                return string.Format("{0}{1}{2}.{3}.{4}",
+                return string.Format("{0}{1}{2}.{3}{4}",
                     dirName, Path.DirectorySeparatorChar,
                     Path.GetFileNameWithoutExtension(fileName),
                     culture.Name, ext);
@@ -223,7 +223,6 @@ namespace LauncherZLib.I18N
             using (var sr = new StreamReader(fileName))
             {
                 var jr = new JsonTextReader(sr);
-                bool started = false, ended = false;
                 jr.Read();
                 if (jr.TokenType != JsonToken.StartObject)
                     throw new FormatException("{ expected at beginning.");

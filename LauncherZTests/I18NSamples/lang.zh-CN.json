@@ -1,0 +1,6 @@
+﻿{
+    "title": "您好",
+    "msg.error": "错误",
+    "msg.success": "成功",
+    "ui.welcome": "欢迎， {0}"
+}

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.InteropServices;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
 using LauncherZLib.API;
@@ -19,8 +20,17 @@ namespace LauncherZLib.Event
     public class EventBus : IEventBus
     {
 
-        private readonly Dictionary<Type, EventHandlerNode> _handlers = new Dictionary<Type, EventHandlerNode>();
+        // holds all registered handlers, flexible
+        private readonly Dictionary<Type, List<EventHandlerNode>> _handlers = new Dictionary<Type, List<EventHandlerNode>>();
+        
+        // caches all registered handlers, used when posting events
+        // so it is safe to register/unregister event handlers in event handlers
+        private readonly Dictionary<Type, EventHandlerNode[]> _handlerCache = new Dictionary<Type, EventHandlerNode[]>(); 
+        
+        // maps registered objects to associated handlers
         private readonly Dictionary<object, List<EventHandlerNode>> _objectMap = new Dictionary<object, List<EventHandlerNode>>();
+        
+        private bool _rebuildFlag = false;
 
         public void Register(object obj)
         {
@@ -43,14 +53,16 @@ namespace LauncherZLib.Event
                 {
                     // add handler
                     if (!_handlers.ContainsKey(node.EventType))
-                        _handlers[node.EventType] = new EventHandlerNode();
-                    AddNodeToLinkedList(_handlers[node.EventType], node);
+                        _handlers[node.EventType] = new List<EventHandlerNode>();
+                    _handlers[node.EventType].Add(node);
 
                     if (!_objectMap.ContainsKey(obj))
                         _objectMap[obj] = new List<EventHandlerNode>();
                     _objectMap[obj].Add(node);
+                    _rebuildFlag = true;
                 }
             }
+
         }
 
         public void Unregister(object obj)
@@ -59,53 +71,45 @@ namespace LauncherZLib.Event
                 return;
             foreach (var node in _objectMap[obj])
             {
-                EventHandlerNode head = _handlers[node.EventType];
-                RemoveNodeFromLinkedList(head, node);
+                _handlers[node.EventType].Remove(node);
             }
             _objectMap[obj].Clear();
             _objectMap.Remove(obj);
+            _rebuildFlag = true;
         }
 
         public void UnregisterAll()
         {
-            
+            object[] objects = _objectMap.Keys.ToArray();
+            foreach (var o in objects)
+            {
+                Unregister(o);
+            }
         }
 
         public void Post(EventBase e)
         {
-            EventHandlerNode node;
-            if (_handlers.TryGetValue(e.GetType(), out node))
+            if (_rebuildFlag)
+                RebuildCache();
+
+            EventHandlerNode[] handlers;
+            if (_handlerCache.TryGetValue(e.GetType(), out handlers))
             {
-                while (node.Next != null)
+                foreach (var node in handlers)
                 {
-                    node = node.Next;
                     node.Handle(e);
                 }
             }
         }
 
-        private void AddNodeToLinkedList(EventHandlerNode head, EventHandlerNode node)
+        private void RebuildCache()
         {
-            EventHandlerNode tail = head;
-            while (tail.Next != null)
-                tail = tail.Next;
-            tail.Next = node;
-            node.Next = null;
-        }
-
-        private bool RemoveNodeFromLinkedList(EventHandlerNode head, EventHandlerNode node)
-        {
-            EventHandlerNode current = head;
-            while (current.Next != null)
+            _handlerCache.Clear();
+            foreach (var pair in _handlers)
             {
-                if (current.Next == node)
-                {
-                    current.Next = node.Next;
-                    return true;
-                }
-                current = current.Next;
+                _handlerCache[pair.Key] = pair.Value.ToArray();
             }
-            return false;
+            _rebuildFlag = false;
         }
         
         private EventHandlerNode CreateHandlerNode(object obj, MethodInfo method)
@@ -158,7 +162,6 @@ namespace LauncherZLib.Event
         {
             public Type EventType { get; private set; }
             public object Instance { get; private set; }
-            public EventHandlerNode Next { get; set; }
 
             private readonly Action<object, EventBase> _dynamicHandler;
             
@@ -169,13 +172,6 @@ namespace LauncherZLib.Event
                 Instance = instance;
                 EventType = eventType;
                 _dynamicHandler = handler;
-            }
-
-            public EventHandlerNode()
-            {
-                Instance = null;
-                EventType = typeof (void);
-                _dynamicHandler = NopHandler;
             }
 
             public void Handle(EventBase e)

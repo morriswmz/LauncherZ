@@ -11,19 +11,19 @@ namespace LauncherZLib.Event
     /// </summary>
     public abstract class EventBase
     {
-        private bool _defaultPrevented = false;
+        protected bool DefaultPrevented;
 
         /// <summary>
         /// Gets whether the default behavior associated with this event is stopped from happening.
         /// </summary>
-        public bool IsDefaultPrevented { get { return _defaultPrevented; } }
+        public virtual bool IsDefaultPrevented { get { return DefaultPrevented; } }
 
         /// <summary>
         /// Stops the default behavior from happending
         /// </summary>
-        public void PreventDefault()
+        public virtual void PreventDefault()
         {
-            _defaultPrevented = true;
+            DefaultPrevented = true;
         }
 
     }

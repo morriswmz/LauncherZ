@@ -17,6 +17,7 @@ namespace LauncherZLib
         public IEnumerable<string> GetAutoCompletions(string context, int limit)
         {
             throw new NotImplementedException();
+           
         }
     }
 }

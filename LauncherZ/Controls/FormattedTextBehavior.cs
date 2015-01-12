@@ -90,7 +90,7 @@ namespace LauncherZ.Controls
                     sb.Append(text[idx]);
                     idx++;
                 }
-                else if ("[~_".IndexOf(c) >= 0)
+                else if ("[~_{".IndexOf(c) >= 0)
                 {
                     // check formatted segment
                     FormattedSegment segment;

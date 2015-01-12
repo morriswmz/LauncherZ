@@ -31,30 +31,30 @@
     <!-- Styles for task data entry. -->
     <Style x:Key="TaskTitleStyle" TargetType="TextBlock">
         <Setter Property="FontSize" Value="16"></Setter>
+        <Setter Property="FontFamily" Value="Segoe UI"></Setter>
         <Setter Property="Foreground" Value="White"></Setter>
     </Style>
     <Style x:Key="TaskDescriptionStyle" TargetType="TextBlock">
         <Setter Property="FontSize" Value="12"></Setter>
+        <Setter Property="FontFamily" Value="Segoe UI"></Setter>
         <Setter Property="Foreground" Value="#FFEEEEEE"></Setter>
     </Style>
     
-    <!-- Style for list box. -->
-    <Style x:Key="TaskListBoxItemContainerStyle" TargetType="ListBoxItem">
-        <Setter Property="FocusVisualStyle" Value="{x:Null}"></Setter>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="ListBoxItem">
-                    <Border x:Name="ListItemBorder" SnapsToDevicePixels="True" BorderThickness="1" BorderBrush="Transparent">
-                        <ContentPresenter></ContentPresenter>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsSelected" Value="True">
-                            <Setter TargetName="ListItemBorder" Property="BorderBrush" Value="{StaticResource DefaultBorderBrush}"></Setter>
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
+    <!-- Style for highlight box -->
+    <Style x:Key="HighlightBoxStyle" TargetType="Rectangle">
+        <Setter Property="Fill" Value="#33E8E8E8"></Setter>
+        <Setter Property="Stroke" Value="White"></Setter>
+        <Style.Triggers>
+            <Trigger Property="Visibility" Value="Visible">
+                <Trigger.EnterActions>
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.0" To="1.0" Duration="0:0:0.1"></DoubleAnimation>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </Trigger.EnterActions>
+            </Trigger>
+        </Style.Triggers>
     </Style>
     
     <!-- Icons -->
@@ -62,4 +62,6 @@
     <BitmapImage x:Key="IconGear" UriSource="../Assets/IconGear.png" PresentationOptions:Freeze="True"></BitmapImage>
     <BitmapImage x:Key="IconNetwork" UriSource="../Assets/IconNetwork.png" PresentationOptions:Freeze="True"></BitmapImage>
     <BitmapImage x:Key="IconCalculator" UriSource="../Assets/IconCalculator.png" PresentationOptions:Freeze="True"></BitmapImage>
+    <BitmapImage x:Key="IconFolder" UriSource="../Assets/IconFolder.png" PresentationOptions:Freeze="True"></BitmapImage>
+    <BitmapImage x:Key="IconBlank" UriSource="../Assets/IconBlank.png" PresentationOptions:Freeze="True"></BitmapImage>
 </ResourceDictionary>

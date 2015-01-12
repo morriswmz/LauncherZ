@@ -85,33 +85,32 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Controls\LauncherSelectionChangedEventArgs.cs" />
     <Compile Include="Controls\FormattedTextBehavior.cs" />
-    <Compile Include="Controls\TaskCustomRenderEvent.cs" />
-    <Compile Include="Controls\TaskDataEntry.xaml.cs">
+    <Compile Include="Controls\LauncherDataItem.xaml.cs">
       <SubType>Code</SubType>
-      <DependentUpon>TaskDataEntry.xaml</DependentUpon>
+      <DependentUpon>LauncherDataItem.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\TaskIconBehavior.cs" />
-    <Compile Include="Controls\TaskInput.xaml.cs">
-      <DependentUpon>TaskInput.xaml</DependentUpon>
+    <Compile Include="Controls\LauncherIconBehavior.cs" />
+    <Compile Include="Controls\LauncherInput.xaml.cs">
+      <DependentUpon>LauncherInput.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\TaskList.xaml.cs">
-      <DependentUpon>TaskList.xaml</DependentUpon>
+    <Compile Include="Controls\LauncherListView.xaml.cs">
+      <DependentUpon>LauncherListView.xaml</DependentUpon>
     </Compile>
     <Compile Include="DetailWindow.xaml.cs">
       <DependentUpon>DetailWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="LauncherZConfig.cs" />
-    <Compile Include="Plugin\IPlugin.cs" />
-    <Page Include="Controls\TaskDataEntry.xaml">
+    <Page Include="Controls\LauncherDataItem.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Controls\TaskInput.xaml">
+    <Page Include="Controls\LauncherInput.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Controls\TaskList.xaml">
+    <Page Include="Controls\LauncherListView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -183,6 +182,12 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Assets\IconFolder.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\IconBlank.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
     <Content Include="Assets\IconCalculator.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -202,6 +207,7 @@
       <Name>LauncherZLib</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

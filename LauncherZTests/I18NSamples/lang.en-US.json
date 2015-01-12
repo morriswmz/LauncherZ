@@ -1,0 +1,6 @@
+﻿{
+    "title": "Hello",
+    "msg.error": "Error",
+    "msg.success": "Success",
+    "ui.welcome": "Welcome, {0}"
+}

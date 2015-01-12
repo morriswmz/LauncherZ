@@ -1,0 +1,18 @@
+﻿<UserControl
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             x:Name="CtlCommandListView" x:Class="LauncherZ.Controls.LauncherListView" 
+             mc:Ignorable="d" 
+             d:DesignWidth="480" Padding="0,5">
+    <Grid>
+
+        <ScrollViewer x:Name="CtlScrollViewer" x:FieldModifier="private" VerticalScrollBarVisibility="Hidden" HorizontalContentAlignment="Stretch">
+            <Grid>
+                <Rectangle x:Name="CtlHighlightBox" x:FieldModifier="private" HorizontalAlignment="Left" Height="80" VerticalAlignment="Top" Width="480" Margin="0" Style="{DynamicResource HighlightBoxStyle}"/>
+                <StackPanel x:Name="CtlLauncherPanel" x:FieldModifier="private"/>
+            </Grid>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

@@ -145,7 +145,7 @@ namespace LauncherZLib.Utils
         /// Will be the default value of TValue if given key is not found.
         /// </param>
         /// <returns>True is key exists.</returns>
-        public bool SafeGet(TKey key, out TValue value)
+        public bool TryGet(TKey key, out TValue value)
         {
             lock (_lock)
             {

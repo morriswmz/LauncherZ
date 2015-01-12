@@ -2,9 +2,11 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using LauncherZLib.API;
 using LauncherZLib.Utils;
@@ -14,22 +16,32 @@ namespace LauncherZLib.Icon
     public class IconManager
     {
 
-        public delegate void IconLoadedHandler(IconLocation location, BitmapImage icon);
+        public delegate void IconLoadedHandler(IconLocation location, BitmapSource icon);
 
-        private Dictionary<IconLocation, BitmapImage> _persistentIcons = new Dictionary<IconLocation, BitmapImage>();
-        private SimpleCache<IconLocation, BitmapImage> _cachedIcons;
+        // stores persistent icons
+        private Dictionary<IconLocation, BitmapSource> _persistentIcons = new Dictionary<IconLocation, BitmapSource>();
+        // stores cached icons, provides quick lookup of non-persistent icons
+        private SimpleCache<IconLocation, BitmapSource> _cachedIcons;
+        // caches loaded icons
+        private SimpleCache<string, BitmapSource> _loadingCache;
+ 
         private ConcurrentQueue<IconLocation> _pending = new ConcurrentQueue<IconLocation>();
         private Dictionary<IconLocation, List<IconLoadedHandler>> _handlers = new Dictionary<IconLocation, List<IconLoadedHandler>>();
         private IIconLocationResolver _resolver;
         private readonly object _loadLock = new object();
 
+        private static readonly string DirectoryKey = ".";
+
         public IconManager(int cacheCapacity, IIconLocationResolver resolver)
         {
             _resolver = resolver;
-            _cachedIcons = new SimpleCache<IconLocation, BitmapImage>(cacheCapacity);
+            _cachedIcons = new SimpleCache<IconLocation, BitmapSource>(cacheCapacity);
+            _loadingCache = new SimpleCache<string, BitmapSource>(cacheCapacity);
         }
 
-        public BitmapImage DefaultIcon { get; set; }
+        public Brush ThumbnailBorderBrush { get; set; }
+
+        public BitmapSource DefaultIcon { get; set; }
 
         public bool ContainsIcon(IconLocation location)
         {
@@ -39,19 +51,20 @@ namespace LauncherZLib.Icon
             }
         }
 
-        public BitmapImage GetIcon(IconLocation location)
+        public BitmapSource GetIcon(IconLocation location)
         {
             lock (_loadLock)
             {
-                if (_persistentIcons.ContainsKey(location))
-                    return _persistentIcons[location];
-                if (_cachedIcons.ContainsKey(location))
-                    return _cachedIcons[location];
+                BitmapSource icon;
+                if (_persistentIcons.TryGetValue(location, out icon))
+                    return icon;
+                if (_cachedIcons.TryGet(location, out icon))
+                    return icon;
                 return DefaultIcon;
             }
         }
 
-        public void RegisterPersistentIcon(IconLocation location, BitmapImage icon)
+        public void RegisterPersistentIcon(IconLocation location, BitmapSource icon)
         {
             if (!icon.IsFrozen)
             {
@@ -63,7 +76,7 @@ namespace LauncherZLib.Icon
             }
         }
 
-        public BitmapImage Load(IconLocation location, bool persistent)
+        public BitmapSource Load(IconLocation location, bool persistent)
         {
             throw new NotImplementedException();
         }
@@ -73,15 +86,16 @@ namespace LauncherZLib.Icon
             bool initLoad = false;
             lock (_loadLock)
             {
+                BitmapSource icon;
                 // check if icon is already loaded
-                if (_persistentIcons.ContainsKey(location))
+                if (_persistentIcons.TryGetValue(location, out icon))
                 {
-                    callback(location, _persistentIcons[location]);
+                    callback(location, icon);
                     return;
                 }
-                if (_cachedIcons.ContainsKey(location))
+                if (_cachedIcons.TryGet(location, out icon))
                 {
-                    callback(location, _cachedIcons[location]);
+                    callback(location, icon);
                     return;
                 }
                 // check if load is initialized
@@ -98,7 +112,7 @@ namespace LauncherZLib.Icon
             }
             if (initLoad)
             {
-                BitmapImage icon = await Task.Run(() => LoadImpl(location)) ?? DefaultIcon;
+                BitmapSource icon = await Task.Run(() => LoadImpl(location)) ?? DefaultIcon;
                 lock (_loadLock)
                 {
                     if (persistent)
@@ -112,9 +126,53 @@ namespace LauncherZLib.Icon
             }
         }
 
-        private BitmapImage LoadImpl(IconLocation location)
+        private BitmapSource LoadImpl(IconLocation location)
         {
-            return null;
+            string path;
+            if (!_resolver.TryResolve(location, out path))
+                return null;
+            // check file
+            BitmapSource icon = null;
+            if (Directory.Exists(path))
+            {
+                // check directory icon
+                if (_loadingCache.TryGet(DirectoryKey, out icon))
+                    return icon;
+                icon = IconLoader.LoadDirectoryIcon(IconSize.Large);
+                if (icon != null)
+                    _loadingCache[DirectoryKey] = icon;
+            }
+            else if (File.Exists(path))
+            {
+                // check normal file icon
+                path = Path.GetFullPath(path);
+                // check loading cache first
+                if (_loadingCache.TryGet(path, out icon))
+                    return icon;
+                string ext = Path.GetExtension(path);
+                // supported image file, generate thumbnail
+                if (IconLoader.IsSupportedImageFileExtension(ext))
+                {
+                    // generate thumbnail first
+                    icon = IconLoader.LoadThumbnail(path, IconSize.Large, ThumbnailBorderBrush);
+
+                    // if fails, continue execution and use file type icon
+
+                }
+                // check loading cache for extension
+                if (string.IsNullOrEmpty(ext) && _loadingCache.TryGet(ext, out icon))
+                    return icon;
+                // load asssociated icon
+                icon = IconLoader.LoadFileIcon(path, IconSize.Large);
+                // save general file type icon
+                // note that .exe and .lnk have distinct icons and are skipped
+                if (icon != null && !string.IsNullOrEmpty(ext) &&
+                    ".exe.lnk".IndexOf(ext, StringComparison.OrdinalIgnoreCase) < 0)
+                {
+                    _loadingCache[ext] = icon;
+                }
+            }
+            return icon;
         }
     
     }
