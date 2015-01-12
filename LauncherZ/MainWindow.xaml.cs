@@ -1,24 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Interop;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 using LauncherZ.Controls;
 using LauncherZLib;
 using LauncherZLib.Event;
-using LauncherZLib.Icon;
 using LauncherZLib.Launcher;
 using LauncherZLib.Utils;
 
@@ -42,10 +30,10 @@ namespace LauncherZ
         public MainWindow()
         {
             InitializeComponent();
-
+            // register global hotkey
             _switchHotkey.Register(this, 0);
             _switchHotkey.HotkeyPressed += SwitchHotkey_HotkeyPressed;
-
+            // init controls
             CtlUserInput.FocusText();
             CtlLauncherList.DataContext = _queryController.Results;
             CtlLauncherList.SelectedIndex = 0;
