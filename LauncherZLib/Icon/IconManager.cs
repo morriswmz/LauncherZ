@@ -155,24 +155,31 @@ namespace LauncherZLib.Icon
                 {
                     // generate thumbnail first
                     icon = IconLoader.LoadThumbnail(path, IconSize.Large, ThumbnailBorderBrush);
-
-                    // if fails, continue execution and use file type icon
-
+                    if (icon != null)
+                    {
+                        _loadingCache[path] = icon;
+                        return icon;
+                    }
+                    // if fails, continue execution and use file type icon (out of if)
                 }
                 // check loading cache for extension
-                if (string.IsNullOrEmpty(ext) && _loadingCache.TryGet(ext, out icon))
+                if (!string.IsNullOrEmpty(ext) && _loadingCache.TryGet(ext, out icon))
                     return icon;
                 // load asssociated icon
                 icon = IconLoader.LoadFileIcon(path, IconSize.Large);
-                // save general file type icon
+                // save general file type icon if successful
                 // note that .exe and .lnk have distinct icons and are skipped
-                if (icon != null && !string.IsNullOrEmpty(ext) &&
-                    ".exe.lnk".IndexOf(ext, StringComparison.OrdinalIgnoreCase) < 0)
+                if (icon != null)
                 {
-                    _loadingCache[ext] = icon;
+                    if (!string.IsNullOrEmpty(ext) &&
+                        ".exe.lnk".IndexOf(ext, StringComparison.OrdinalIgnoreCase) < 0)
+                    {
+                        _loadingCache[ext] = icon;
+                    }
+                    return icon;
                 }
             }
-            return icon;
+            return null;
         }
     
     }

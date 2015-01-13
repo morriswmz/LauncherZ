@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using LauncherZLib.Icon;
@@ -165,6 +166,7 @@ namespace LauncherZ
                 IconManager.RegisterPersistentIcon(new IconLocation("LauncherZ", s), bitmapImage);
             }
             IconManager.DefaultIcon = IconManager.GetIcon(new IconLocation("LauncherZ", "IconBlank"));
+            IconManager.ThumbnailBorderBrush = Brushes.White;
         }
 
         private void InitializeLogger()

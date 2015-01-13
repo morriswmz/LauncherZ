@@ -31,7 +31,7 @@ namespace CorePlugins
             {
                 return new List<LauncherData>()
                 {
-                    new LauncherData("Total CPU Usage", "", "LauncherZ|IconNetwork", 1.0,
+                    new LauncherData("Total CPU Usage", "", @"LauncherZ|IconGear", 1.0,
                         new LauncherExtendedProperties(true, TickRate.Normal))
                 };
             }

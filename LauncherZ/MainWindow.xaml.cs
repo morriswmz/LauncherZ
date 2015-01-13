@@ -39,7 +39,7 @@ namespace LauncherZ
             CtlLauncherList.SelectedIndex = 0;
             
             var cultureInfo = Thread.CurrentThread.CurrentCulture;
-
+            
             
         }
 

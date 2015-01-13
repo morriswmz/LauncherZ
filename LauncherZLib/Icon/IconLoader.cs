@@ -50,7 +50,50 @@ namespace LauncherZLib.Icon
 
         public static BitmapSource LoadThumbnail(string path, IconSize size, Brush borderBrush)
         {
-            return null;
+            int sizeLimit = size == IconSize.Small ? 16 : 32;
+            int borderThickness = size == IconSize.Small ? 1 : 2;
+            var image = new BitmapImage();
+            // read information without actual decoding
+            image.BeginInit();
+            image.UriSource = new Uri(path, UriKind.Absolute);
+            image.CacheOption = BitmapCacheOption.None;
+            image.EndInit();
+            image.Freeze();
+            bool isLandScape = image.PixelWidth > image.PixelHeight;
+            // now do the actual loading
+            image = new BitmapImage();
+            image.BeginInit();
+            if (isLandScape)
+            {
+                image.DecodePixelHeight = sizeLimit;
+            }
+            else
+            {
+                image.DecodePixelWidth = sizeLimit;
+            }
+            image.UriSource = new Uri(path, UriKind.Absolute);
+            image.CacheOption = BitmapCacheOption.None;
+            image.EndInit();
+            image.Freeze(); // wpf is lazy, it is likely that the image is still not decoded
+            // draw the thumbnail
+            var drawingVisual = new DrawingVisual();
+            using (DrawingContext drawingContext = drawingVisual.RenderOpen())
+            {
+                // draw image
+                var imageRect = isLandScape
+                    ? new Rect(-(image.PixelWidth - image.PixelHeight)/2.0, 0, image.PixelWidth, sizeLimit)
+                    : new Rect(0, -(image.PixelHeight - image.PixelWidth) / 2.0, sizeLimit, image.PixelHeight);
+                drawingContext.DrawImage(image, imageRect);
+                // draw border
+                var borderRect = new Rect(borderThickness / 2.0, borderThickness / 2.0,
+                    sizeLimit - borderThickness, sizeLimit - borderThickness);
+                drawingContext.DrawRectangle(Brushes.Transparent, new Pen(borderBrush, borderThickness), borderRect);
+            }
+            // render, defaults to 96dpi
+            var renderTarget = new RenderTargetBitmap(sizeLimit, sizeLimit, 96.0, 96.0, PixelFormats.Pbgra32);
+            renderTarget.Render(drawingVisual);
+            renderTarget.Freeze();
+            return renderTarget;
         }
 
         private static BitmapSource GetFileIcon(string path, IconSize size)

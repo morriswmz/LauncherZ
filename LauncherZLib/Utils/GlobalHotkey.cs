@@ -9,6 +9,10 @@ using LauncherZLib.Win32;
 
 namespace LauncherZLib.Utils
 {
+
+    /// <summary>
+    /// Helps define and register a global hotkey.
+    /// </summary>
     public class GlobalHotkey : IDisposable
     {
 
@@ -20,6 +24,10 @@ namespace LauncherZLib.Utils
         private readonly uint _modifiers;
         private HwndSource _hSource;
         
+        /// <summary>
+        /// Initialize a global hotkey with specified key combination.
+        /// </summary>
+        /// <param name="keyCombo">A valid key combination. e.g. Win+OemQuestion</param>
         public GlobalHotkey(string keyCombo)
         {
             IsRegistered = false;
@@ -72,37 +80,91 @@ namespace LauncherZLib.Utils
             Dispose(false);
         }
 
+        /// <summary>
+        /// Occurs when registered global hotkey is pressed.
+        /// </summary>
         public event EventHandler HotkeyPressed;
 
+        /// <summary>
+        /// Gets the id associated with the global hotkey.
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="T:System.InvalidOperationException">
+        /// Thrown when the global hotkey is unregistered.
+        /// </exception>
+        /// <exception cref="T:System.ObjectDisposedException">
+        /// Thrown when the object is disposed.
+        /// </exception>
         public int GetId()
         {
             VerifyStatus(true);
             return _id;
         }
 
+        /// <summary>
+        /// Gets the window handle used in registeration.
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="T:System.InvalidOperationException">
+        /// Thrown when the global hotkey is unregistered.
+        /// </exception>
+        /// <exception cref="T:System.ObjectDisposedException">
+        /// Thrown when the object is disposed.
+        /// </exception>
         public IntPtr GetHandle()
         {
             VerifyStatus(true);
             return _hWnd;
         }
 
+        /// <summary>
+        /// Gets the key combination as an array.
+        /// </summary>
+        /// <returns></returns>
         public Key[] GetKeyCombination()
         {
             return (Key[])_keys.Clone();
         }
 
+        /// <summary>
+        /// Gets whether the global hotkey is registered.
+        /// </summary>
         public bool IsRegistered { get; private set; }
 
+        /// <summary>
+        /// Gets the hotkey in the key combination.
+        /// </summary>
         public Key Hotkey { get { return _hotkey; } }
 
+        /// <summary>
+        /// Gets whether the global hotkey has control key as modifier.
+        /// </summary>
         public bool HasControlModifier { get { return (_modifiers & User32.MOD_CONTROL) > 0; } }
 
+        /// <summary>
+        /// Gets whether the global hotkey has alt key as modifier.
+        /// </summary>
         public bool HasAltModifier { get { return (_modifiers & User32.MOD_ALT) > 0; } }
 
+        /// <summary>
+        /// Gets whether the global hotkey has shift key as modifier.
+        /// </summary>
         public bool HasShiftModifier { get { return (_modifiers & User32.MOD_SHIFT) > 0; } }
 
+        /// <summary>
+        /// Gets whether the global hotkey has win key as modifier.
+        /// </summary>
         public bool HasWinModifier { get { return (_modifiers & User32.MOD_WIN) > 0; } }
 
+        /// <summary>
+        /// Registers the global hotkey.
+        /// If the global hotkey is already registered, <see cref="T:System.InvalidOperationException"/>
+        /// will be thrown.
+        /// </summary>
+        /// <param name="window">Associated window to receive WM_HOTKEY.</param>
+        /// <param name="id">Associated id for the hotkey. With the same window, this value must be unique
+        /// for different global hotkeys.</param>
+        /// <returns></returns>
         public GlobalHotkey Register(Window window, int id)
         {
             VerifyStatus(false);
@@ -127,6 +189,12 @@ namespace LauncherZLib.Utils
             return this;
         }
 
+        /// <summary>
+        /// Unregisters the global hotkey.
+        /// If the global hotkey is already unregistered, <see cref="T:System.InvalidOperationException"/>
+        /// will be thrown.
+        /// </summary>
+        /// <returns></returns>
         public GlobalHotkey Unregister()
         {
             VerifyStatus(true);
@@ -137,9 +205,11 @@ namespace LauncherZLib.Utils
             IsRegistered = false;
             return this;
         }
-
         
-
+        /// <summary>
+        /// Disposes the object.
+        /// Global hotkey will be unregistered and unmanaged resources will be released.
+        /// </summary>
         public void Dispose()
         {
             Dispose(true);
@@ -151,12 +221,17 @@ namespace LauncherZLib.Utils
             if (_disposed)
                 return;
 
+            // dispose managed resources
             if (disposing)
             {
                 if (_hSource != null)
+                {
+                    _hSource.RemoveHook(HotkeyHook);
                     _hSource.Dispose();
+                }
             }
 
+            // dispose unmanaged resources
             if (IsRegistered)
             {
                 IsRegistered = false;
