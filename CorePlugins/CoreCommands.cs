@@ -27,7 +27,7 @@ namespace CorePlugins
 
         public IEnumerable<LauncherData> Query(LauncherQuery query)
         {
-            if (query.RawInput.ToLower() == "date")
+            if (query.RawInput.ToLower() == "cpu")
             {
                 return new List<LauncherData>()
                 {
@@ -40,7 +40,7 @@ namespace CorePlugins
 
 
         [SubscribeEvent]
-        public void CommandItemTickHandler(LauncherTickEvent e)
+        public void LauncherTickHandler(LauncherTickEvent e)
         {
             var cpu = (int) _cpuCounter.NextValue();
             var bars = 20*cpu/100;

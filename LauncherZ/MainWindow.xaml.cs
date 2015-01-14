@@ -65,7 +65,7 @@ namespace LauncherZ
             if (!_deactivating)
             {
                 _deactivating = true;
-                CtlUserInput.Text = "";
+                CtlUserInput.SetTextWithoutNotification("");
                 // force clear
                 _queryController.ClearCurrentQuery();
                 // ensure render updates
@@ -98,30 +98,16 @@ namespace LauncherZ
                 CtlUserInput.FocusText();
             }
 
-            
 
-            //if (e.Key.Equals(Key.Down))
-            //{
-            //    CtlLauncherList.SelectNext();
-            //} else if (e.Key.Equals(Key.Up))
-            //{
-            //    CtlLauncherList.SelectPrevious();
-            //}
-            
-            //if (e.Key.Equals(Key.Tab))
-            //{
-            //    CtlUserInput.HintText = CtlUserInput.Text;
-            //    sampleList[0].Description += "\nNewLine";
-            //    if (detailWindow == null)
-            //    {
-            //        detailWindow = new DetailWindow();
-            //        detailWindow.Show();
-            //        detailWindow.Top = Top;
-            //        detailWindow.Left = Left + ActualWidth + 10;
-            //    }
-            //    detailWindow.CtlDetailText.Text = CtlUserInput.Text;
-            //    e.Handled = true;
-            //}
+
+            if (e.Key.Equals(Key.Down))
+            {
+                CtlLauncherList.SelectNext();
+            }
+            else if (e.Key.Equals(Key.Up))
+            {
+                CtlLauncherList.SelectPrevious();
+            }
             else if (e.Key.Equals(Key.Escape))
             {
                 ClearAndHide();
@@ -130,11 +116,31 @@ namespace LauncherZ
 
         private void MainWindow_PreviewKeyUp(object sender, KeyEventArgs e)
         {
-            
-            if (e.Key.Equals(Key.Down) || e.Key.Equals(Key.Up))
-                return;
-            
-            
+            if (e.Key.Equals(Key.Enter))
+            {
+                LauncherData launcherData = CtlLauncherList.SelectedLauncher;
+                if (launcherData != null)
+                {
+                    var executedEvent = new LauncherExecutedEvent(launcherData, _queryController.CurrentQuery);
+                    LauncherZApp.Instance.PluginManager.DistributeEventTo(launcherData.PluginId, executedEvent);
+                    if (executedEvent.IsDefaultPrevented)
+                    {
+                        if (executedEvent.HideWindow)
+                        {
+                            ClearAndHide();
+                        }
+                        if (executedEvent.ModifiedInput != CtlUserInput.Text)
+                        {
+                            CtlUserInput.SetTextAndNotify(executedEvent.ModifiedInput);
+                        }
+                    }
+                    else
+                    {
+                        ClearAndHide();
+                    }
+                    e.Handled = true;
+                }
+            }
         }
 
         private void CtlUserInput_OnDelayedTextChanged(object sender, RoutedEventArgs e)

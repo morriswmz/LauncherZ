@@ -104,6 +104,15 @@ namespace LauncherZ.Controls
         }
 
         /// <summary>
+        /// Retrieves the LauncherData associated with current selection.
+        /// If SelectedIndex is -1, null will be returned.
+        /// </summary>
+        public LauncherData SelectedLauncher
+        {
+            get { return GetAssociatedLauncherDataAt(SelectedIndex); }
+        }
+
+        /// <summary>
         /// Gets the number of items.
         /// </summary>
         public int ItemCount

@@ -163,7 +163,7 @@ namespace LauncherZ
             foreach (var s in internalIconName)
             {
                 var bitmapImage = FindResource(s) as BitmapImage;
-                IconManager.RegisterPersistentIcon(new IconLocation("LauncherZ", s), bitmapImage);
+                IconManager.AddIcon(new IconLocation("LauncherZ", s), bitmapImage, true);
             }
             IconManager.DefaultIcon = IconManager.GetIcon(new IconLocation("LauncherZ", "IconBlank"));
             IconManager.ThumbnailBorderBrush = Brushes.White;

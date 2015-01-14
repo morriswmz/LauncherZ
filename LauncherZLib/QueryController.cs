@@ -52,7 +52,7 @@ namespace LauncherZLib
             _pluginManager.PluginDeactivated += PluginManager_PluginDeactivated;
         }
 
-        
+        public LauncherQuery CurrentQuery { get { return _currentQuery; } }
 
         public LauncherList Results { get { return _results; } }
 

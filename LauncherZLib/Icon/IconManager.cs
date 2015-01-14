@@ -63,8 +63,13 @@ namespace LauncherZLib.Icon
                 return DefaultIcon;
             }
         }
+        
+        public void AddIcon(IconLocation location, bool persistent)
+        {
+            throw new NotImplementedException();
+        }
 
-        public void RegisterPersistentIcon(IconLocation location, BitmapSource icon)
+        public void AddIcon(IconLocation location, BitmapSource icon, bool persistent)
         {
             if (!icon.IsFrozen)
             {
@@ -72,16 +77,19 @@ namespace LauncherZLib.Icon
             }
             lock (_loadLock)
             {
-                _persistentIcons[location] = icon;
+                if (persistent)
+                {
+                    _persistentIcons[location] = icon;
+                }
+                else
+                {
+                    _cachedIcons[location] = icon;
+                }
+                
             }
         }
 
-        public BitmapSource Load(IconLocation location, bool persistent)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async void LoadAsync(IconLocation location, bool persistent, IconLoadedHandler callback)
+        public async void AddIconAsync(IconLocation location, bool persistent, IconLoadedHandler callback)
         {
             bool initLoad = false;
             lock (_loadLock)
@@ -112,7 +120,7 @@ namespace LauncherZLib.Icon
             }
             if (initLoad)
             {
-                BitmapSource icon = await Task.Run(() => LoadImpl(location)) ?? DefaultIcon;
+                BitmapSource icon = await Task.Run(() => AddImpl(location)) ?? DefaultIcon;
                 lock (_loadLock)
                 {
                     if (persistent)
@@ -126,7 +134,7 @@ namespace LauncherZLib.Icon
             }
         }
 
-        private BitmapSource LoadImpl(IconLocation location)
+        private BitmapSource AddImpl(IconLocation location)
         {
             string path;
             if (!_resolver.TryResolve(location, out path))

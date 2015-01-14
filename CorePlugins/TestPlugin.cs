@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -39,8 +40,8 @@ namespace CorePlugins
             {
                 for (var i = 0; i < 4; i++)
                 {
-                    result.Add(new LauncherData("TestItem" + i, "", "",
-                        1.0 - (double) i/5.0, new LauncherExtendedProperties(true, TickRate.Slow)));
+                    result.Add(new LauncherData("TestItem" + i, "[Hover] to generate a random number.", "",
+                        1.0 - (double) i/5.0, new LauncherExtendedProperties(false, TickRate.Slow)));
                 }
             }
 
@@ -48,21 +49,29 @@ namespace CorePlugins
         }
 
         [SubscribeEvent]
-        public void CommandItemTickHandler(LauncherTickEvent e)
+        public void LauncherTickHandler(LauncherTickEvent e)
         {
             e.LauncherData.Description = string.Format("Number [{0}]", _random.NextDouble());
         }
 
         [SubscribeEvent]
-        public void CommandItemSelectedHandler(LauncherSelectedEvent e)
+        public void LauncherSelectedHandler(LauncherSelectedEvent e)
         {
             e.LauncherData.ExtendedProperties.Tickable = true;
+            e.LauncherData.Description = "Waiting for random number generator...";
         }
 
         [SubscribeEvent]
-        public void CommandItemDeselectedHandler(LauncherDeselectedEvent e)
+        public void LauncherDeselectedHandler(LauncherDeselectedEvent e)
         {
             e.LauncherData.ExtendedProperties.Tickable = false;
+            e.LauncherData.Description = "[Hover] to generate a random number.";
+        }
+
+        [SubscribeEvent]
+        public void LauncherExecutedHanlder(LauncherExecutedEvent e)
+        {
+            e.PreventDefault();
         }
 
     }

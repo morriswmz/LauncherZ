@@ -97,7 +97,7 @@ namespace LauncherZLib.Event
         /// <summary>
         /// Retrieves the current query.
         /// </summary>
-        public LauncherQuery CuurentQuery { get { return _currentQuery; } }
+        public LauncherQuery CurrentQuery { get { return _currentQuery; } }
 
         /// <summary>
         /// Gets or sets the modified input after execution.

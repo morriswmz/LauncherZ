@@ -63,7 +63,7 @@ namespace LauncherZ.Controls
             if (!iconManager.ContainsIcon(iconLocation))
             {
                 image.Source = iconManager.DefaultIcon;
-                iconManager.LoadAsync(iconLocation, false, (location, icon) =>
+                iconManager.AddIconAsync(iconLocation, false, (location, icon) =>
                 {
                     if (location.ToString() == GetIconLocation(image))
                         image.Source = icon;
