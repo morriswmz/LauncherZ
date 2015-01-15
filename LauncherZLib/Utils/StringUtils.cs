@@ -9,7 +9,8 @@ namespace LauncherZLib.Utils
 {
     public static class StringUtils
     {
-        public static readonly Regex ProperIdPattern = new Regex(@"^[_a-z][_a-z0-9]*$", RegexOptions.IgnoreCase);
+        public static readonly Regex ProperIdPattern = new Regex(@"^[_a-z][_a-z0-9]*(\.[_a-z][_a-z0-9]*)*$",
+            RegexOptions.IgnoreCase);
 
         public static bool IsProperId(this string str)
         {
@@ -46,36 +47,7 @@ namespace LauncherZLib.Utils
                     return "";
             }
         }
-
-        public static string[] ParseArguments(string rawInput)
-        {
-            if (string.IsNullOrWhiteSpace(rawInput))
-                return new string[0];
-
-            return new string[]{rawInput};
-            int idx = 0, n = rawInput.Length;
-            char q = ' ';
-            StringBuilder sb = new StringBuilder();
-            while (idx < n)
-            {
-                switch (rawInput[idx])
-                {
-                    case '\\':
-                        // check escape
-                        
-                        break;
-                    case '\'':
-                        // check single quote
-                        break;
-                    case '"':
-                        // check double quote
-                        break;
-                    default:
-                        break;
-                }
-            }
-            return new string[0];
-        }
-
     }
+
+
 }

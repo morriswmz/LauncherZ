@@ -27,7 +27,7 @@ namespace CorePlugins
 
         public IEnumerable<LauncherData> Query(LauncherQuery query)
         {
-            if (query.RawInput.ToLower() == "cpu")
+            if (query.OriginalInput.ToLower() == "cpu")
             {
                 return new List<LauncherData>()
                 {

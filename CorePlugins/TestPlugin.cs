@@ -36,7 +36,7 @@ namespace CorePlugins
             
             var result = new List<LauncherData>();
 
-            if (!string.IsNullOrEmpty(query.RawInput))
+            if (!string.IsNullOrEmpty(query.OriginalInput))
             {
                 for (var i = 0; i < 4; i++)
                 {
