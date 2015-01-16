@@ -14,12 +14,12 @@ namespace LauncherZLib.Matching
     /// </summary>
     public class FlexLexicon
     {
-        private readonly Dictionary<string, char> _dict = new Dictionary<string, char>();
+        private readonly Dictionary<string, string> _dict = new Dictionary<string, string>(2048);
 
         /// <summary>
         /// <para>Checks if given literal has short form match.</para>
-        /// <para>For example, with pinying, chinese character "中" can match "z", which is the first
-        /// letter of its pinying "zhong"</para>
+        /// <para>For example, with pinying, chinese character "汽" can match "z" or "g", which is the first
+        /// letter of its pinying "zhong" or "gai".</para>
         /// </summary>
         /// <param name="literal"></param>
         /// <param name="abbr"></param>
@@ -28,11 +28,33 @@ namespace LauncherZLib.Matching
         {
             if (literal[0] == abbr)
                 return true;
-            char c;
-            return _dict.TryGetValue(literal, out c) && c == abbr;
+            string abbrs;
+            if (!_dict.TryGetValue(literal, out abbrs))
+                return false;
+            if (abbrs[0] == abbr)
+                return true;
+            return abbrs.IndexOf(abbr, 1) >= 0;
         }
 
-        
+        /// <summary>
+        /// <para>Adds entries from file.</para>
+        /// <para>The specified file must be a UTF-8 encoded text file. Each non-empty line shoule either
+        /// be a comment line or definition line. A comment line starts with "#". A definition line
+        /// should have the format "LITERAL:ABBRS" (e.g. "中:z").</para>
+        /// </summary>
+        /// <param name="path"></param>
+        public void AddFromFile(string path)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Clears the lexicon.
+        /// </summary>
+        public void Clear()
+        {
+            _dict.Clear();
+        }
 
     }
 }
