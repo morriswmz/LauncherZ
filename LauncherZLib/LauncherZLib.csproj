@@ -63,6 +63,10 @@
     <Compile Include="Icon\IconLoader.cs" />
     <Compile Include="Icon\IconLocation.cs" />
     <Compile Include="Icon\IconManager.cs" />
+    <Compile Include="Matching\FlexLexicon.cs" />
+    <Compile Include="Matching\FlexMatcher.cs" />
+    <Compile Include="Matching\FlexResult.cs" />
+    <Compile Include="Matching\FlexScorer.cs" />
     <Compile Include="Plugin\AsyncUpdateEventArgs.cs" />
     <Compile Include="Plugin\PluginStatus.cs" />
     <Compile Include="Plugin\PluginContainer.cs" />

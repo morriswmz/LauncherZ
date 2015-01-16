@@ -35,13 +35,18 @@ namespace LauncherZLib.I18N
 
         }
 
+        /// <summary>
+        /// Gets the translated string.
+        /// </summary>
+        /// <param name="strName"></param>
+        /// <returns>Translated string, or original string when fails.</returns>
         public string this[string strName]
         {
             get { return Translate(strName); }
         }
 
         /// <summary>
-        /// 
+        /// Gets the current culture associated with the LocalizationDictionary.
         /// </summary>
         public CultureInfo CurrentCulture
         {
@@ -61,7 +66,7 @@ namespace LauncherZLib.I18N
         }
 
         /// <summary>
-        /// 
+        /// Translates given string.
         /// </summary>
         /// <param name="strName"></param>
         /// <returns></returns>
@@ -71,7 +76,7 @@ namespace LauncherZLib.I18N
         }
 
         /// <summary>
-        /// 
+        /// Checks if given string can be translated.
         /// </summary>
         /// <param name="strName"></param>
         /// <returns></returns>
@@ -81,7 +86,7 @@ namespace LauncherZLib.I18N
         }
 
         /// <summary>
-        /// 
+        /// Loads specific language file with fallback.
         /// </summary>
         /// <param name="fileName"></param>
         public void LoadLanguageFile(string fileName)
@@ -90,10 +95,10 @@ namespace LauncherZLib.I18N
         }
 
         /// <summary>
-        /// 
+        /// Loads specific language file.
         /// </summary>
         /// <param name="fileName"></param>
-        /// <param name="fallback"></param>
+        /// <param name="fallback">If true, will attempt to load language file for fallback language.</param>
         public void LoadLanguageFile(string fileName, bool fallback)
         {
             string baseFileName = TrimCultureNameFromPath(fileName);
@@ -133,7 +138,7 @@ namespace LauncherZLib.I18N
         }
 
         /// <summary>
-        /// 
+        /// Reloads all language files.
         /// </summary>
         public void ReloadAllLanguageFiles()
         {
@@ -142,10 +147,15 @@ namespace LauncherZLib.I18N
         }
 
         /// <summary>
-        /// 
+        /// Removes culture name from given path.
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
+        /// <example>
+        /// Strings.json             -> Strings.json
+        /// Strings.en-US.json       -> Strings.json
+        /// Strings.en-US.zh-CN.json -> Strings.en-US.json
+        /// </example>
         public static string TrimCultureNameFromPath(string path)
         {
             string fileName = Path.GetFileName(path);
@@ -184,11 +194,16 @@ namespace LauncherZLib.I18N
         }
 
         /// <summary>
-        /// 
+        /// Append culture name to given path.
         /// </summary>
         /// <param name="path"></param>
         /// <param name="culture"></param>
         /// <returns></returns>
+        /// <example>
+        /// Strings            -> Strings.en-US
+        /// Strings.json       -> Strings.en-US.json
+        /// Strings.en-US.json -> Strings.en-US.en-US.json
+        /// </example>
         public static string AddCultureNameToPath(string path, CultureInfo culture)
         {
             string fileName = Path.GetFileName(path);

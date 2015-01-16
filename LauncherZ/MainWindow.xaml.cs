@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
 using LauncherZ.Controls;
@@ -39,7 +40,6 @@ namespace LauncherZ
             CtlLauncherList.SelectedIndex = 0;
             
             var cultureInfo = Thread.CurrentThread.CurrentCulture;
-            
             
         }
 
