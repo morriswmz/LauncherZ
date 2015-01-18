@@ -83,7 +83,7 @@ namespace LauncherZLib.Matching
             {
                 exactMatchCollection = FlexMatchCollection.Empty;
             }
-            if (exactOnly)
+            if (exactOnly || allMatched)
             {
                 return new FlexResult(true, exactMatchCollection, false, FlexMatchCollection.Empty);
             }

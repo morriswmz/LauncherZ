@@ -40,7 +40,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CoreCommands.cs" />
+    <Compile Include="AppLauncher\AppLauncherPlugin.cs" />
+    <Compile Include="CoreCommands\CommandExtendedProperties.cs" />
+    <Compile Include="CoreCommands\CpuCommandHandler.cs" />
+    <Compile Include="CoreCommands\ICommandHandler.cs" />
+    <Compile Include="CoreCommands\CoreCommandsPlugin.cs" />
     <Compile Include="TestPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -56,9 +60,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="AppLauncher\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Content Include="Lexicon\ChineseBasic.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

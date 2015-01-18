@@ -20,7 +20,18 @@
             "priority": 1.0,
             "plugin_type": "assembly",
             "assembly": "CorePlugins.dll",
-            "plugin_class": "CorePlugins.CoreCommands"
+            "plugin_class": "CorePlugins.CoreCommands.CoreCommandsPlugin"
+        },
+        {
+            "id": "LZAppLauncher",
+            "name": "LauncherZ Application Launcher",
+            "authors": [ "morriswmz" ],
+            "version": "1.0.0.0",
+            "description": "Launch installed applications!",
+            "priority": 1.0,
+            "plugin_type": "assembly",
+            "assembly": "CorePlugins.dll",
+            "plugin_class": "CorePlugins.AppLauncher.AppLauncherPlugin"
         }
     ]
 }
