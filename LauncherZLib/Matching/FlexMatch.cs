@@ -1,4 +1,6 @@
-﻿namespace LauncherZLib.Matching
+﻿using System;
+
+namespace LauncherZLib.Matching
 {
     /// <summary>
     /// Represents a match.
@@ -28,5 +30,46 @@
             Content = content;
         }
 
+        /// <summary>
+        /// Checks overlap.
+        /// </summary>
+        /// <param name="otherStartIdx"></param>
+        /// <param name="otherLength"></param>
+        /// <returns></returns>
+        public bool OverlapsWith(int otherStartIdx, int otherLength)
+        {
+            int left = Math.Min(StartIndex, otherStartIdx);
+            int right = Math.Max(StartIndex + Length, otherStartIdx + otherLength);
+            return (right - left) < (otherLength + Length);
+        }
+
+        protected bool Equals(FlexMatch other)
+        {
+            return StartIndex == other.StartIndex && Length == other.Length && string.Equals(Content, other.Content);
+        }
+
+        public override string ToString()
+        {
+            return string.Format("{{StartIndex={0}, Length={1}, Content={2}}}", StartIndex, Length, Content);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((FlexMatch) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hashCode = StartIndex;
+                hashCode = (hashCode*397) ^ Length;
+                hashCode = (hashCode*397) ^ (Content != null ? Content.GetHashCode() : 0);
+                return hashCode;
+            }
+        }
     }
 }

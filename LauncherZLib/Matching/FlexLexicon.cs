@@ -20,15 +20,17 @@ namespace LauncherZLib.Matching
 
         /// <summary>
         /// <para>Checks if given character has short form match.</para>
-        /// <para>For example, with pinying, chinese character "汽" can match "z" or "g", which is the first
+        /// <para>For example, with pinying, chinese character "汽" can match "Z" or "G", which is the first
         /// letter of its pinying "zhong" or "gai".</para>
         /// </summary>
-        /// <param name="character"></param>
-        /// <param name="replacement"></param>
+        /// <param name="character">Must be one character (possible surrogate pair).</param>
+        /// <param name="replacement">Possible replacement character. Will be converted to uppercase
+        /// under <b>InvariantCulture</b>.</param>
         /// <returns></returns>
         public bool Match(string character, char replacement)
         {
             string abbrs;
+            replacement = char.ToUpperInvariant(replacement);
             if (!_dict.TryGetValue(character, out abbrs))
                 return false;
             if (abbrs[0] == replacement)
@@ -40,7 +42,7 @@ namespace LauncherZLib.Matching
         /// <para>Adds entries from file.</para>
         /// <para>The specified file must be a UTF-8 encoded text file. Each non-empty line shoule either
         /// be a comment line or definition line. A comment line starts with "#". A definition line
-        /// should have the format "CHARS ABBRS" (e.g. "中 z"), where white spaces functions as
+        /// should have the format "CHARS ABBRS" (e.g. "中 Z"), where white spaces functions as
         /// separators.</para>
         /// </summary>
         /// <param name="path"></param>
@@ -83,24 +85,32 @@ namespace LauncherZLib.Matching
         /// <summary>
         /// <para>Adds entries to the lexicon.</para>
         /// <para>
-        /// For example, <b>Add("事实","s")</b> will map both "事" and "实" to "s".
-        /// <b>Add("茄", "jq")</b> will map "茄" to both "j" and "q".
+        /// For example, <b>Add("事实","s")</b> will map both "事" and "实" to "S".
+        /// <b>Add("茄", "jq")</b> will map "茄" to both "J" and "Q".
         /// </para>
         /// </summary>
         /// <param name="character">A string containing all characters.</param>
         /// <param name="replacement">A string containing all possible replacements.</param>
         /// <remarks>
+        /// <para>
         /// Do not add entries that may cause ambiguity. For example, <b>Add("a", "b")</b>
         /// is not a good idea (consider "false = true").
+        /// </para>
+        /// <para>
+        /// Replacement characters are converted to uppercase using <b>InvariantCulture</b>
+        /// automatically for internal storage.
+        /// </para>
         /// </remarks>
         public void Add(string character, string replacement)
         {
             TextElementEnumerator te = StringInfo.GetTextElementEnumerator(character);
+            replacement = replacement.ToUpperInvariant();
             while (te.MoveNext())
             {
                 string charStr = te.GetTextElement();
                 if (_dict.ContainsKey(charStr))
                 {
+                    // combine existing
                     foreach (char c in replacement)
                     {
                         if (!_dict[charStr].Contains(c))
@@ -111,6 +121,7 @@ namespace LauncherZLib.Matching
                 }
                 else
                 {
+                    // add new
                     _dict.Add(charStr, replacement);
                 }
             }

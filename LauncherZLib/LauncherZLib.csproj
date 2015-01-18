@@ -65,6 +65,7 @@
     <Compile Include="Icon\IconManager.cs" />
     <Compile Include="Matching\FlexLexicon.cs" />
     <Compile Include="Matching\FlexMatch.cs" />
+    <Compile Include="Matching\FlexMatchCollection.cs" />
     <Compile Include="Matching\FlexMatcher.cs" />
     <Compile Include="Matching\FlexResult.cs" />
     <Compile Include="Matching\FlexScorer.cs" />

@@ -54,6 +54,7 @@
     <Compile Include="BenchmarkMisc.cs" />
     <Compile Include="TestEventBus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestFlexMatcher.cs" />
     <Compile Include="TestLocalizationDictionary.cs" />
     <Compile Include="TestQuery.cs" />
   </ItemGroup>
@@ -72,6 +73,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="I18NSamples\lang.en-US.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="LexiconSamples\zh-CN.testdata.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="LexiconSamples\zh-CN.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

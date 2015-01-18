@@ -8,20 +8,25 @@ namespace LauncherZLib.Matching
 {
     public class FlexResult
     {
+        public FlexResult(bool isExactMatchPerformed, FlexMatchCollection exactMatches, bool isFlexMatchPerformed, FlexMatchCollection flexMatches)
+        {
+            Success = (isExactMatchPerformed && exactMatches.Count > 0) ||
+                      (isFlexMatchPerformed && flexMatches.Count > 0);
+            IsExactMatchPerformed = isExactMatchPerformed;
+            ExactMatches = exactMatches ?? FlexMatchCollection.Empty;
+            IsFlexMatchPerformed = isFlexMatchPerformed;
+            FlexMatches = flexMatches ?? FlexMatchCollection.Empty;
+        }
+
+        public bool Success { get; private set; }
+
         public bool IsExactMatchPerformed { get; private set; }
 
-        public IEnumerable<FlexMatch> ExactMatches { get; private set; }
+        public FlexMatchCollection ExactMatches { get; private set; }
 
         public bool IsFlexMatchPerformed { get; private set; }
 
-        public IEnumerable<FlexMatch> FlexMatches { get; private set; }
+        public FlexMatchCollection FlexMatches { get; private set; }
 
-        public FlexResult(bool isExactMatchPerformed, IEnumerable<FlexMatch> exactMatches, bool isFlexMatchPerformed, IEnumerable<FlexMatch> flexMatches)
-        {
-            IsExactMatchPerformed = isExactMatchPerformed;
-            ExactMatches = exactMatches;
-            IsFlexMatchPerformed = isFlexMatchPerformed;
-            FlexMatches = flexMatches;
-        }
     }
 }

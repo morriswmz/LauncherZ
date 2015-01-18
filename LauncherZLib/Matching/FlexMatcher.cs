@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace LauncherZLib.Matching
 {
@@ -12,23 +12,9 @@ namespace LauncherZLib.Matching
 
         private readonly FlexLexicon _lexicon = new FlexLexicon();
 
-        private CultureInfo _culture;
-
-        public FlexMatcher(CultureInfo culture)
+        public FlexMatcher()
         {
-            if (culture == null)
-                throw new ArgumentNullException();
-            _culture = culture;
-        }
 
-        /// <summary>
-        /// Gets or sets the culture environment.
-        /// This is used in casing conversion, etc.
-        /// </summary>
-        public CultureInfo Culture
-        {
-            get { return _culture; }
-            set { _culture = value ?? CultureInfo.InvariantCulture; }
         }
 
         /// <summary>
@@ -42,44 +28,99 @@ namespace LauncherZLib.Matching
         /// <param name="str"></param>
         /// <param name="keywords"></param>
         /// <returns></returns>
+        /// <remarks>
+        /// <para>
+        /// This method uses <b>StringComparison.OrdinalIgnoreCase</b> for case insensitive matching
+        /// due to the complexity of culture-aware case conversion. Culture-aware culture case
+        /// conversion does not necessarily preserve the length of the string, which will make it
+        /// difficult to track the indices and content of a match. In addition, current implementation
+        /// of regular expression obtains culture information from current thread. It is impossible
+        /// to specify culture information in corresponding methods.
+        /// </para>
+        /// </remarks>
         public FlexResult Match(string str, string[] keywords)
         {
             bool exactOnly = keywords.Length > 1;
 
-            // 0: normalize
-            string strCI = str.ToLower(_culture);
-            string[] keywordsCI = keywords.Select(kw => kw.ToLower(_culture)).ToArray();
+            // 0: normalize to uppercase
+            string strU = str.ToUpperInvariant();
+            string[] keywordsU = keywords.Select(kw => kw.ToUpperInvariant()).ToArray();
 
-
-            // 1: match exact keywords, order is irrelevant
-            bool allMatched = false;
+            // 1: match exact keywords, first come first serve, no overlap
+            var allMatched = true;
             var exactMatches = new List<FlexMatch>();
-            for (var i = 0;i < keywordsCI.Length;i++)
+            int idx = 0;
+            for (var i = 0;i < keywordsU.Length;i++)
             {
-                int idx = 0;
                 int foundIdx;
-                string keyword = keywordsCI[i];
-                while ((foundIdx = strCI.IndexOf(keyword, idx, StringComparison.Ordinal)) >= 0)
+                string keyword = keywordsU[i];
+                int l = keyword.Length;
+                var matched = false;
+                idx = 0;
+                while ((foundIdx = strU.IndexOf(keyword, idx, StringComparison.Ordinal)) >= 0)
                 {
-                    exactMatches.Add(new FlexMatch(idx, keyword.Length, keywords[i]));
                     idx = foundIdx + 1;
+                    // check possible overlap before adding
+                    if (i != 0 && exactMatches.Any(m => m.OverlapsWith(foundIdx, l)))
+                        continue;
+                    exactMatches.Add(new FlexMatch(foundIdx, l, str.Substring(foundIdx, l)));
+                    matched = true;
                 }
+                // for multiple keywords, all of them must be matched
+                if (!matched)
+                {
+                    allMatched = false;
+                    break;
+                }  
             }
-
+            FlexMatchCollection exactMatchCollection;
+            if (allMatched)
+            {
+                exactMatches.Sort((x, y) => x.StartIndex.CompareTo(y.StartIndex));
+                exactMatchCollection = new FlexMatchCollection(exactMatches.ToArray());
+            }
+            else
+            {
+                exactMatchCollection = FlexMatchCollection.Empty;
+            }
             if (exactOnly)
             {
-                return null;
-            }
-            // 2: match every character
-            TextElementEnumerator te = StringInfo.GetTextElementEnumerator(keywords[0]);
-            string s;
-            while (te.MoveNext())
-            {
-                
-                s = te.GetTextElement();
+                return new FlexResult(true, exactMatchCollection, false, FlexMatchCollection.Empty);
             }
 
-            return null;
+            // 2: match every character, order is important
+            TextElementEnumerator teK = StringInfo.GetTextElementEnumerator(keywordsU[0]);
+            TextElementEnumerator teS = StringInfo.GetTextElementEnumerator(strU);
+            var flexMatches = new List<FlexMatch>();
+            allMatched = true;
+            while (teK.MoveNext())
+            {
+                string kc = teK.GetTextElement();
+                var matched = false;
+                while (teS.MoveNext())
+                {
+                    string sc = teS.GetTextElement();
+                    // since both keyword and string are normalized
+                    // matched = ordinally equal || (kc is simple char && lexicon match)
+                    matched = sc.Equals(kc, StringComparison.Ordinal) ||
+                                (kc.Length == 1 && _lexicon.Match(sc, kc[0]));
+                    if (matched)
+                    {
+                        flexMatches.Add(new FlexMatch(teS.ElementIndex, sc.Length, sc));
+                        break;
+                    }
+                }
+                // every character should have a match
+                if (!matched)
+                {
+                    allMatched = false;
+                    break;
+                }
+            }
+            var flexMatchCollection = allMatched
+                ? new FlexMatchCollection(flexMatches.ToArray())
+                : FlexMatchCollection.Empty;
+            return new FlexResult(true, exactMatchCollection, true, flexMatchCollection);
         }
         
 
