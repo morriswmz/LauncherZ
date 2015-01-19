@@ -171,7 +171,7 @@ namespace LauncherZLib.Utils
             _id = id;
             var winIterop = new WindowInteropHelper(window);
             winIterop.EnsureHandle();
-            _hWnd = winIterop.Handle;
+            _hWnd = winIterop.Handle; // DO NOT DISPOSE THIS! WILL DESTROY THE ACTUAL WINDOW!
             _hSource = HwndSource.FromHwnd(_hWnd);
             if (_hSource == null)
             {
@@ -182,7 +182,6 @@ namespace LauncherZLib.Utils
             {
                 int errCode = Marshal.GetLastWin32Error();
                 _hSource.RemoveHook(HotkeyHook);
-                _hSource.Dispose();
                 throw new Win32Exception(errCode);
             }
             IsRegistered = true;
@@ -199,7 +198,6 @@ namespace LauncherZLib.Utils
         {
             VerifyStatus(true);
             _hSource.RemoveHook(HotkeyHook);
-            _hSource.Dispose();
             if (!User32.UnregisterHotKey(_hWnd, _id))
                 throw new Win32Exception(Marshal.GetLastWin32Error());
             IsRegistered = false;
@@ -227,7 +225,6 @@ namespace LauncherZLib.Utils
                 if (_hSource != null)
                 {
                     _hSource.RemoveHook(HotkeyHook);
-                    _hSource.Dispose();
                 }
             }
 

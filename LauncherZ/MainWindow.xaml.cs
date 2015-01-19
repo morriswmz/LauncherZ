@@ -172,17 +172,17 @@ namespace LauncherZ
             }
         }
 
-        private void MainWindow_Closed(object sender, EventArgs e)
-        {
-            _switchHotkey.Unregister();
-        }
-
         private void MainWindow_Deactivated(object sender, EventArgs e)
         {
 #if DEBUG
 #else
             ClearAndHide();
 #endif
+        }
+
+        private void MainWindow_Closed(object sender, EventArgs e)
+        {
+            _switchHotkey.Unregister().Dispose();
         }
     }
 

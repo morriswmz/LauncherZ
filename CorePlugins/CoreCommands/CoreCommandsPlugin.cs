@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using LauncherZLib.API;
 using LauncherZLib.Event;
@@ -17,7 +18,10 @@ namespace CorePlugins.CoreCommands
         {
             _pluginContext = pluginContext;
             _pluginContext.EventBus.Register(this);
+            _pluginContext.Localization.LoadLanguageFile(
+                Path.Combine(_pluginContext.SourceDirectory, @"I18N\CoreCommandsStrings.json"));
             AddHandler(new CpuCommandHandler());
+            AddHandler(new ExitCommandHandler());
         }
 
         public void Deactivate(IPluginContext pluginContext)
@@ -35,7 +39,7 @@ namespace CorePlugins.CoreCommands
             ICommandHandler handler;
             if (_handlers.TryGetValue(query.Arguments[0], out handler))
             {
-                return handler.HandleQuery(query);
+                return handler.HandleQuery(query, _pluginContext);
             }
             else
             {
@@ -53,7 +57,21 @@ namespace CorePlugins.CoreCommands
                 ICommandHandler handler;
                 if (_handlers.TryGetValue(ccProp.Arguments[0], out handler))
                 {
-                    handler.HandleTick(e);
+                    handler.HandleTick(e, _pluginContext);
+                }
+            }
+        }
+
+        [SubscribeEvent]
+        public void LauncherExecutedHandler(LauncherExecutedEvent e)
+        {
+            var ccProp = e.LauncherData.ExtendedProperties as CommandExtendedProperties;
+            if (ccProp != null)
+            {
+                ICommandHandler handler;
+                if (_handlers.TryGetValue(ccProp.Arguments[0], out handler))
+                {
+                    handler.HandleExecute(e, _pluginContext);
                 }
             }
         }

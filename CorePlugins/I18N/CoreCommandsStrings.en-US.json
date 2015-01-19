@@ -1,0 +1,9 @@
+﻿{
+    /* the following items should match the manifest file */
+    "Name": "LauncherZ Core Commands",
+    "Description": "Provides basic commands.",
+    /* en-US */
+    "ExitCommandTitle": "Exit LauncherZ",
+    "ExitCommandDescription": "Press [Enter] to exit.",
+    "CpuCommandTitle":  "Total CPU usage"
+}

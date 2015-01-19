@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using LauncherZLib.API;
 using LauncherZLib.Event;
 using LauncherZLib.Launcher;
 
@@ -13,11 +10,11 @@ namespace CorePlugins.CoreCommands
 
         string CommandName { get; }
 
-        IEnumerable<LauncherData> HandleQuery(LauncherQuery query);
+        IEnumerable<LauncherData> HandleQuery(LauncherQuery query, IPluginContext context);
 
-        void HandleTick(LauncherTickEvent e);
+        void HandleTick(LauncherTickEvent e, IPluginContext context);
 
-        void HandleExecute(LauncherExecutedEvent e);
+        void HandleExecute(LauncherExecutedEvent e, IPluginContext context);
 
     }
 }

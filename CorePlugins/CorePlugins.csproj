@@ -31,18 +31,23 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Windows" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppLauncher\AppLauncherPlugin.cs" />
     <Compile Include="CoreCommands\CommandExtendedProperties.cs" />
     <Compile Include="CoreCommands\CpuCommandHandler.cs" />
+    <Compile Include="CoreCommands\ExitCommandHandler.cs" />
     <Compile Include="CoreCommands\ICommandHandler.cs" />
     <Compile Include="CoreCommands\CoreCommandsPlugin.cs" />
     <Compile Include="TestPlugin.cs" />
@@ -56,6 +61,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="I18N\CoreCommandsStrings.en-US.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="manifest.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

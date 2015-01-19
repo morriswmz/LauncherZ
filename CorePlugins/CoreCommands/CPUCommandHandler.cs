@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using LauncherZLib.API;
 using LauncherZLib.Event;
 using LauncherZLib.Launcher;
 
@@ -25,16 +26,16 @@ namespace CorePlugins.CoreCommands
         public string CommandName { get { return "CPU"; } }
 
 
-        public IEnumerable<LauncherData> HandleQuery(LauncherQuery query)
+        public IEnumerable<LauncherData> HandleQuery(LauncherQuery query, IPluginContext context)
         {
             return new LauncherData[]
             {
-                new LauncherData("Total CPU Usage", "", @"LauncherZ|IconGear", 1.0,
+                new LauncherData(context.Localization["CpuCommandTitle"], "", @"LauncherZ|IconGear", 1.0,
                         new CommandExtendedProperties(true, TickRate.Normal, query.Arguments.ToArray()))
             };
         }
 
-        public void HandleTick(LauncherTickEvent e)
+        public void HandleTick(LauncherTickEvent e, IPluginContext context)
         {
             var cpu = (int)_cpuCounter.NextValue();
             var bars = 20 * cpu / 100;
@@ -47,7 +48,7 @@ namespace CorePlugins.CoreCommands
             e.LauncherData.Description = string.Format("{0}% \\[{1}\\]", cpu, new string(progress));
         }
 
-        public void HandleExecute(LauncherExecutedEvent e)
+        public void HandleExecute(LauncherExecutedEvent e, IPluginContext context)
         {
             // do nothing
         }

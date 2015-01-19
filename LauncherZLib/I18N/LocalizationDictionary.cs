@@ -258,6 +258,10 @@ namespace LauncherZLib.I18N
                                 jr.LineNumber, jr.LinePosition));
                         _strings[propName] = (string)jr.Value;
                     }
+                    else if (jr.TokenType == JsonToken.Comment)
+                    {
+                        // do nothing
+                    }
                     else
                     {
                         throw new FormatException(string.Format("Unexpected token at line {0}:{1}",

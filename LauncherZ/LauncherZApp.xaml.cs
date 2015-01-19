@@ -97,6 +97,7 @@ namespace LauncherZ
             if (_appInitialized)
             {
                 // clean up
+                Logger.Fine("Exiting...");
                 Logger.Close();
             }
         }
