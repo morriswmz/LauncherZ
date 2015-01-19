@@ -20,7 +20,7 @@ namespace LauncherZLib.Matching
 
         public FlexMatchCollection(FlexMatch[] matches)
         {
-            _matches = matches;
+            _matches = (FlexMatch[]) matches.Clone();
             Count = _matches.Length;
         }
 
@@ -33,7 +33,7 @@ namespace LauncherZLib.Matching
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return _matches.GetEnumerator();
+            return GetEnumerator();
         }
 
         public IEnumerator<FlexMatch> GetEnumerator()

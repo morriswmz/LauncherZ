@@ -154,7 +154,7 @@ namespace LauncherZ
             }
             else
             {
-                _queryController.DistributeQuery(LauncherQuery.Create(CtlUserInput.Text));
+                _queryController.DistributeQuery(new LauncherQuery(CtlUserInput.Text));
             }
         }
 

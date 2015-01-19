@@ -12,13 +12,18 @@ namespace LauncherZLib.Launcher
 
         private readonly long _queryId;
         private readonly string _originalInput;
-        private readonly ReadOnlyCollection<string> _arguments;
+        private readonly ArgumentCollection _arguments;
 
-        private LauncherQuery(long queryId, string originalInput, string[] arguments)
+        /// <summary>
+        /// Creates a new query from given input.
+        /// </summary>
+        /// <param name="input"></param>
+        public LauncherQuery(string input)
         {
-            _queryId = queryId;
-            _originalInput = originalInput;
-            _arguments = Array.AsReadOnly(arguments);
+            long newId = Interlocked.Increment(ref _queryCounter);
+            _queryId = newId;
+            _originalInput = input;
+            _arguments = new ArgumentCollection(ParseArguments(input));
         }
 
         /// <summary>
@@ -34,18 +39,7 @@ namespace LauncherZLib.Launcher
         /// <summary>
         /// Gets the parse arguments.
         /// </summary>
-        public ReadOnlyCollection<string> Arguments { get { return _arguments; } }
-
-        /// <summary>
-        /// Creates a new query from given input.
-        /// </summary>
-        /// <param name="input"></param>
-        /// <returns></returns>
-        public static LauncherQuery Create(string input)
-        {
-            long newId = Interlocked.Increment(ref _queryCounter);
-            return new LauncherQuery(newId, input, ParseArguments(input));
-        }
+        public ArgumentCollection Arguments { get { return _arguments; } }
 
         /// <summary>
         /// Splits original input into arguments by space and double quotes.

@@ -10,14 +10,16 @@ namespace CorePlugins.CoreCommands
     public class CommandExtendedProperties : LauncherExtendedProperties
     {
 
-        public string[] Arguments { get; private set; }
+        public ArgumentCollection Arguments { get; private set; }
 
-        public CommandExtendedProperties(bool tickable, string[] arguments) : base(tickable)
+        public CommandExtendedProperties(bool tickable, ArgumentCollection arguments)
+            : base(tickable)
         {
             Arguments = arguments;
         }
 
-        public CommandExtendedProperties(bool tickable, TickRate rate, string[] arguments) : base(tickable, rate)
+        public CommandExtendedProperties(bool tickable, TickRate rate, ArgumentCollection arguments)
+            : base(tickable, rate)
         {
             Arguments = arguments;
         }

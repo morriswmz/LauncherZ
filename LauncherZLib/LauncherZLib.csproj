@@ -52,6 +52,7 @@
     <Compile Include="API\IPluginContext.cs" />
     <Compile Include="API\IPlugin.cs" />
     <Compile Include="API\IPluginAsync.cs" />
+    <Compile Include="Launcher\ArgumentCollection.cs" />
     <Compile Include="Launcher\TickRate.cs" />
     <Compile Include="Event\LauncherEvent.cs" />
     <Compile Include="Event\EventBase.cs" />
