@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -45,6 +48,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppLauncher\AppLauncherPlugin.cs" />
+    <Compile Include="AppLauncher\AppManifest.cs" />
+    <Compile Include="AppLauncher\AppManifestManager.cs" />
     <Compile Include="CoreCommands\CommandExtendedProperties.cs" />
     <Compile Include="CoreCommands\CpuCommandHandler.cs" />
     <Compile Include="CoreCommands\ExitCommandHandler.cs" />

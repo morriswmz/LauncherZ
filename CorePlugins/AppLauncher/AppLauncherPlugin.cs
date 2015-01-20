@@ -11,6 +11,8 @@ namespace CorePlugins.AppLauncher
     public class AppLauncherPlugin : IPlugin
     {
 
+
+
         public void Activate(IPluginContext pluginContext)
         {
             
@@ -25,6 +27,8 @@ namespace CorePlugins.AppLauncher
         {
             return Enumerable.Empty<LauncherData>();
         }
+
+
 
     }
 }
