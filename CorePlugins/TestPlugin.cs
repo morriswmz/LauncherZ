@@ -35,12 +35,18 @@ namespace CorePlugins
         {
             
             var result = new List<LauncherData>();
-
+            var icons = new string[]
+            {
+                @"C:\ShipID.txt",
+                @"D:\list.txt",
+                @"D:\SkyDrive\Private Photo\CA\Scenery\RIMG1550.JPG",
+                @"C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Adobe Reader XI.lnk"
+            };
             if (!string.IsNullOrEmpty(query.OriginalInput))
             {
                 for (var i = 0; i < 4; i++)
                 {
-                    result.Add(new LauncherData("TestItem" + i, "[Hover] to generate a random number.", "",
+                    result.Add(new LauncherData("TestItem" + i, "[Hover] to generate a random number.", icons[i],
                         1.0 - (double) i/5.0, new LauncherExtendedProperties(false, TickRate.Slow)));
                 }
             }

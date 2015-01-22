@@ -34,7 +34,7 @@ namespace LauncherZLib.Matching
             }
             if (result.FlexMatches.Count > 0)
                 flexScore /= result.FlexMatches.Count;
-
+            
             return (_exactWeight * exactScore + _flexWeight * flexScore) / (_exactWeight + _flexWeight);
         }
 

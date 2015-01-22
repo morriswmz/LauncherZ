@@ -261,12 +261,22 @@ namespace LauncherZ.Controls
             }
             else
             {
-                CtlLauncherPanel.Children.Insert(index, item);
-                // adjust selection if inserted before selection
-                // unless the 1st item is selected
-                if (SelectedIndex > 0 && index <= SelectedIndex)
+                if (SelectedIndex == 0 && index == 0)
                 {
-                    SelectedIndex++;
+                    // if 1st item is selected, we don't change selection when
+                    // inserting at index 0
+                    LauncherData oldLauncherData = GetAssociatedLauncherDataAt(0);
+                    CtlLauncherPanel.Children.Insert(index, item);
+                    RaiseSelectionChangedEvent(oldLauncherData, launcherData);
+                }
+                else
+                {
+                    // adjust selection if inserted before selection
+                    CtlLauncherPanel.Children.Insert(index, item);
+                    if (index <= SelectedIndex)
+                    {
+                        SelectedIndex++;
+                    }
                 }
             }
         }

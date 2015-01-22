@@ -81,7 +81,7 @@ namespace LauncherZTests
             var ids = new long[inputs.Length];
             for (var i = 0; i < inputs.Length; i++)
             {
-                LauncherQuery q = LauncherQuery.Create(inputs[i]);
+                var q = new LauncherQuery(inputs[i]);
                 CollectionAssert.AreEqual(correctArgs[i], q.Arguments.ToArray(),
                     string.Format("Argument parsing failed for: {0}. Expected: [\"{1}\"]. Actual: [\"{2}\"].",
                     inputs[i], string.Join("\", \"", correctArgs[i]), string.Join("\", \"", q.Arguments)));
