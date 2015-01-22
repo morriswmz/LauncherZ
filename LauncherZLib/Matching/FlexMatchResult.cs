@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace LauncherZLib.Matching
 {
-    public class FlexResult
+    public class FlexMatchResult
     {
-        public FlexResult(bool isExactMatchPerformed, FlexMatchCollection exactMatches, bool isFlexMatchPerformed, FlexMatchCollection flexMatches)
+        public FlexMatchResult(bool isExactMatchPerformed, FlexMatchCollection exactMatches, bool isFlexMatchPerformed, FlexMatchCollection flexMatches)
         {
             Success = (isExactMatchPerformed && exactMatches.Count > 0) ||
                       (isFlexMatchPerformed && flexMatches.Count > 0);

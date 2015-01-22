@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using LauncherZLib.API;
+using LauncherZLib.Launcher;
+using LauncherZLib.Matching;
 using Newtonsoft.Json;
 
 namespace CorePlugins.AppLauncher
@@ -13,16 +15,35 @@ namespace CorePlugins.AppLauncher
     {
         private ILogger _logger;
         private AppManifest _manifest;
-        private List<string> _searchPath;
+        private FlexMatcher _matcher = new FlexMatcher();
+        private FlexScorer _scorer = new FlexScorer();
 
         public AppManifestManager(ILogger logger)
         {
             _logger = logger;
         }
 
-        public void AddSearchPath(string path)
+
+        public IEnumerable<LauncherData> Query(string[] keywords, int limit)
         {
-            
+            var candidates = new List<AppQueryResult>();
+            foreach (var app in _manifest.Apps)
+            {
+                FlexMatchResult matchResult = _matcher.Match(app.Name, keywords);
+                if (matchResult.Success)
+                {
+                    var result = new AppQueryResult(app, matchResult)
+                    {
+                        Relevance = _scorer.Score(app.Name, matchResult)
+                    };
+                    // weighted sum of match score and frequency of usage
+                    // here we use exponential decay 1.0 - exp(-n)
+                    result.Relevance = 0.8*result.Relevance + 0.2*(1.0 - Math.Exp(-app.Frequency/5.0));
+                }
+            }
+            return candidates.OrderByDescending(x => x.Relevance)
+                .Take(limit)
+                .Select(x => x.CreateLauncherData());
         }
 
         public void ScheduleUpdateManifest()
@@ -47,21 +68,26 @@ namespace CorePlugins.AppLauncher
             }
         }
 
-        public void LoadManifestFromFile(string path)
+        public bool LoadManifestFromFile(string path)
         {
+            if (!File.Exists(path))
+                return false;
+
             try
             {
-
+                var serializer = new JsonSerializer();
+                using (var sr = new StreamReader(path))
+                {
+                    var jsonReader = new JsonTextReader(sr);
+                    _manifest = serializer.Deserialize<AppManifest>(jsonReader);
+                }
+                return true;
             }
             catch (Exception ex)
             {
-                
+                _logger.Error(string.Format("Failed to load application manifest from {0}", path));
+                return false;
             }
-        }
-
-        private void DoUpdateManifest()
-        {
-            
         }
 
     }

@@ -68,7 +68,7 @@
     <Compile Include="Matching\FlexMatch.cs" />
     <Compile Include="Matching\FlexMatchCollection.cs" />
     <Compile Include="Matching\FlexMatcher.cs" />
-    <Compile Include="Matching\FlexResult.cs" />
+    <Compile Include="Matching\FlexMatchResult.cs" />
     <Compile Include="Matching\FlexScorer.cs" />
     <Compile Include="Plugin\AsyncUpdateEventArgs.cs" />
     <Compile Include="Plugin\PluginStatus.cs" />

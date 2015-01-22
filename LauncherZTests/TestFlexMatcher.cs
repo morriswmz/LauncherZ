@@ -84,7 +84,7 @@ namespace LauncherZTests
 
             var englishInput = "Bag Age Gear Bar";
             var englishKeywords1 = new string[] {"ba", "ag", "ge"};
-            var englishResult1 = new FlexResult(true,
+            var englishResult1 = new FlexMatchResult(true,
                 new FlexMatchCollection(new FlexMatch[]
                 {
                     new FlexMatch(0, 2, "Ba"),
@@ -93,11 +93,11 @@ namespace LauncherZTests
                     new FlexMatch(13, 2, "Ba")
                 }), false, FlexMatchCollection.Empty);
             var englishKeywords2 = new string[] {"ba", "ak"};
-            var englishResult2 = new FlexResult(true, FlexMatchCollection.Empty, false,
+            var englishResult2 = new FlexMatchResult(true, FlexMatchCollection.Empty, false,
                 new FlexMatchCollection(new FlexMatch[0]));
             var mixedInput = "中国上海 China Shanghai";
             var mixedKeywords1 = new string[] {"zgshcs"};
-            var mixedResult1 = new FlexResult(true, FlexMatchCollection.Empty, true,
+            var mixedResult1 = new FlexMatchResult(true, FlexMatchCollection.Empty, true,
                 new FlexMatchCollection(new FlexMatch[]
                 {
                     new FlexMatch(0, 1, "中"),
@@ -108,10 +108,10 @@ namespace LauncherZTests
                     new FlexMatch(11, 1, "S")
                 }));
             var mixedKeywords2 = new string[] {"zgsh]"};
-            var mixedResult2 = new FlexResult(true, FlexMatchCollection.Empty, true,
+            var mixedResult2 = new FlexMatchResult(true, FlexMatchCollection.Empty, true,
                new FlexMatchCollection(new FlexMatch[0]));
 
-            FlexResult result;
+            FlexMatchResult result;
 
             result = fm.Match(englishInput, englishKeywords1);
             CompareResults(englishResult1, result);
@@ -123,7 +123,7 @@ namespace LauncherZTests
             CompareResults(mixedResult2, result);
         }
 
-        private void CompareResults(FlexResult expected, FlexResult actual)
+        private void CompareResults(FlexMatchResult expected, FlexMatchResult actual)
         {
             Assert.AreEqual(expected.Success, actual.Success, "Success status mismatch.");
             Assert.AreEqual(expected.IsExactMatchPerformed, actual.IsExactMatchPerformed,

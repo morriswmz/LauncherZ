@@ -38,7 +38,7 @@ namespace LauncherZLib.Matching
         /// to specify culture information in corresponding methods.
         /// </para>
         /// </remarks>
-        public FlexResult Match(string str, string[] keywords)
+        public FlexMatchResult Match(string str, string[] keywords)
         {
             bool exactOnly = keywords.Length > 1;
 
@@ -85,7 +85,7 @@ namespace LauncherZLib.Matching
             }
             if (exactOnly || allMatched)
             {
-                return new FlexResult(true, exactMatchCollection, false, FlexMatchCollection.Empty);
+                return new FlexMatchResult(true, exactMatchCollection, false, FlexMatchCollection.Empty);
             }
 
             // 2: match every character, order is important
@@ -120,7 +120,7 @@ namespace LauncherZLib.Matching
             var flexMatchCollection = allMatched
                 ? new FlexMatchCollection(flexMatches.ToArray())
                 : FlexMatchCollection.Empty;
-            return new FlexResult(true, exactMatchCollection, true, flexMatchCollection);
+            return new FlexMatchResult(true, exactMatchCollection, true, flexMatchCollection);
         }
         
 

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace LauncherZLib.Matching
 {
     /// <summary>
-    /// Gives <see cref="T:LauncherZLib.Matching.FlexResult"/> a score.
+    /// Gives <see cref="T:LauncherZLib.Matching.FlexMatchResult"/> a score.
     /// </summary>
     public class FlexScorer
     {
@@ -17,7 +17,7 @@ namespace LauncherZLib.Matching
         private double _exactDelay = 1.0;
         private double _flexDelay = 1.0;
 
-        public double Score(string originalString, FlexResult result)
+        public double Score(string originalString, FlexMatchResult result)
         {
             double exactScore = 0.0;
             foreach (var exactMatch in result.ExactMatches)

@@ -47,9 +47,11 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AppLauncher\AppLauncherExtendedProperties.cs" />
     <Compile Include="AppLauncher\AppLauncherPlugin.cs" />
     <Compile Include="AppLauncher\AppManifest.cs" />
     <Compile Include="AppLauncher\AppManifestManager.cs" />
+    <Compile Include="AppLauncher\AppQueryResult.cs" />
     <Compile Include="CoreCommands\CommandExtendedProperties.cs" />
     <Compile Include="CoreCommands\CpuCommandHandler.cs" />
     <Compile Include="CoreCommands\ExitCommandHandler.cs" />
