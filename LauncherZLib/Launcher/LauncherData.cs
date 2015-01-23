@@ -7,10 +7,14 @@ namespace LauncherZLib.Launcher
     public class LauncherData : INotifyPropertyChanged
     {
 
+        private static readonly FontFamily DefaultFontFamily = new FontFamily("Global User Interface");
+
         private string _title = "";
         private string _description = "";
         private bool _isDescriptionVisible = true;
         private bool _isTitleVisible = true;
+        private FontFamily _titleFont = DefaultFontFamily;
+        private FontFamily _descriptionFont = DefaultFontFamily;
         private string _iconLocation = "";
         private readonly double _relevance;
         private readonly LauncherExtendedProperties _launcherEx;
@@ -45,7 +49,7 @@ namespace LauncherZLib.Launcher
                 if (_title != value)
                 {
                     _title = value;
-                    DispatchPropertyChangedEvent(new PropertyChangedEventArgs("Title"));
+                    DispatchPropertyChangedEvent("Title");
                 }
             }
         }
@@ -62,7 +66,7 @@ namespace LauncherZLib.Launcher
                 if (_description != value)
                 {
                     _description = value;
-                    DispatchPropertyChangedEvent(new PropertyChangedEventArgs("Description"));
+                    DispatchPropertyChangedEvent("Description");
                 }
             }
         }
@@ -79,7 +83,7 @@ namespace LauncherZLib.Launcher
                 if (_isTitleVisible != value)
                 {
                     _isTitleVisible = value;
-                    DispatchPropertyChangedEvent(new PropertyChangedEventArgs("IsTitleVisible"));
+                    DispatchPropertyChangedEvent("IsTitleVisible");
                 }
             }
         }
@@ -96,7 +100,41 @@ namespace LauncherZLib.Launcher
                 if (_isDescriptionVisible != value)
                 {
                     _isDescriptionVisible = value;
-                    DispatchPropertyChangedEvent(new PropertyChangedEventArgs("IsDescriptionVisible"));
+                    DispatchPropertyChangedEvent("IsDescriptionVisible");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the font family of the title.
+        /// </summary>
+        public FontFamily TitleFont
+        {
+            get { return _titleFont; }
+            set
+            {
+                FontFamily newFont = value ?? DefaultFontFamily;
+                if (!_titleFont.Equals(newFont))
+                {
+                    _titleFont = newFont;
+                    DispatchPropertyChangedEvent("TitleFont");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the font family of the description.
+        /// </summary>
+        public FontFamily DescriptionFont
+        {
+            get { return _descriptionFont; }
+            set
+            {
+                FontFamily newFont = value ?? DefaultFontFamily;
+                if (!_descriptionFont.Equals(newFont))
+                {
+                    _descriptionFont = newFont;
+                    DispatchPropertyChangedEvent("DescriptionFont");
                 }
             }
         }
@@ -123,7 +161,7 @@ namespace LauncherZLib.Launcher
                 if (_iconLocation != value)
                 {
                     _iconLocation = value;
-                    DispatchPropertyChangedEvent(new PropertyChangedEventArgs("IconLocation"));
+                    DispatchPropertyChangedEvent("IconLocation");
                 }
             }
         }
@@ -141,20 +179,15 @@ namespace LauncherZLib.Launcher
         {
             get { return _launcherEx; }
         }
-
-        public FontFamily Font
-        {
-            get { return null; }
-        }
         
         #endregion
 
-        protected void DispatchPropertyChangedEvent(PropertyChangedEventArgs e)
+        protected void DispatchPropertyChangedEvent(string propName)
         {
             var handler = PropertyChanged;
             if (handler != null)
             {
-                handler(this, e);
+                handler(this, new PropertyChangedEventArgs(propName));
             }
         }
     }

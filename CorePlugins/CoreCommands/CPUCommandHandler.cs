@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Windows.Media;
 using LauncherZLib.API;
 using LauncherZLib.Event;
 using LauncherZLib.Launcher;
@@ -32,6 +33,9 @@ namespace CorePlugins.CoreCommands
             {
                 new LauncherData(context.Localization["CpuCommandTitle"], "", @"LauncherZ|IconGear", 1.0,
                         new CommandExtendedProperties(true, TickRate.Normal, query.Arguments))
+                {
+                    DescriptionFont = new FontFamily("Segoe UI Mono")
+                }
             };
         }
 
@@ -44,13 +48,13 @@ namespace CorePlugins.CoreCommands
             for (i = 0; i < bars; i++)
                 progress[i] = '=';
             for (; i < 20; i++)
-                progress[i] = ' ';
-            e.LauncherData.Description = string.Format("{0}% \\[{1}\\]", cpu, new string(progress));
+                progress[i] = '-';
+            e.LauncherData.Description = string.Format("[{1}] {0}%", cpu, new string(progress));
         }
 
         public void HandleExecute(LauncherExecutedEvent e, IPluginContext context)
         {
-            // do nothing
+            e.PreventDefault();
         }
 
         public void Dispose()

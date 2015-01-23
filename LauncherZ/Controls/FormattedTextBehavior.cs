@@ -54,7 +54,6 @@ namespace LauncherZ.Controls
                     }
                 }
             }
-
         }
 
         private static IEnumerable<FormattedSegment> ParseFormattedText(string text)
