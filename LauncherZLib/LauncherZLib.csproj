@@ -52,6 +52,9 @@
     <Compile Include="API\IPluginContext.cs" />
     <Compile Include="API\IPlugin.cs" />
     <Compile Include="API\IPluginAsync.cs" />
+    <Compile Include="FormattedText\FormattedSegment.cs" />
+    <Compile Include="FormattedText\FormattedTextEngine.cs" />
+    <Compile Include="FormattedText\TextFormat.cs" />
     <Compile Include="Launcher\ArgumentCollection.cs" />
     <Compile Include="Launcher\TickRate.cs" />
     <Compile Include="Event\LauncherEvent.cs" />
@@ -94,9 +97,7 @@
     <Compile Include="Win32\SHFILEINFO.cs" />
     <Compile Include="Win32\User32.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="FormattedText\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

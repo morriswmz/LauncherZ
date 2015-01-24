@@ -202,6 +202,7 @@ namespace LauncherZLib.Launcher
                 string.Format("Design [time] title {0}", index),
                 "This is shown in _design mode_ only. " +
                 "[Highlights] are ~supported~.\n" +
+                "They are [[[~_Stackable_~]]]. " +
                 "Creation Time: " + DateTime.Now.ToLongTimeString(),
                 "LauncherZ|IconBlank", 0.0, new LauncherExtendedProperties(false)
             ) {}
