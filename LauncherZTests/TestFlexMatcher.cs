@@ -105,7 +105,7 @@ namespace LauncherZTests
                     new FlexMatch(2, 1, "上"),
                     new FlexMatch(3, 1, "海"),
                     new FlexMatch(5, 1, "C"),
-                    new FlexMatch(11, 1, "S")
+                    new FlexMatch(11, 1, "h")
                 }));
             var mixedKeywords2 = new string[] {"zgsh]"};
             var mixedResult2 = new FlexMatchResult(true, FlexMatchCollection.Empty, true,

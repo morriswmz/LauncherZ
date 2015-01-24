@@ -18,5 +18,24 @@ namespace LauncherZLib.FormattedText
             Format = format;
         }
 
+        private bool Equals(FormattedSegment other)
+        {
+            return string.Equals(Text, other.Text) && Format == other.Format;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            return obj is FormattedSegment && Equals((FormattedSegment) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return ((Text != null ? Text.GetHashCode() : 0)*397) ^ (int) Format;
+            }
+        }
     }
 }

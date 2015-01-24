@@ -54,6 +54,9 @@ namespace LauncherZLib.Matching
             {
                 int foundIdx;
                 string keyword = keywordsU[i];
+                if (keyword.Length == 0)
+                    continue;
+
                 int l = keyword.Length;
                 var matched = false;
                 idx = 0;
@@ -106,7 +109,7 @@ namespace LauncherZLib.Matching
                                 (kc.Length == 1 && _lexicon.Match(sc, kc[0]));
                     if (matched)
                     {
-                        flexMatches.Add(new FlexMatch(teS.ElementIndex, sc.Length, sc));
+                        flexMatches.Add(new FlexMatch(teS.ElementIndex, sc.Length, str.Substring(teS.ElementIndex, sc.Length)));
                         break;
                     }
                 }

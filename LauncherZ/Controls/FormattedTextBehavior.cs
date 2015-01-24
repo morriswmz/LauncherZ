@@ -38,7 +38,7 @@ namespace LauncherZ.Controls
                 {
                     IEnumerable<FormattedSegment> segments = FormattedTextEngine.ParseFormattedText(text);
                     textBlock.Inlines.Clear();
-                    textBlock.Inlines.AddRange(FormattedTextEngine.EmitInlines(segments));
+                    textBlock.Inlines.AddRange(EmitInlines(segments));
                 }
                 catch (Exception ex)
                 {
@@ -48,7 +48,36 @@ namespace LauncherZ.Controls
             }
         }
 
+        /// <summary>
+        /// Generates inlines according to given formatted segments.
+        /// </summary>
+        /// <param name="segments"></param>
+        /// <returns></returns>
+        private static IEnumerable<Inline> EmitInlines(IEnumerable<FormattedSegment> segments)
+        {
+            if (segments == null)
+                throw new ArgumentNullException("segments");
 
-
+            var inlines = new List<Inline>();
+            foreach (var segment in segments)
+            {
+                if (segment.Format.HasFlag(TextFormat.NewLine))
+                {
+                    inlines.Add(new LineBreak());
+                }
+                else
+                {
+                    var run = new Run(segment.Text);
+                    if (segment.Format.HasFlag(TextFormat.Bold))
+                        run.FontWeight = FontWeights.Bold;
+                    if (segment.Format.HasFlag(TextFormat.Italic))
+                        run.FontStyle = FontStyles.Italic;
+                    if (segment.Format.HasFlag(TextFormat.Underline))
+                        run.TextDecorations.Add(TextDecorations.Underline);
+                    inlines.Add(run);
+                }
+            }
+            return inlines;
+        }
     }
 }
