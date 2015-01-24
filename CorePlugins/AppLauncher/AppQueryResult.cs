@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LauncherZLib.FormattedText;
 using LauncherZLib.Launcher;
 using LauncherZLib.Matching;
 
@@ -19,9 +20,12 @@ namespace CorePlugins.AppLauncher
 
         public double Relevance { get; set; }
 
-        public AppQueryResult(AppDescription appDescription, FlexMatchResult result)
+        public AppQueryResult(string title, string description, string linkFileLocation, double relevance)
         {
-            
+            Title = title;
+            Description = description;
+            LinkFileLocation = linkFileLocation;
+            Relevance = relevance;
         }
 
         public LauncherData CreateLauncherData()

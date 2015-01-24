@@ -132,66 +132,12 @@ namespace LauncherZLib.FormattedText
             return segments;
         }
 
-        public static IEnumerable<FormattedSegment> ParseFlexMatchResult(string input, FlexMatchResult result)
-        {
-            return ParseFlexMatchResult(input, result, TextFormat.Normal, TextFormat.Bold);
-        } 
-
-        public static IEnumerable<FormattedSegment> ParseFlexMatchResult(string input, FlexMatchResult result,
-            TextFormat normalFormat, TextFormat highlightFormat)
-        {
-            if (input == null)
-                throw new ArgumentNullException("input");
-            if (result == null)
-                throw new ArgumentNullException("result");
-
-            if (!result.Success)
-                return new FormattedSegment[] {new FormattedSegment(input, TextFormat.Normal)};
-
-            FlexMatchCollection matches = null;
-            if (result.IsExactMatchPerformed && result.ExactMatches.Count > 0)
-                matches = result.ExactMatches;
-            if (result.IsFlexMatchPerformed && result.FlexMatches.Count > 0)
-                matches = result.FlexMatches;
-
-            if (matches != null)
-            {
-                var segments = new List<FormattedSegment>();
-                var lastPlainIdx = 0;
-                var matchSb = new StringBuilder();
-                foreach (var m in matches)
-                {
-                    if (m.StartIndex > lastPlainIdx)
-                    {
-                        if (matchSb.Length > 0)
-                        {
-                            segments.AddRange(ParsePlainText(matchSb.ToString(), highlightFormat));
-                            matchSb.Clear();
-                        }
-                        segments.AddRange(ParsePlainText(input.Substring(lastPlainIdx, m.StartIndex - lastPlainIdx), normalFormat));
-                        matchSb.Append(m.Content);
-                    }
-                    else
-                    {
-                        // concat adjacent match
-                        matchSb.Append(m.Content);
-                    }
-                    lastPlainIdx = m.StartIndex + m.Length;
-                }
-                if (matchSb.Length > 0)
-                {
-                    segments.AddRange(ParsePlainText(matchSb.ToString(), highlightFormat));
-                }
-                if (lastPlainIdx < input.Length)
-                {
-                    segments.AddRange(ParsePlainText(input.Substring(lastPlainIdx, input.Length - lastPlainIdx), normalFormat));
-                }
-                return segments;
-            }
-
-            return Enumerable.Empty<FormattedSegment>();
-        }
-
+        /// <summary>
+        /// Converts input into plain segments (normal / newline only) with unified format.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="format"></param>
+        /// <returns></returns>
         public static IEnumerable<FormattedSegment> ParsePlainText(string text, TextFormat format)
         {
             if (text == null)
@@ -237,7 +183,118 @@ namespace LauncherZLib.FormattedText
                 segments.Add(new FormattedSegment(sb.ToString(), format));
             }
             return segments;
+        }
+
+        /// <summary>
+        /// Converts <see cref="T:LauncherZLib.Matching.FlexMatchResult"/> to formatted string,
+        /// assuming bold as highlight format.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        public static string ConvertFlexMatchResult(string input, FlexMatchResult result)
+        {
+            return ConvertFlexMatchResult(input, result, TextFormat.Normal, TextFormat.Bold);
         } 
+
+        /// <summary>
+        /// Converts <see cref="T:LauncherZLib.Matching.FlexMatchResult"/> to formatted string with
+        /// specified format.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="result"></param>
+        /// <param name="normalFormat"></param>
+        /// <param name="highlightFormat"></param>
+        /// <returns></returns>
+        public static string ConvertFlexMatchResult(string input, FlexMatchResult result,
+            TextFormat normalFormat, TextFormat highlightFormat)
+        {
+            if (input == null)
+                throw new ArgumentNullException("input");
+            if (result == null)
+                throw new ArgumentNullException("result");
+
+            if (!result.Success)
+                return WrapWithFormat(input, normalFormat);
+
+            FlexMatchCollection matches = null;
+            if (result.IsExactMatchPerformed && result.ExactMatches.Count > 0)
+                matches = result.ExactMatches;
+            if (result.IsFlexMatchPerformed && result.FlexMatches.Count > 0)
+                matches = result.FlexMatches;
+            
+            if (matches != null)
+            {
+                var sb = new StringBuilder(input.Length + matches.Count*4);
+                var plainStart = 0;
+                var hlStart = 0;
+                foreach (var m in matches)
+                {
+                    if (m.StartIndex > plainStart)
+                    {
+                        if (plainStart > hlStart)
+                        {
+                            // emit existing match
+                            sb.Append(WrapWithFormat(input.Substring(hlStart, plainStart - hlStart), highlightFormat));
+                        }
+                        sb.Append(WrapWithFormat(input.Substring(plainStart, m.StartIndex - plainStart), normalFormat));
+                        hlStart = m.StartIndex;
+                        plainStart = m.StartIndex + m.Length;
+                    }
+                    else
+                    {
+                        // concat adjacent matches
+                        plainStart += m.Length;
+                    }
+                }
+                // last pieces
+                if (plainStart > hlStart)
+                    sb.Append(WrapWithFormat(input.Substring(hlStart, plainStart - hlStart), highlightFormat));
+                if (plainStart < input.Length)
+                    sb.Append(WrapWithFormat(input.Substring(plainStart), normalFormat));
+                return sb.ToString();
+            }
+
+
+            return WrapWithFormat(input, normalFormat);
+        }
+        
+        /// <summary>
+        /// <para>Wraps a string with format controllers.</para>
+        /// <para>For example, WrapWithFormat("A", TextFormat.Bold) will return "[A]".</para>
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="format"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This method will fix potential escaping problems. If the given string ends with a single backslash,
+        /// a new backslash will be appended to prevent escaping controlling characters.
+        /// </remarks>
+        public static string WrapWithFormat(string str, TextFormat format)
+        {
+            if (string.IsNullOrEmpty(str))
+                throw new ArgumentNullException("str");
+
+            bool fixEscape = str.Length >= 2 && str[str.Length - 1] == '\\' & str[str.Length - 2] != '\\';
+            if (format == TextFormat.Normal || format.HasFlag(TextFormat.Underline))
+                return fixEscape ? str + '\\' : str;
+            
+            var left = format.HasFlag(TextFormat.Bold) ? "[" : "";
+            var right = format.HasFlag(TextFormat.Bold) ? "]" : "";
+            if (format.HasFlag(TextFormat.Italic))
+            {
+                left = left + '~';
+                right = '~' + right;
+            }
+            if (format.HasFlag(TextFormat.Underline))
+            {
+                left = left + '_';
+                right = '_' + right;
+            }
+            return fixEscape
+                ? string.Format("{0}{1}\\{2}", left, str, right)
+                : string.Format("{0}{1}{2}", left, str, right);
+        }
         
         private static TextFormat ModifyFormatByControlChar(TextFormat format, char c)
         {

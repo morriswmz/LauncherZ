@@ -95,8 +95,8 @@ namespace LauncherZTests
                 new FormattedSegment(string.Empty, TextFormat.NewLine),
                 new FormattedSegment("F", TextFormat.Normal)
             };
-            FormattedSegment[] actualOutputFlex1 =
-                FormattedTextEngine.ParseFlexMatchResult(inputFlex1, result1).ToArray();
+            string converted1 = FormattedTextEngine.ConvertFlexMatchResult(inputFlex1, result1);
+            FormattedSegment[] actualOutputFlex1 = FormattedTextEngine.ParseFormattedText(converted1).ToArray();
             CollectionAssert.AreEqual(expectedOutputFlex1, actualOutputFlex1);
 
             var inputFlex2 = "Renewable Energy";
@@ -117,8 +117,8 @@ namespace LauncherZTests
                 new FormattedSegment("g", TextFormat.Bold),
                 new FormattedSegment("y", TextFormat.Normal)
             };
-            FormattedSegment[] actualOutputFlex2 =
-                FormattedTextEngine.ParseFlexMatchResult(inputFlex2, result2).ToArray();
+            string converted2 = FormattedTextEngine.ConvertFlexMatchResult(inputFlex2, result2);
+            FormattedSegment[] actualOutputFlex2 = FormattedTextEngine.ParseFormattedText(converted2).ToArray();
             CollectionAssert.AreEqual(expectedOutputFlex2, actualOutputFlex2);
 
         }

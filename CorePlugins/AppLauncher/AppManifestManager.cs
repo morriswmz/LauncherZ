@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using LauncherZLib.API;
+using LauncherZLib.FormattedText;
 using LauncherZLib.Launcher;
 using LauncherZLib.Matching;
 using Newtonsoft.Json;
@@ -32,13 +33,15 @@ namespace CorePlugins.AppLauncher
                 FlexMatchResult matchResult = _matcher.Match(app.Name, keywords);
                 if (matchResult.Success)
                 {
-                    var result = new AppQueryResult(app, matchResult)
-                    {
-                        Relevance = _scorer.Score(app.Name, matchResult)
-                    };
+                    double baseScore = _scorer.Score(app.Name, matchResult);
                     // weighted sum of match score and frequency of usage
                     // here we use exponential decay 1.0 - exp(-n)
-                    result.Relevance = 0.8*result.Relevance + 0.2*(1.0 - Math.Exp(-app.Frequency/5.0));
+                    double freqScore = 0.2*(1.0 - Math.Exp(-app.Frequency/5.0));
+                    var result = new AppQueryResult(
+                        FormattedTextEngine.ConvertFlexMatchResult(app.Name, matchResult),
+                        app.Description, app.LinkFileLocation,
+                        0.8*baseScore + 0.2*freqScore);
+                    candidates.Add(result);
                 }
             }
             return candidates.OrderByDescending(x => x.Relevance)
