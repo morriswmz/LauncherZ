@@ -190,6 +190,11 @@ namespace LauncherZLib.Launcher
                 handler(this, new PropertyChangedEventArgs(propName));
             }
         }
+
+        public override string ToString()
+        {
+            return string.Format("[{0}]{1}", Relevance, Title);
+        }
     }
 
     /// <summary>

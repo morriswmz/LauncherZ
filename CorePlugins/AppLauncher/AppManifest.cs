@@ -12,6 +12,13 @@ namespace CorePlugins.AppLauncher
     {
         [JsonProperty(PropertyName = "apps", Required = Required.Always)]
         public List<AppDescription> Apps { get; set; }
+
+        public static readonly AppManifest Empty = new AppManifest();
+
+        public AppManifest()
+        {
+            Apps = new List<AppDescription>(0);
+        }
     }
 
     [Serializable]
@@ -29,7 +36,10 @@ namespace CorePlugins.AppLauncher
         [JsonProperty(PropertyName = "frequency", Required = Required.Always)]
         public int Frequency { get; set; }
 
-
+        public override string ToString()
+        {
+            return string.IsNullOrEmpty(Name) ? "[Unnamed]" : Name;
+        }
     }
 
 }

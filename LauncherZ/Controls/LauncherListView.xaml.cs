@@ -361,6 +361,9 @@ namespace LauncherZ.Controls
 
         private LauncherData GetAssociatedLauncherDataAt(int idx)
         {
+            if (idx < 0 || idx >= CtlLauncherPanel.Children.Count)
+                return null;
+
             var item = (LauncherDataItem)CtlLauncherPanel.Children[idx];
             return item.DataContext as LauncherData;
         }
@@ -378,7 +381,7 @@ namespace LauncherZ.Controls
             {
                 // smooth scrolling !!!!
                 CtlScrollViewer.ScrollToVerticalOffset(0.5 * (_targetVerticalOffset + CtlScrollViewer.VerticalOffset));
-                if (Math.Abs(CtlScrollViewer.VerticalOffset - _targetVerticalOffset) < 0.2)
+                if (Math.Abs(CtlScrollViewer.VerticalOffset - _targetVerticalOffset) < 0.5)
                 {
                     CtlScrollViewer.ScrollToVerticalOffset(_targetVerticalOffset);
                     _scrolling = false;

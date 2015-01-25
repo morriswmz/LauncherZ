@@ -2,64 +2,97 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
+using IWshRuntimeLibrary;
 using LauncherZLib.API;
 using LauncherZLib.FormattedText;
 using LauncherZLib.Launcher;
 using LauncherZLib.Matching;
+using LauncherZLib.Utils;
 using Newtonsoft.Json;
+using File = System.IO.File;
 
 namespace CorePlugins.AppLauncher
 {
     public class AppManifestManager
     {
         private ILogger _logger;
-        private AppManifest _manifest;
+        private AppManifest _manifest = AppManifest.Empty;
         private FlexMatcher _matcher = new FlexMatcher();
         private FlexScorer _scorer = new FlexScorer();
+        private string _manifestPath;
+        private bool _updating = false;
+        private CancellationTokenSource _csSource;
+        private readonly object _updateLock = new object();
 
-        public AppManifestManager(ILogger logger)
+        public AppManifestManager(string manifestPath, ILogger logger)
         {
+            if (manifestPath == null)
+                throw new ArgumentNullException("manifestPath");
+            if (logger == null)
+                throw new ArgumentNullException("logger");
+
+            _manifestPath = manifestPath;
             _logger = logger;
         }
 
+        public bool IsManifestEmpty { get { return _manifest.Apps == null || _manifest.Apps.Count == 0; } }
 
-        public IEnumerable<LauncherData> Query(string[] keywords, int limit)
+        public IEnumerable<AppDescription> GetAppDescriptions()
         {
-            var candidates = new List<AppQueryResult>();
-            foreach (var app in _manifest.Apps)
+            return IsManifestEmpty ? Enumerable.Empty<AppDescription>() : _manifest.Apps;
+        } 
+
+        public async void ScheduleUpdateManifest()
+        {
+            if (_updating)
+                return;
+
+            _updating = true;
+
+            // start update task
+            _csSource = new CancellationTokenSource();
+            Dictionary<string, AppDescription> apps = await Task.Run(() => DoUpdate(), _csSource.Token);
+            if (!_csSource.IsCancellationRequested)
             {
-                FlexMatchResult matchResult = _matcher.Match(app.Name, keywords);
-                if (matchResult.Success)
+                // copy old data
+                foreach (var oldApp in _manifest.Apps)
                 {
-                    double baseScore = _scorer.Score(app.Name, matchResult);
-                    // weighted sum of match score and frequency of usage
-                    // here we use exponential decay 1.0 - exp(-n)
-                    double freqScore = 0.2*(1.0 - Math.Exp(-app.Frequency/5.0));
-                    var result = new AppQueryResult(
-                        FormattedTextEngine.ConvertFlexMatchResult(app.Name, matchResult),
-                        app.Description, app.LinkFileLocation,
-                        0.8*baseScore + 0.2*freqScore);
-                    candidates.Add(result);
+                    AppDescription newApp;
+                    if (apps.TryGetValue(oldApp.LinkFileLocation, out newApp))
+                    {
+                        newApp.Frequency = oldApp.Frequency;
+                    }
                 }
+                // update existing
+                _manifest.Apps = apps.Values.ToList();
+                SaveManifestToFile();
             }
-            return candidates.OrderByDescending(x => x.Relevance)
-                .Take(limit)
-                .Select(x => x.CreateLauncherData());
+            _updating = false;
         }
 
-        public void ScheduleUpdateManifest()
+        public void AbortUpdate()
         {
-            
+            if (!_csSource.IsCancellationRequested)
+                _csSource.Cancel();
         }
 
-        public void SaveManifestToFile(string path)
+        public void IncreaseFrequencyFor(string lnkFilePath)
+        {
+            var app = _manifest.Apps.Find(
+                x => x.LinkFileLocation.Equals(lnkFilePath, StringComparison.OrdinalIgnoreCase));
+            if (app != null)
+                app.Frequency++;
+        }
+
+        public void SaveManifestToFile()
         {
             try
             {
-                var serializer = new JsonSerializer();
-                using (var sw = new StreamWriter(path))
+                var serializer = new JsonSerializer {Formatting = Formatting.Indented};
+                using (var sw = new StreamWriter(_manifestPath))
                 {
                     serializer.Serialize(sw, _manifest);
                     sw.Flush();
@@ -67,19 +100,19 @@ namespace CorePlugins.AppLauncher
             }
             catch (Exception ex)
             {
-                _logger.Error(string.Format("Failed to save application manifest to {0}", path));
+                _logger.Error(string.Format("Failed to save application manifest to {0}", _manifestPath));
             }
         }
 
-        public bool LoadManifestFromFile(string path)
+        public bool LoadManifestFromFile()
         {
-            if (!File.Exists(path))
+            if (!File.Exists(_manifestPath))
                 return false;
 
             try
             {
                 var serializer = new JsonSerializer();
-                using (var sr = new StreamReader(path))
+                using (var sr = new StreamReader(_manifestPath))
                 {
                     var jsonReader = new JsonTextReader(sr);
                     _manifest = serializer.Deserialize<AppManifest>(jsonReader);
@@ -88,9 +121,73 @@ namespace CorePlugins.AppLauncher
             }
             catch (Exception ex)
             {
-                _logger.Error(string.Format("Failed to load application manifest from {0}", path));
+                _logger.Error(string.Format("Failed to load application manifest from {0}", _manifestPath));
                 return false;
             }
+        }
+
+        public Dictionary<string, AppDescription> DoUpdate()
+        {
+            if (_csSource.IsCancellationRequested)
+                return new Dictionary<string, AppDescription>(0);
+
+            // init Windows Script Host
+            IWshShell wsh = null;
+            try
+            {
+                wsh = new WshShell();
+            }
+            catch (Exception)
+            {
+                return new Dictionary<string, AppDescription>(0);
+            }
+            // create directory walker
+            var walker = new SafeDirectoryWalker
+            {
+                Recursive = true,
+                MaxDepth = 8,
+                SearchPattern = new Regex(@"\.lnk$", RegexOptions.IgnoreCase)
+            };
+            var apps = new Dictionary<string, AppDescription>();
+            var aborted = false;
+            // search for *.lnk
+            var folders = new string[]
+            {
+                Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu),
+                Environment.GetFolderPath(Environment.SpecialFolder.StartMenu)
+            };
+            foreach (var folder in folders)
+            {
+                walker.Walk(folder, fi =>
+                {
+                    if (_csSource.IsCancellationRequested)
+                    {
+                        aborted = true;
+                        return false;
+                    }
+
+                    try
+                    {
+                        IWshShortcut shortcut = wsh.CreateShortcut(fi.FullName);
+                        apps.Add(fi.FullName, new AppDescription()
+                        {
+                            Name = Path.GetFileNameWithoutExtension(fi.Name),
+                            Description =
+                                string.IsNullOrEmpty(shortcut.Description) ? fi.FullName : shortcut.Description,
+                            LinkFileLocation = fi.FullName
+                        });
+                        return true;
+                    }
+                    catch (Exception)
+                    {
+                        System.Diagnostics.Trace.WriteLine(fi.FullName);
+                        return true;
+                    }
+                });
+            }
+
+
+            return aborted ? new Dictionary<string, AppDescription>(0) : apps;
         }
 
     }

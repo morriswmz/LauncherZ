@@ -179,6 +179,18 @@ namespace LauncherZLib.Plugin
         }
 
         /// <summary>
+        /// Deactivates all plugins.
+        /// </summary>
+        public void DeactivateAll()
+        {
+            string[] pluginIds = _activePluginIds.ToArray();
+            foreach (var pluginId in pluginIds)
+            {
+                Deactivate(pluginId);
+            }
+        }
+
+        /// <summary>
         /// Retrieves the priority of specific plugin.
         /// </summary>
         /// <param name="pluginId"></param>
@@ -231,7 +243,7 @@ namespace LauncherZLib.Plugin
                 {
                     info.SourceDirectory = dir;
                     info.DataDirectory = string.Format("{0}{1}{2}",
-                        dataPath, Path.DirectorySeparatorChar, (new DirectoryInfo(dir)).Name);
+                        dataPath, Path.DirectorySeparatorChar, info.Id);
                     try
                     {
                         PluginContainer container = LoadPlugin(info);

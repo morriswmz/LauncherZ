@@ -73,6 +73,7 @@
     <Compile Include="Matching\FlexMatcher.cs" />
     <Compile Include="Matching\FlexMatchResult.cs" />
     <Compile Include="Matching\FlexScorer.cs" />
+    <Compile Include="PluginTemplate\EmptyPlugin.cs" />
     <Compile Include="Plugin\AsyncUpdateEventArgs.cs" />
     <Compile Include="Plugin\PluginStatus.cs" />
     <Compile Include="Plugin\PluginContainer.cs" />
@@ -87,8 +88,10 @@
     <Compile Include="Launcher\LauncherQuery.cs" />
     <Compile Include="QueryController.cs" />
     <Compile Include="UserVariableManager.cs" />
+    <Compile Include="Utils\FileSystemUtils.cs" />
     <Compile Include="Utils\GlobalHotkey.cs" />
     <Compile Include="Utils\KeyboardUtils.cs" />
+    <Compile Include="Utils\SafeDirectoryWalker.cs" />
     <Compile Include="Utils\SimpleCache.cs" />
     <Compile Include="Utils\SimpleLogger.cs" />
     <Compile Include="Utils\StringUtils.cs" />

@@ -97,6 +97,8 @@ namespace LauncherZ
             if (_appInitialized)
             {
                 // clean up
+                Logger.Info("Deactivating plugins...");
+                PluginManager.DeactivateAll();
                 Logger.Fine("Exiting...");
                 Logger.Close();
             }
