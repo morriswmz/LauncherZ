@@ -35,7 +35,6 @@ namespace CorePlugins.AppLauncher
 
         public override void Deactivate(IPluginContext pluginContext)
         {
-            _manager.SaveManifestToFile();
             _manager.AbortUpdate();
         }
 

@@ -28,7 +28,7 @@ namespace LauncherZLib.PluginTemplate
                         Environment.NewLine, ex));
                 }
             }
-                
+            
                 
         }
 
