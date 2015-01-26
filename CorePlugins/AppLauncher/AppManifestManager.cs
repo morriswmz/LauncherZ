@@ -25,7 +25,6 @@ namespace CorePlugins.AppLauncher
         private string _manifestPath;
         private bool _updating = false;
         private CancellationTokenSource _csSource;
-        private readonly object _updateLock = new object();
 
         public AppManifestManager(string manifestPath, ILogger logger)
         {
@@ -89,41 +88,20 @@ namespace CorePlugins.AppLauncher
 
         public void SaveManifestToFile()
         {
-            try
-            {
-                var serializer = new JsonSerializer {Formatting = Formatting.Indented};
-                using (var sw = new StreamWriter(_manifestPath))
-                {
-                    serializer.Serialize(sw, _manifest);
-                    sw.Flush();
-                }
-            }
-            catch (Exception ex)
-            {
+            if (!JsonUtils.TryStreamSerialize(_manifestPath, _manifest, Formatting.Indented))
                 _logger.Error(string.Format("Failed to save application manifest to {0}", _manifestPath));
-            }
         }
 
         public bool LoadManifestFromFile()
         {
-            if (!File.Exists(_manifestPath))
-                return false;
-
-            try
-            {
-                var serializer = new JsonSerializer();
-                using (var sr = new StreamReader(_manifestPath))
-                {
-                    var jsonReader = new JsonTextReader(sr);
-                    _manifest = serializer.Deserialize<AppManifest>(jsonReader);
-                }
-                return true;
-            }
-            catch (Exception ex)
+            AppManifest loadedManifest;
+            if (!JsonUtils.TryStreamDeserialize(_manifestPath, out loadedManifest))
             {
                 _logger.Error(string.Format("Failed to load application manifest from {0}", _manifestPath));
                 return false;
             }
+            _manifest = loadedManifest;
+            return true;
         }
 
         public Dictionary<string, AppDescription> DoUpdate()

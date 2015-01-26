@@ -17,6 +17,18 @@ namespace LauncherZLib.Matching
         private double _exactDecay = 1.0;
         private double _flexDecay = 1.0;
 
+        public double ExactMatchWeight
+        {
+            get { return _exactWeight; }
+            set { _exactWeight = Math.Max(1.0, value); }
+        }
+
+        public double FlexMatchWeight
+        {
+            get { return _flexWeight; }
+            set { _flexWeight = Math.Max(1.0, value); }
+        }
+
         public double Score(string originalString, FlexMatchResult result)
         {
             double exactScore = 0.0;

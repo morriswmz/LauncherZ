@@ -222,7 +222,6 @@ namespace LauncherZLib.Plugin
             dataPath = dataPath.TrimEnd(Path.DirectorySeparatorChar);
 
             string[] directories = Directory.GetDirectories(searchPath);
-            var result = new List<PluginContainer>();
             foreach (string dir in directories)
             {
                 var infos = new List<PluginInfo>();
@@ -357,8 +356,7 @@ namespace LauncherZLib.Plugin
             }
 
             // read manifest.json
-            string json = File.ReadAllText(jsonPath);
-            var manifest = JsonConvert.DeserializeObject<PluginManifest>(json);
+            var manifest = JsonUtils.StreamDeserialize<PluginManifest>(jsonPath);
             return (manifest == null || manifest.Plugins == null) ? Enumerable.Empty<PluginInfo>() : manifest.Plugins;
         }
 
