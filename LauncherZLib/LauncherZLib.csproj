@@ -73,6 +73,8 @@
     <Compile Include="Matching\FlexMatcher.cs" />
     <Compile Include="Matching\FlexMatchResult.cs" />
     <Compile Include="Matching\FlexScorer.cs" />
+    <Compile Include="PluginTemplate\CommandPlugin.cs" />
+    <Compile Include="PluginTemplate\ConfigurablePlugin.cs" />
     <Compile Include="PluginTemplate\EmptyPlugin.cs" />
     <Compile Include="Plugin\AsyncUpdateEventArgs.cs" />
     <Compile Include="Plugin\PluginStatus.cs" />

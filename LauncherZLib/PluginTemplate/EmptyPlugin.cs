@@ -28,8 +28,6 @@ namespace LauncherZLib.PluginTemplate
                         Environment.NewLine, ex));
                 }
             }
-            
-                
         }
 
         public abstract void Deactivate(IPluginContext pluginContext);
