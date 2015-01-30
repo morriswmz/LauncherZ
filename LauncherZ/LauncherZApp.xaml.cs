@@ -16,6 +16,7 @@ using System.Windows.Threading;
 using LauncherZLib.Icon;
 using LauncherZLib.Plugin;
 using LauncherZLib.Utils;
+using Newtonsoft.Json;
 
 namespace LauncherZ
 {
