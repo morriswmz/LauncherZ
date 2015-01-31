@@ -27,9 +27,6 @@ namespace LauncherZLib.Plugin
         [JsonProperty(PropertyName = "version", Required = Required.Always)]
         public string Version { get; set; }
 
-        [JsonProperty(PropertyName = "priority")]
-        public double Priority { get; set; }
-
         [JsonProperty(PropertyName = "plugin_type", Required = Required.Always)]
         public string PluginType { get; set; }
 
@@ -54,7 +51,6 @@ namespace LauncherZLib.Plugin
         public PluginInfo()
         {
             Description = string.Empty;
-            Priority = 0.0;
             Assembly = string.Empty;
             PluginClass = string.Empty;
             Xml = string.Empty;

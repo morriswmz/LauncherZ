@@ -24,7 +24,7 @@ namespace LauncherZLib.Plugin
         private readonly List<string> _authors;
         private readonly Version _version;
         private readonly string _description;
-        private readonly double _priority;
+        private double _priority = 0.0;
         private readonly string _sourceDirectory;
         private readonly string _suggestedDataDirectory;
         private readonly bool _isAsync;
@@ -76,9 +76,15 @@ namespace LauncherZLib.Plugin
         }
         
         /// <summary>
-        /// 
+        /// Gets or sets the priority of this plugin.
+        /// Value is constrained between 0 and 1 inclusive.
         /// </summary>
-        public double Priority { get { return _priority; } }
+        public double Priority { 
+            get { return _priority; }
+            set {
+                _priority = double.IsNaN(value) ? 0.0 : Math.Max(0.0, Math.Min(value, 1.0));
+            }
+        }
 
         /// <summary>
         /// 
@@ -135,7 +141,6 @@ namespace LauncherZLib.Plugin
             _authors = info.Authors;
             _version = new Version(info.Version);
             _description = info.Description;
-            _priority = info.Priority;
             _sourceDirectory = info.SourceDirectory;
             _suggestedDataDirectory = info.DataDirectory;
             _eventBus = new EventBus();

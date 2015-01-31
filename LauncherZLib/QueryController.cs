@@ -187,8 +187,8 @@ namespace LauncherZLib
                 if (x.Relevance < y.Relevance)
                     return -1;
 
-                double xp = _pluginManager.GetPriorityOf(x.PluginId);
-                double yp = _pluginManager.GetPriorityOf(y.PluginId);
+                double xp = _pluginManager.GetPluginPriority(x.PluginId);
+                double yp = _pluginManager.GetPluginPriority(y.PluginId);
                 return xp.CompareTo(yp);
             }
         }

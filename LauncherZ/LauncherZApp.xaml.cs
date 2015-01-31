@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -28,9 +25,12 @@ namespace LauncherZ
 
         #region Private Fields
 
+        private const string AppConfigFileName = "LauncherZConfig.json";
         private bool _appInitialized = false;
 
         #endregion
+
+        
 
         /// <summary>
         /// The current LaucherZApp instance.
@@ -55,6 +55,8 @@ namespace LauncherZ
         public string AppDataBasePath { get; private set; }
         public string PluginDataPath { get; private set; }
         public string LogPath { get; private set; }
+
+        public LauncherZConfig Configuration { get; private set; }
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
@@ -97,6 +99,18 @@ namespace LauncherZ
         {
             if (_appInitialized)
             {
+                // save configruation
+                try
+                {
+                    JsonUtils.StreamSerialize(
+                        Path.Combine(AppDataBasePath, AppConfigFileName), Configuration, Formatting.Indented);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(string.Format(
+                        "An exception occurred while saving application configuration. Details:{0}{1}",
+                        Environment.NewLine, ex));
+                }
                 // clean up
                 Logger.Info("Deactivating plugins...");
                 PluginManager.DeactivateAll();
@@ -108,19 +122,44 @@ namespace LauncherZ
         private void InitilizeApp()
         {
             AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
-            // create app data files
-            CreateAppDataFiles();
+            // create app data folders
+            CreateAppDataFolders();
             // initialize logger
             InitializeLogger();
             // load configurations
+            try
+            {
+                Configuration = JsonUtils.StreamDeserialize<LauncherZConfig>(
+                    Path.Combine(AppDataBasePath, AppConfigFileName));
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(string.Format(
+                    "An exception occurred while loading application configuration. Details: {0}{1}",
+                    Environment.NewLine, ex));
+                // default config
+                Logger.Warning("Using default configuration.");
+                Configuration = new LauncherZConfig();
+            }
             Logger.Info("Initialized.");
             // initialize components
-            PluginManager = new PluginManager(Logger);
+            PluginManager = new PluginManager(Logger, Dispatcher);
             IconManager = new IconManager(512, PluginManager);
             RegitserInternalIcons();
             // load plugins
             PluginManager.LoadAllFrom(Path.GetFullPath(@".\Plugins"), PluginDataPath);
             PluginManager.LoadAllFrom(string.Format("{0}{1}Plugins", AppDataBasePath, Path.DirectorySeparatorChar), PluginDataPath);
+            // set plugin priorities from configuration
+            foreach (var pair in Configuration.Priorities)
+            {
+                PluginManager.SetPluginPriority(pair.Key, pair.Value);
+            }
+            // save priorities back to configuration
+            Configuration.Priorities.Clear();
+            foreach (var pluginId in PluginManager.LoadedPluginIds)
+            {
+                Configuration.Priorities.Add(pluginId, PluginManager.GetPluginPriority(pluginId));
+            }
 
             _appInitialized = true;
         }
@@ -138,7 +177,7 @@ namespace LauncherZ
             // leave it unhandled
         }
 
-        private void CreateAppDataFiles()
+        private void CreateAppDataFolders()
         {
             string userAppDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             
@@ -170,7 +209,8 @@ namespace LauncherZ
                 IconManager.AddIcon(new IconLocation("LauncherZ", s), bitmapImage, true);
             }
             IconManager.DefaultIcon = IconManager.GetIcon(new IconLocation("LauncherZ", "IconBlank"));
-            IconManager.ThumbnailBorderBrush = Brushes.White;
+            var iconBorderBrush = FindResource("IconBorderBrush") as Brush;
+            IconManager.ThumbnailBorderBrush = iconBorderBrush ?? Brushes.White;
         }
 
         private void InitializeLogger()

@@ -58,6 +58,7 @@
     </Style>
     
     <!-- Icons -->
+    <SolidColorBrush x:Key="IconBorderBrush" Color="White"></SolidColorBrush>
     <BitmapImage x:Key="IconProgram" UriSource="../Assets/IconProgram.png" PresentationOptions:Freeze="True"></BitmapImage>
     <BitmapImage x:Key="IconGear" UriSource="../Assets/IconGear.png" PresentationOptions:Freeze="True"></BitmapImage>
     <BitmapImage x:Key="IconNetwork" UriSource="../Assets/IconNetwork.png" PresentationOptions:Freeze="True"></BitmapImage>

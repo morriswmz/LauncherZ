@@ -46,11 +46,24 @@ namespace LauncherZLib.Plugin
 
         #endregion
 
-        public PluginManager(ILoggerProvider loggerProvider)
+        /// <summary>
+        /// Creates a plugin manager.
+        /// </summary>
+        /// <param name="loggerProvider">Logger provider.</param>
+        /// <param name="dispatcher">
+        /// Dispatcher of the main UI thread.
+        /// Asynchrous callbacks will be invoke via this dispatcher.
+        /// </param>
+        public PluginManager(ILoggerProvider loggerProvider, Dispatcher dispatcher)
         {
+            if (loggerProvider == null)
+                throw new ArgumentNullException("loggerProvider");
+            if (dispatcher == null)
+                throw new ArgumentNullException("dispatcher");
+
             _loggerProvider = loggerProvider;
             _logger = _loggerProvider.CreateLogger("PluginManager");
-            _dispatcher = Dispatcher.CurrentDispatcher;
+            _dispatcher = dispatcher;
         }
 
         /// <summary>
@@ -194,16 +207,32 @@ namespace LauncherZLib.Plugin
         /// Retrieves the priority of specific plugin.
         /// </summary>
         /// <param name="pluginId"></param>
-        /// <returns></returns>
-        public double GetPriorityOf(string pluginId)
+        /// <returns>
+        /// Corresponding priority.
+        /// If the specified plugin does not exist, 0 will be returned.
+        /// </returns>
+        public double GetPluginPriority(string pluginId)
         {
-            if (_activePluginIds.Contains(pluginId))
+            PluginContainer container;
+            if (_loadedPlugins.TryGetValue(pluginId, out container))
             {
-                return _loadedPlugins[pluginId].Priority;
+                return container.Priority;
             }
-            else
+            return 0.0;
+        }
+
+        /// <summary>
+        /// Sets the priority of specific plugin.
+        /// If the specified plugin does not exist, no action will be taken.
+        /// </summary>
+        /// <param name="pluginId"></param>
+        /// <param name="priority"></param>
+        public void SetPluginPriority(string pluginId, double priority)
+        {
+            PluginContainer container;
+            if (_loadedPlugins.TryGetValue(pluginId, out container))
             {
-                return 0.0;
+                container.Priority = priority;
             }
         }
 
