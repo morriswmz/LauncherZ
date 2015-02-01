@@ -360,7 +360,7 @@ namespace LauncherZLib.Plugin
                 return;
             }
 
-            // make sure event is raised on the same thread where the PluginManager was created.
+            // make sure event is raised on main UI thread.
             _dispatcher.InvokeAsync(() =>
             {
                 _logger.Error(string.Format(
@@ -434,7 +434,7 @@ namespace LauncherZLib.Plugin
                 // load into container if not null
                 if (plugin != null)
                 {
-                    var container = new PluginContainer(plugin, info, _loggerProvider.CreateLogger(info.Id))
+                    var container = new PluginContainer(plugin, info, _loggerProvider.CreateLogger(info.Id), _dispatcher)
                     {
                         CrashHandler = PluginCrashHandler
                     };

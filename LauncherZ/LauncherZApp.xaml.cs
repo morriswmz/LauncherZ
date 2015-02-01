@@ -25,7 +25,7 @@ namespace LauncherZ
 
         #region Private Fields
 
-        private const string AppConfigFileName = "LauncherZConfig.json";
+        private const string AppConfigFileName = "global_config.json";
         private bool _appInitialized = false;
 
         #endregion
@@ -56,7 +56,7 @@ namespace LauncherZ
         public string PluginDataPath { get; private set; }
         public string LogPath { get; private set; }
 
-        public LauncherZConfig Configuration { get; private set; }
+        internal LauncherZConfig Configuration { get; private set; }
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {

@@ -15,7 +15,7 @@ namespace LauncherZLib.Event
     /// <summary>
     /// Provides a platform to post/subscribe event without explicit registeration between components.
     /// No more "MyClass.EventA += SomeHandler".
-    /// This class is not thread-safe.
+    /// This class is NOT thread-safe.
     /// </summary>
     public class EventBus : IEventBus
     {

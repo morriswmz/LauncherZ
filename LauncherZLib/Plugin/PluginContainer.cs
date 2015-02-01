@@ -29,6 +29,7 @@ namespace LauncherZLib.Plugin
         private readonly string _suggestedDataDirectory;
         private readonly bool _isAsync;
 
+        private readonly Dispatcher _dispatcher;
         private readonly EventBus _eventBus;
         private readonly LocalizationDictionary _locDict;
         private readonly ILogger _logger;
@@ -133,8 +134,24 @@ namespace LauncherZLib.Plugin
         /// </summary>
         public event EventHandler<AsyncUpdateEventArgs> AsyncUpdate; 
 
-        public PluginContainer(IPlugin plugin, PluginInfo info, ILogger logger)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="plugin"></param>
+        /// <param name="info"></param>
+        /// <param name="logger"></param>
+        /// <param name="dispatcher"></param>
+        public PluginContainer(IPlugin plugin, PluginInfo info, ILogger logger, Dispatcher dispatcher)
         {
+            if (plugin == null)
+                throw new ArgumentNullException("plugin");
+            if (info == null)
+                throw new ArgumentNullException("info");
+            if (logger == null)
+                throw new ArgumentNullException("logger");
+            if (dispatcher == null)
+                throw new ArgumentNullException("dispatcher");
+
             _plugin = plugin;
             _id = info.Id;
             _name = info.Name;
@@ -143,6 +160,7 @@ namespace LauncherZLib.Plugin
             _description = info.Description;
             _sourceDirectory = info.SourceDirectory;
             _suggestedDataDirectory = info.DataDirectory;
+            _dispatcher = dispatcher;
             _eventBus = new EventBus();
             _locDict = new LocalizationDictionary();
             _logger = logger;

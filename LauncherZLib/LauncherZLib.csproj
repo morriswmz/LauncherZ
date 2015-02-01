@@ -56,6 +56,7 @@
     <Compile Include="API\IPluginContext.cs" />
     <Compile Include="API\IPlugin.cs" />
     <Compile Include="API\IPluginAsync.cs" />
+    <Compile Include="Event\LauncherResultUpdateEvent.cs" />
     <Compile Include="FormattedText\FormattedSegment.cs" />
     <Compile Include="FormattedText\FormattedTextEngine.cs" />
     <Compile Include="FormattedText\TextFormat.cs" />
