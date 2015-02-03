@@ -168,8 +168,16 @@ namespace LauncherZLib.Plugin
             Status = PluginStatus.Deactivated;
         }
 
+        public void AttachToParentEventBus(IEventBus eventBus)
+        {
+            
+        }
+
         public IEnumerable<LauncherData> Query(LauncherQuery query)
         {
+            if (Status != PluginStatus.Activated)
+                throw new InvalidOperationException();
+
             IEnumerable<LauncherData> results = _plugin.Query(query);
             return results ?? Enumerable.Empty<LauncherData>();
         }

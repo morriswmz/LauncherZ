@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Runtime.InteropServices;
-using System.Runtime.Remoting.Messaging;
-using System.Text;
-using System.Threading.Tasks;
 using LauncherZLib.API;
 
 namespace LauncherZLib.Event
@@ -15,7 +10,7 @@ namespace LauncherZLib.Event
     /// <summary>
     /// Provides a platform to post/subscribe event without explicit registeration between components.
     /// No more "MyClass.EventA += SomeHandler".
-    /// This class is NOT thread-safe.
+    /// This class is thread-safe.
     /// </summary>
     public class EventBus : IEventBus
     {
@@ -25,47 +20,110 @@ namespace LauncherZLib.Event
         
         // caches all registered handlers, used when posting events
         // so it is safe to register/unregister event handlers in event handlers
-        private readonly Dictionary<Type, EventHandlerNode[]> _handlerCache = new Dictionary<Type, EventHandlerNode[]>(); 
+        private Dictionary<Type, EventHandlerNode[]> _handlerCache = new Dictionary<Type, EventHandlerNode[]>(); 
         
         // maps registered objects to associated handlers
         private readonly Dictionary<object, List<EventHandlerNode>> _objectMap = new Dictionary<object, List<EventHandlerNode>>();
         
         private bool _rebuildFlag = false;
+        private object _lock = new object();
 
+        /// <summary>
+        /// Registers an event handler.
+        /// No action will be taken if given event handler is already registered.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <seealso cref="T:LauncherZLib.Event.SubscribeEventAttribute"/>
         public void Register(object obj)
         {
-            // check if already registered
-            if (_objectMap.ContainsKey(obj))
-                return;
-
-            foreach (var methodInfo in obj.GetType().GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance))
+            lock (_lock)
             {
-                // check attribute
-                if (!methodInfo.GetCustomAttributes(typeof(SubscribeEventAttribute), false).Any())
-                    continue;
-                // check method
-                if (methodInfo.IsStatic || methodInfo.IsAbstract || methodInfo.IsGenericMethod)
-                    throw new InvalidHandlerException("Event handler cannot be static, abstract or generic.");
-                
-                // create and add
-                EventHandlerNode node = CreateHandlerNode(obj, methodInfo);
-                if (node != null)
-                {
-                    // add handler
-                    if (!_handlers.ContainsKey(node.EventType))
-                        _handlers[node.EventType] = new List<EventHandlerNode>();
-                    _handlers[node.EventType].Add(node);
+                // check if already registered
+                if (_objectMap.ContainsKey(obj))
+                    return;
 
-                    if (!_objectMap.ContainsKey(obj))
-                        _objectMap[obj] = new List<EventHandlerNode>();
-                    _objectMap[obj].Add(node);
-                    _rebuildFlag = true;
+                foreach (
+                    var methodInfo in
+                        obj.GetType().GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance))
+                {
+                    // check attribute
+                    if (!methodInfo.GetCustomAttributes(typeof (SubscribeEventAttribute), false).Any())
+                        continue;
+                    // check method
+                    if (methodInfo.IsStatic || methodInfo.IsAbstract || methodInfo.IsGenericMethod)
+                        throw new InvalidHandlerException("Event handler cannot be static, abstract or generic.");
+
+                    // create and add
+                    EventHandlerNode node = CreateHandlerNode(obj, methodInfo);
+                    if (node != null)
+                    {
+                        // add handler
+                        if (!_handlers.ContainsKey(node.EventType))
+                            _handlers[node.EventType] = new List<EventHandlerNode>();
+                        _handlers[node.EventType].Add(node);
+
+                        if (!_objectMap.ContainsKey(obj))
+                            _objectMap[obj] = new List<EventHandlerNode>();
+                        _objectMap[obj].Add(node);
+                        _rebuildFlag = true;
+                    }
                 }
             }
-
         }
 
+        /// <summary>
+        /// Unregisters a specific event handler.
+        /// No action will be taken if given event handler is not registered.
+        /// </summary>
+        /// <param name="obj"></param>
         public void Unregister(object obj)
+        {
+            lock (_lock)
+            {
+                UnregisterImpl(obj);
+            }
+        }
+
+        /// <summary>
+        /// Unregisters all event handlers.
+        /// </summary>
+        public void UnregisterAll()
+        {
+            lock (_lock)
+            {
+                object[] objects = _objectMap.Keys.ToArray();
+                foreach (var o in objects)
+                {
+                    UnregisterImpl(o);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Posts an event.
+        /// </summary>
+        /// <param name="e"></param>
+        /// <remarks>
+        /// This method distributes given event to a cached event handler list. Adding/removing event handlers
+        /// while handling the event will not affect the cached event handler list.
+        /// Although this class is thread-safe, you should still think carefully in multi-threaded environment.
+        /// </remarks>
+        public void Post(EventBase e)
+        {
+            if (_rebuildFlag)
+                RebuildCache();
+            // do not put any lock here, you don't want a deadlock
+            EventHandlerNode[] handlers;
+            if (_handlerCache.TryGetValue(e.GetType(), out handlers))
+            {
+                foreach (var node in handlers)
+                {
+                    node.Handle(e);
+                }
+            }
+        }
+
+        private void UnregisterImpl(object obj)
         {
             if (!_objectMap.ContainsKey(obj))
                 return;
@@ -78,38 +136,24 @@ namespace LauncherZLib.Event
             _rebuildFlag = true;
         }
 
-        public void UnregisterAll()
-        {
-            object[] objects = _objectMap.Keys.ToArray();
-            foreach (var o in objects)
-            {
-                Unregister(o);
-            }
-        }
-
-        public void Post(EventBase e)
-        {
-            if (_rebuildFlag)
-                RebuildCache();
-
-            EventHandlerNode[] handlers;
-            if (_handlerCache.TryGetValue(e.GetType(), out handlers))
-            {
-                foreach (var node in handlers)
-                {
-                    node.Handle(e);
-                }
-            }
-        }
-
         private void RebuildCache()
         {
-            _handlerCache.Clear();
-            foreach (var pair in _handlers)
+            lock (_lock)
             {
-                _handlerCache[pair.Key] = pair.Value.ToArray();
+                // sometimes another post call may be blocked when caching is being rebuilt
+                // when it continues, we don't want to rebuild the same cache twice
+                if (!_rebuildFlag)
+                    return;
+                // we do not modify the original cache here
+                // so it won't breaking ongoing post calls
+                var newCache = new Dictionary<Type, EventHandlerNode[]>();
+                foreach (var pair in _handlers)
+                {
+                    newCache[pair.Key] = pair.Value.ToArray();
+                }
+                _handlerCache = newCache;
+                _rebuildFlag = false;
             }
-            _rebuildFlag = false;
         }
         
         private EventHandlerNode CreateHandlerNode(object obj, MethodInfo method)

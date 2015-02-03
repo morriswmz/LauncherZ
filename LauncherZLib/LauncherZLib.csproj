@@ -82,6 +82,8 @@
     <Compile Include="PluginTemplate\ConfigurablePlugin.cs" />
     <Compile Include="PluginTemplate\EmptyPlugin.cs" />
     <Compile Include="Plugin\AsyncUpdateEventArgs.cs" />
+    <Compile Include="Plugin\PluginEventBusWrapper.cs" />
+    <Compile Include="Plugin\PluginEventRelay.cs" />
     <Compile Include="Plugin\PluginStatus.cs" />
     <Compile Include="Plugin\PluginContainer.cs" />
     <Compile Include="Plugin\PluginCrashedEventArgs.cs" />

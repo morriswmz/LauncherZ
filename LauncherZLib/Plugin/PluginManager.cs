@@ -20,6 +20,7 @@ namespace LauncherZLib.Plugin
         private readonly HashSet<string> _deactivatedPluginIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         private readonly HashSet<string> _activePluginIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         private readonly List<PluginContainer> _sortedActiveContainers = new List<PluginContainer>();
+        private readonly IEventBus _eventBus = new EventBus();
         private readonly ILoggerProvider _loggerProvider;
         private readonly ILogger _logger;
         private readonly Dispatcher _dispatcher;
@@ -326,6 +327,28 @@ namespace LauncherZLib.Plugin
                 return;
             if (container.Status == PluginStatus.Activated)
                 container.EventBus.Post(e);
+        }
+
+        /// <summary>
+        /// Registers an event handler for events raised by plugins.
+        /// No action will be taken if given handler is already registered.
+        /// </summary>
+        /// <param name="handler"></param>
+        /// <seealso cref="T:LauncherZLib.Event.EventBus"/>
+        public void RegisterPluginEventHandler(object handler)
+        {
+            _eventBus.Register(handler);
+        }
+
+        /// <summary>
+        /// Removes an event handler for events raised by plugins.
+        /// No action will be taken if given handler does not exist.
+        /// </summary>
+        /// <param name="handler"></param>
+        /// <seealso cref="T:LauncherZLib.Event.EventBus"/>
+        public void RemovePluginEventHandler(object handler)
+        {
+            _eventBus.Unregister(handler);
         }
 
         private void DispatchPluginActivatedEvent(string pluginId)

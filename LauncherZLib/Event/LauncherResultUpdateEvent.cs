@@ -32,9 +32,15 @@ namespace LauncherZLib.Event
         }
     }
 
-    internal class InternalLauncherResultUpdateEvent : LauncherResultUpdateEvent
+    internal class LauncherResultUpdateEventIntl : LauncherResultUpdateEvent
     {
         public string PluginId { get; private set; }
+
+        public LauncherResultUpdateEventIntl(LauncherResultUpdateEvent e, string pluginId)
+            : base(e.QueryId, e.Results, e.IsFinal)
+        {
+            PluginId = pluginId;
+        }
 
     }
 

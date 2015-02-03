@@ -8,6 +8,7 @@ namespace LauncherZLib.API
     /// <summary>
     /// Describes a plugin for LauncherZ with asynchronous query.
     /// </summary>
+    [Obsolete]
     public interface IPluginAsync : IPlugin
     {
 
