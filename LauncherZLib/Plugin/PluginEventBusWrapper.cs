@@ -28,17 +28,17 @@ namespace LauncherZLib.Plugin
 
         public void Register(object obj)
         {
-            
+            _eventBus.Register(obj);
         }
 
         public void Unregister(object obj)
         {
-            
+            _eventBus.Unregister(obj);
         }
 
         public void UnregisterAll()
         {
-            
+            _eventBus.UnregisterAll();
         }
 
         public void Post(EventBase e)

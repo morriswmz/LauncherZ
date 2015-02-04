@@ -36,7 +36,7 @@ namespace LauncherZLib.Event
     {
         public string PluginId { get; private set; }
 
-        public LauncherResultUpdateEventIntl(LauncherResultUpdateEvent e, string pluginId)
+        public LauncherResultUpdateEventIntl(string pluginId, LauncherResultUpdateEvent e)
             : base(e.QueryId, e.Results, e.IsFinal)
         {
             PluginId = pluginId;
