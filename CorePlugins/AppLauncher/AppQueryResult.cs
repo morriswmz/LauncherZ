@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using LauncherZLib.FormattedText;
-using LauncherZLib.Launcher;
-using LauncherZLib.Matching;
+﻿using LauncherZLib.Launcher;
 
 namespace CorePlugins.AppLauncher
 {

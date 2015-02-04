@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Threading;
 using LauncherZLib.API;
 using LauncherZLib.Event;
@@ -13,17 +9,17 @@ namespace LauncherZLib.Plugin
     {
 
         private readonly IEventBus _eventBus;
-        private readonly Dispatcher _dispatcher;
+        private readonly IDispatcherService _dispatcher;
 
-        public PluginEventBusWrapper(IEventBus eventBus, Dispatcher dispatcher)
+        public PluginEventBusWrapper(IEventBus eventBus, IDispatcherService dispatcherService)
         {
             if (eventBus == null)
                 throw new ArgumentNullException("eventBus");
-            if (dispatcher == null)
-                throw new ArgumentNullException("dispatcher");
+            if (dispatcherService == null)
+                throw new ArgumentNullException("dispatcherService");
 
             _eventBus = eventBus;
-            _dispatcher = dispatcher;
+            _dispatcher = dispatcherService;
         }
 
         public void Register(object obj)

@@ -29,8 +29,10 @@ namespace LauncherZLib.Plugin
         private readonly string _suggestedDataDirectory;
         private readonly bool _isAsync;
 
-        private readonly Dispatcher _dispatcher;
+        private readonly IDispatcherService _dispatcherService;
         private readonly EventBus _eventBus;
+        private readonly PluginEventBusWrapper _eventBusWrapper;
+        private readonly PluginEventRelay _eventRelay;
         private readonly LocalizationDictionary _locDict;
         private readonly ILogger _logger;
 
@@ -105,7 +107,12 @@ namespace LauncherZLib.Plugin
         /// <summary>
         /// 
         /// </summary>
-        public IEventBus EventBus { get { return _eventBus; } }
+        public IEventBus EventBus { get { return _eventBusWrapper; } }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        internal IEventBus UnwrappedEventBus { get { return _eventBus; } }
 
         /// <summary>
         /// 
@@ -132,27 +139,21 @@ namespace LauncherZLib.Plugin
         /// <summary>
         /// 
         /// </summary>
-        public event EventHandler<AsyncUpdateEventArgs> AsyncUpdate; 
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="plugin"></param>
         /// <param name="info"></param>
         /// <param name="logger"></param>
         /// <param name="dispatcher"></param>
-        public PluginContainer(IPlugin plugin, PluginInfo info, ILogger logger, Dispatcher dispatcher)
+        public PluginContainer(IPlugin plugin, PluginInfo info, PluginContextParameters contextParams)
         {
             if (plugin == null)
                 throw new ArgumentNullException("plugin");
             if (info == null)
                 throw new ArgumentNullException("info");
-            if (logger == null)
-                throw new ArgumentNullException("logger");
-            if (dispatcher == null)
-                throw new ArgumentNullException("dispatcher");
+            if (contextParams == null)
+                throw new ArgumentNullException("contextParams");
 
             _plugin = plugin;
+            // copy plugin information
             _id = info.Id;
             _name = info.Name;
             _authors = info.Authors;
@@ -160,17 +161,23 @@ namespace LauncherZLib.Plugin
             _description = info.Description;
             _sourceDirectory = info.SourceDirectory;
             _suggestedDataDirectory = info.DataDirectory;
-            _dispatcher = dispatcher;
-            _eventBus = new EventBus();
-            _locDict = new LocalizationDictionary();
-            _logger = logger;
-            _isAsync = plugin is IPluginAsync;
-            Status = PluginStatus.Deactivated;
-        }
 
-        public void AttachToParentEventBus(IEventBus eventBus)
-        {
+            // set up plugin environment
+            if (contextParams.DispatcherService == null)
+                throw new NullReferenceException("DispatcherService cannot be null in PluginContextParameters.");
+            if (contextParams.Logger == null)
+                throw new NullReferenceException("Logger cannot be null in PluginContextParameters.");
+            if (contextParams.ParentEventBus == null)
+                throw new NullReferenceException("ParentEventBus cannot be null in PluginContextParameters.");
+
+            _dispatcherService = contextParams.DispatcherService;
+            _eventBus = new EventBus();
+            _eventBusWrapper = new PluginEventBusWrapper(_eventBus, _dispatcherService);
+            _eventRelay = new PluginEventRelay(Id, contextParams.ParentEventBus, _eventBus);
+            _logger = contextParams.Logger;
+            _locDict = new LocalizationDictionary();
             
+            Status = PluginStatus.Deactivated;
         }
 
         public IEnumerable<LauncherData> Query(LauncherQuery query)
@@ -191,11 +198,7 @@ namespace LauncherZLib.Plugin
                 return;
 
             _plugin.Activate(this);
-            // if activation is successful, register event handler
-            if (_isAsync)
-            {
-                ((IPluginAsync)_plugin).AsyncUpdate += OnPluginAsyncUpdate;
-            }
+            _eventRelay.Link();
             Status = PluginStatus.Activated;
         }
 
@@ -204,13 +207,12 @@ namespace LauncherZLib.Plugin
         /// </summary>
         public void Deactivate()
         {
+            if (Status != PluginStatus.Activated)
+                return;
+
             Status = PluginStatus.Deactivated;
-            // remove event handler first
-            if (_isAsync)
-            {
-                ((IPluginAsync)_plugin).AsyncUpdate -= OnPluginAsyncUpdate;
-            }
             // always mark as deactivated, despite exceptions
+            _eventRelay.Unlink();
             _plugin.Deactivate(this);
         }
 
@@ -222,10 +224,6 @@ namespace LauncherZLib.Plugin
         public void DoCrashCleanup()
         {
             Status = PluginStatus.Crashed;
-            if (_isAsync)
-            {
-                ((IPluginAsync)_plugin).AsyncUpdate -= OnPluginAsyncUpdate;
-            }
         }
 
         public int CompareTo(PluginContainer other)
@@ -237,13 +235,6 @@ namespace LauncherZLib.Plugin
         {
             string authors = string.Join(", ", _authors);
             return string.Format("{{Name={0}, Version={1}, Authors=[{2}]}}", Name, _version, authors);
-        }
-
-        private void OnPluginAsyncUpdate(object sender, AsyncUpdateEventArgs e)
-        {
-            var handler = AsyncUpdate;
-            if (handler != null)
-                handler(this, e);
         }
     }
 }

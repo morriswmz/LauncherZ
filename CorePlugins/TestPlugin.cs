@@ -12,13 +12,11 @@ using LauncherZLib.Plugin;
 
 namespace CorePlugins
 {
-    public class TestPlugin : IPluginAsync
+    public class TestPlugin : IPlugin
     {
 
         private IPluginContext _context;
         private Random _random = new Random();
-
-        public event EventHandler<AsyncUpdateEventArgs> AsyncUpdate;
 
         public void Activate(IPluginContext pluginContext)
         {
@@ -34,7 +32,7 @@ namespace CorePlugins
         public IEnumerable<LauncherData> Query(LauncherQuery query)
         {
             
-            var result = new List<LauncherData>();
+            /*var result = new List<LauncherData>();
             var icons = new string[]
             {
                 @"C:\ShipID.txt",
@@ -49,11 +47,21 @@ namespace CorePlugins
                     result.Add(new LauncherData("TestItem" + i, "[Hover] to generate a random number.", icons[i],
                         1.0 - (double) i/5.0, new LauncherExtendedProperties(false, TickRate.Slow)));
                 }
-            }
+            }*/
+            Task.Run(() =>
+            {
+                Thread.Sleep(1000);
+                _context.EventBus.Post(new LauncherResultUpdateEvent(query.QueryId, new LauncherData[]
+                {
+                    new LauncherData(
+                        "Test", string.Format("[Delayed by 1000ms] {0}", DateTime.Now),
+                        "LauncherZ|IconGear", 1.0)
+                }, false));
+            });
 
-            return result;
+            return Enumerable.Empty<LauncherData>();
         }
-
+        /*
         [SubscribeEvent]
         public void LauncherTickHandler(LauncherTickEvent e)
         {
@@ -78,7 +86,7 @@ namespace CorePlugins
         public void LauncherExecutedHanlder(LauncherExecutedEvent e)
         {
             e.PreventDefault();
-        }
+        }*/
 
     }
 }

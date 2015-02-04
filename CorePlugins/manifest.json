@@ -6,7 +6,6 @@
             "authors": [ "morriswmz" ],
             "version": "1.0.0.0",
             "description": "For test purpose only.",
-            "priority": 0.0,
             "plugin_type": "assembly",
             "assembly": "CorePlugins.dll",
             "plugin_class": "CorePlugins.TestPlugin"
@@ -17,7 +16,6 @@
             "authors": [ "morriswmz" ],
             "version": "1.0.0.0",
             "description": "Provides basic commands.",
-            "priority": 1.0,
             "plugin_type": "assembly",
             "assembly": "CorePlugins.dll",
             "plugin_class": "CorePlugins.CoreCommands.CoreCommandsPlugin"
@@ -28,7 +26,6 @@
             "authors": [ "morriswmz" ],
             "version": "1.0.0.0",
             "description": "Launches installed applications!",
-            "priority": 1.0,
             "plugin_type": "assembly",
             "assembly": "CorePlugins.dll",
             "plugin_class": "CorePlugins.AppLauncher.AppLauncherPlugin"

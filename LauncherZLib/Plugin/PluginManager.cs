@@ -23,7 +23,7 @@ namespace LauncherZLib.Plugin
         private readonly IEventBus _eventBus = new EventBus();
         private readonly ILoggerProvider _loggerProvider;
         private readonly ILogger _logger;
-        private readonly Dispatcher _dispatcher;
+        private readonly IDispatcherService _dispatcherService;
 
         #region Events
 
@@ -51,20 +51,20 @@ namespace LauncherZLib.Plugin
         /// Creates a plugin manager.
         /// </summary>
         /// <param name="loggerProvider">Logger provider.</param>
-        /// <param name="dispatcher">
-        /// Dispatcher of the main UI thread.
-        /// Asynchrous callbacks will be invoke via this dispatcher.
+        /// <param name="dispatcherService">
+        /// Dispatcher service of the main UI thread.
+        /// Asynchrous callbacks will be invoke via this dispatcher service.
         /// </param>
-        public PluginManager(ILoggerProvider loggerProvider, Dispatcher dispatcher)
+        public PluginManager(ILoggerProvider loggerProvider, IDispatcherService dispatcherService)
         {
             if (loggerProvider == null)
                 throw new ArgumentNullException("loggerProvider");
-            if (dispatcher == null)
-                throw new ArgumentNullException("dispatcher");
+            if (dispatcherService == null)
+                throw new ArgumentNullException("dispatcherService");
 
             _loggerProvider = loggerProvider;
             _logger = _loggerProvider.CreateLogger("PluginManager");
-            _dispatcher = dispatcher;
+            _dispatcherService = dispatcherService;
         }
 
         /// <summary>
@@ -384,7 +384,7 @@ namespace LauncherZLib.Plugin
             }
 
             // make sure event is raised on main UI thread.
-            _dispatcher.InvokeAsync(() =>
+            _dispatcherService.InvokeAsync(() =>
             {
                 _logger.Error(string.Format(
                     "Plugin {0} crashed with message: {1}", container, friendlyMsg));
@@ -439,7 +439,7 @@ namespace LauncherZLib.Plugin
                 IPlugin plugin = null;
                 if (info.PluginType == PluginType.Assembly)
                 {
-                    plugin = LoadAssemblyProvider(info);
+                    plugin = LoadAssemblyPlugin(info);
                 }
                 else if (info.PluginType == PluginType.Xml)
                 {
@@ -457,7 +457,13 @@ namespace LauncherZLib.Plugin
                 // load into container if not null
                 if (plugin != null)
                 {
-                    var container = new PluginContainer(plugin, info, _loggerProvider.CreateLogger(info.Id), _dispatcher)
+                    var contextParams = new PluginContextParameters()
+                    {
+                        DispatcherService = _dispatcherService,
+                        Logger = _loggerProvider.CreateLogger(info.Id),
+                        ParentEventBus = _eventBus
+                    };
+                    var container = new PluginContainer(plugin, info, contextParams)
                     {
                         CrashHandler = PluginCrashHandler
                     };
@@ -468,7 +474,7 @@ namespace LauncherZLib.Plugin
         }
 
         
-        private static IPlugin LoadAssemblyProvider(PluginInfo info)
+        private static IPlugin LoadAssemblyPlugin(PluginInfo info)
         {
             // normalize
             if (info.Assembly.StartsWith(".\\") || info.Assembly.StartsWith(".//"))

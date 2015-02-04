@@ -74,7 +74,7 @@ namespace CorePlugins.AppLauncher
 
         public void AbortUpdate()
         {
-            if (!_csSource.IsCancellationRequested)
+            if (_csSource != null && !_csSource.IsCancellationRequested)
                 _csSource.Cancel();
         }
 

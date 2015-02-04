@@ -8,6 +8,11 @@ using LauncherZLib.Event;
 
 namespace LauncherZLib.Plugin
 {
+
+    /// <summary>
+    /// Passes relevant events raised by plugins to parent event bus,
+    /// converting them to tagged version.
+    /// </summary>
     public class PluginEventRelay
     {
 
@@ -17,7 +22,7 @@ namespace LauncherZLib.Plugin
 
         public PluginEventRelay(string pluginId, IEventBus parent, IEventBus child)
         {
-            if (_pluginId == null)
+            if (pluginId == null)
                 throw new ArgumentNullException("pluginId");
             if (parent == null)
                 throw new ArgumentNullException("parent");
@@ -26,21 +31,43 @@ namespace LauncherZLib.Plugin
             if (parent == child)
                 throw new ArgumentException("Parent event bus and child event bus should be distinct.");
 
+            _pluginId = pluginId;
             _parentEventBus = parent;
             _childEventBus = child;
-            child.Register(this);
+            Link();
         }
 
+        /// <summary>
+        /// Gets if the relay is unlinked.
+        /// </summary>
+        public bool IsLinked { get; private set; }
+
+        /// <summary>
+        /// Links the relay to child event bus.
+        /// </summary>
+        public void Link()
+        {
+            _childEventBus.Register(this);
+            IsLinked = true;
+        }
+
+        /// <summary>
+        /// Unlinks the relay from child event bus.
+        /// </summary>
         public void Unlink()
         {
             _childEventBus.Unregister(this);
+            IsLinked = false;
         }
+
+        #region Event Relays
 
         [SubscribeEvent]
         public void LauncherResultUpdateHandler(LauncherResultUpdateEvent e)
         {
-            _parentEventBus.Post(new LauncherResultUpdateEventIntl(_pluginId, e));
+            _parentEventBus.Post(new LauncherResultUpdateEventTagged(_pluginId, e));
         }
 
+        #endregion
     }
 }

@@ -49,13 +49,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="API\IAutoCompletionProvider.cs" />
+    <Compile Include="API\IDispatcherService.cs" />
     <Compile Include="API\IEventBus.cs" />
     <Compile Include="API\IIconLocationResolver.cs" />
     <Compile Include="API\ILogger.cs" />
     <Compile Include="API\ILoggerProvider.cs" />
     <Compile Include="API\IPluginContext.cs" />
     <Compile Include="API\IPlugin.cs" />
-    <Compile Include="API\IPluginAsync.cs" />
     <Compile Include="Event\LauncherResultUpdateEvent.cs" />
     <Compile Include="FormattedText\FormattedSegment.cs" />
     <Compile Include="FormattedText\FormattedTextEngine.cs" />
@@ -81,7 +81,7 @@
     <Compile Include="PluginTemplate\CommandPlugin.cs" />
     <Compile Include="PluginTemplate\ConfigurablePlugin.cs" />
     <Compile Include="PluginTemplate\EmptyPlugin.cs" />
-    <Compile Include="Plugin\AsyncUpdateEventArgs.cs" />
+    <Compile Include="Plugin\PluginContextParameters.cs" />
     <Compile Include="Plugin\PluginEventBusWrapper.cs" />
     <Compile Include="Plugin\PluginEventRelay.cs" />
     <Compile Include="Plugin\PluginStatus.cs" />
@@ -102,6 +102,7 @@
     <Compile Include="Utils\KeyboardUtils.cs" />
     <Compile Include="Utils\SafeDirectoryWalker.cs" />
     <Compile Include="Utils\SimpleCache.cs" />
+    <Compile Include="Utils\SimpleDispatcherService.cs" />
     <Compile Include="Utils\SimpleLogger.cs" />
     <Compile Include="Utils\StringUtils.cs" />
     <Compile Include="Win32\Kernel32.cs" />

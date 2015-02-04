@@ -10,6 +10,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using LauncherZLib.API;
 using LauncherZLib.Icon;
 using LauncherZLib.Plugin;
 using LauncherZLib.Utils;
@@ -41,12 +42,14 @@ namespace LauncherZ
         /// <summary>
         /// IconManager of LauncherZ.
         /// </summary>
-        public IconManager IconManager { get; private set; }
+        internal IconManager IconManager { get; private set; }
 
-        public SimpleLogger Logger { get; private set; }
+        internal SimpleLogger Logger { get; private set; }
 
         internal PluginManager PluginManager { get; private set; }
-        
+
+        internal IDispatcherService AppDispatcherService { get; private set; }
+
         /// <summary>
         /// GUID of LauncherZ.
         /// </summary>
@@ -143,7 +146,8 @@ namespace LauncherZ
             }
             Logger.Info("Initialized.");
             // initialize components
-            PluginManager = new PluginManager(Logger, Dispatcher);
+            AppDispatcherService = new SimpleDispatcherService(Dispatcher);
+            PluginManager = new PluginManager(Logger, AppDispatcherService);
             IconManager = new IconManager(512, PluginManager);
             RegitserInternalIcons();
             // load plugins

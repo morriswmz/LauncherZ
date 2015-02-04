@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Configuration;
-using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Windows.Threading;
-using LauncherZLib.API;
 using LauncherZLib.Event;
 using LauncherZLib.Launcher;
 using LauncherZLib.Plugin;
@@ -40,16 +37,8 @@ namespace LauncherZLib
             _maxResults = maxResults;
             _results = new LauncherList(new LauncherDataComparer(manager));
             
-            foreach (var pluginContainer in _pluginManager.SortedActivePlugins)
-            {
-                if (pluginContainer.IsAsync)
-                {
-                    pluginContainer.AsyncUpdate += Plugin_AsyncUpdate;
-                }
-            }
-
-            _pluginManager.PluginActivated += PluginManager_PluginActivated;
-            _pluginManager.PluginDeactivated += PluginManager_PluginDeactivated;
+            // handles events from plugins
+            _pluginManager.RegisterPluginEventHandler(this);
         }
 
         public LauncherQuery CurrentQuery { get { return _currentQuery; } }
@@ -84,6 +73,25 @@ namespace LauncherZLib
 
         #region Event Handling
 
+        [SubscribeEvent]
+        public void LauncherResultUpdateHandler(LauncherResultUpdateEventTagged e)
+        {
+            if (_currentQuery == null || _currentQuery.QueryId != e.QueryId)
+                return;
+            // assign plugin id;
+            foreach (var commandData in e.Results)
+            {
+                commandData.PluginId = e.PluginId;
+            }
+            _results.AddRange(e.Results);
+            // check final flag
+            if (e.IsFinal)
+                _asyncCompleteFlags[e.PluginId] = true;
+            // check timer
+            if (!_tickTimer.IsEnabled)
+                _tickTimer.Start();
+        }
+
         private void TickTimer_Tick(object sender, EventArgs e)
         {
             if (_results.Count == 0)
@@ -111,64 +119,8 @@ namespace LauncherZLib
                 }    
             }
         }
-
-
-        private void PluginManager_PluginDeactivated(object sender, PluginManagerEventArgs e)
-        {
-            PluginContainer container = _pluginManager.GetPluginContainer(e.PluginId);
-            if (container.IsAsync)
-            {
-                container.AsyncUpdate -= Plugin_AsyncUpdate;
-            }
-        }
-
-        private void PluginManager_PluginActivated(object sender, PluginManagerEventArgs e)
-        {
-            PluginContainer container = _pluginManager.GetPluginContainer(e.PluginId);
-            if (container.IsAsync)
-            {
-                container.AsyncUpdate += Plugin_AsyncUpdate;
-            }
-        }
         
-        /// <summary>
-        /// Handles asynchrounous results.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void Plugin_AsyncUpdate(object sender, AsyncUpdateEventArgs e)
-        {
-            if (_dispatcher.CheckAccess())
-            {
-                DoAsyncUpdate((PluginContainer) sender, e);
-            }
-            else
-            {
-                _dispatcher.InvokeAsync(() => DoAsyncUpdate((PluginContainer) sender, e));
-            }
-        }
-
-        private void DoAsyncUpdate(PluginContainer container, AsyncUpdateEventArgs e)
-        {
-            if (_currentQuery == null || _currentQuery.QueryId != e.QueryId)
-                return;
-            // assign plugin id;
-            foreach (var commandData in e.Results)
-            {
-                commandData.PluginId = container.Id;
-            }
-            _results.AddRange(e.Results);
-            // check final flag
-            if (e.IsFinal)
-                _asyncCompleteFlags[container.Id] = true;
-            // check timer
-            if (!_tickTimer.IsEnabled)
-                _tickTimer.Start();
-        }
-
         #endregion
-
-        
 
         sealed class LauncherDataComparer : IComparer<LauncherData>
         {
