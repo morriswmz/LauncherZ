@@ -48,7 +48,6 @@ namespace LauncherZ.Controls
 
             var iconLocationStr = e.NewValue as string;
             image = d as Image;
-            
             if (image == null)
                 return;
 

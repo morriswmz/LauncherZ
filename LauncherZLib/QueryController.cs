@@ -4,6 +4,8 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Threading;
 using LauncherZLib.Event;
+using LauncherZLib.Event.Launcher;
+using LauncherZLib.Event.Plugin;
 using LauncherZLib.Launcher;
 using LauncherZLib.Plugin;
 
@@ -74,19 +76,19 @@ namespace LauncherZLib
         #region Event Handling
 
         [SubscribeEvent]
-        public void LauncherResultUpdateHandler(LauncherResultUpdateEventTagged e)
+        public void LauncherResultUpdateHandler(QueryResultUpdateEvent e)
         {
             if (_currentQuery == null || _currentQuery.QueryId != e.QueryId)
                 return;
             // assign plugin id;
             foreach (var commandData in e.Results)
             {
-                commandData.PluginId = e.PluginId;
+                commandData.PluginId = e.SourcePluginContext.Id;
             }
             _results.AddRange(e.Results);
             // check final flag
             if (e.IsFinal)
-                _asyncCompleteFlags[e.PluginId] = true;
+                _asyncCompleteFlags[e.SourcePluginContext.Id] = true;
             // check timer
             if (!_tickTimer.IsEnabled)
                 _tickTimer.Start();

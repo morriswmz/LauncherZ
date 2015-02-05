@@ -173,7 +173,7 @@ namespace LauncherZLib.Plugin
             _dispatcherService = contextParams.DispatcherService;
             _eventBus = new EventBus();
             _eventBusWrapper = new PluginEventBusWrapper(_eventBus, _dispatcherService);
-            _eventRelay = new PluginEventRelay(Id, contextParams.ParentEventBus, _eventBus);
+            _eventRelay = new PluginEventRelay(contextParams.ParentEventBus, _eventBus);
             _logger = contextParams.Logger;
             _locDict = new LocalizationDictionary();
             

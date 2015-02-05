@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using LauncherZLib.API;
 using LauncherZLib.Event;
+using LauncherZLib.Event.Launcher;
 using LauncherZLib.Launcher;
 
 namespace CorePlugins.CoreCommands

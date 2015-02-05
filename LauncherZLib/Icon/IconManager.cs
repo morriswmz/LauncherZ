@@ -129,6 +129,7 @@ namespace LauncherZLib.Icon
                         _cachedIcons[location] = icon;
                     foreach (var handler in _handlers[location])
                         handler(location, icon);
+                    _handlers[location].Clear();
                     _handlers.Remove(location);
                 }
             }

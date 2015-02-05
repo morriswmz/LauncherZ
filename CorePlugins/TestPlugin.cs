@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using LauncherZLib.API;
 using LauncherZLib.Event;
+using LauncherZLib.Event.Plugin;
 using LauncherZLib.Launcher;
 using LauncherZLib.Plugin;
 
@@ -51,7 +52,7 @@ namespace CorePlugins
             Task.Run(() =>
             {
                 Thread.Sleep(1000);
-                _context.EventBus.Post(new LauncherResultUpdateEvent(query.QueryId, new LauncherData[]
+                _context.EventBus.Post(new QueryResultUpdateEvent(_context, query.QueryId, new LauncherData[]
                 {
                     new LauncherData(
                         "Test", string.Format("[Delayed by 1000ms] {0}", DateTime.Now),

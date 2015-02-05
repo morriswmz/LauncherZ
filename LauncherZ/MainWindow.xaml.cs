@@ -8,6 +8,7 @@ using System.Windows.Threading;
 using LauncherZ.Controls;
 using LauncherZLib;
 using LauncherZLib.Event;
+using LauncherZLib.Event.Launcher;
 using LauncherZLib.Launcher;
 using LauncherZLib.Utils;
 

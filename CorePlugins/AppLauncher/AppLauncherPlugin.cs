@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using LauncherZLib.API;
 using LauncherZLib.Event;
+using LauncherZLib.Event.Launcher;
 using LauncherZLib.FormattedText;
 using LauncherZLib.Launcher;
 using LauncherZLib.Matching;

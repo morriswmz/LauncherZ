@@ -8,8 +8,8 @@ namespace LauncherZLib.Launcher
     public class LauncherList : ICollection<LauncherData>, INotifyCollectionChanged
     {
 
-        private readonly IComparer<LauncherData> _comparer; 
-        private readonly List<LauncherData> _launchers = new List<LauncherData>();
+        protected readonly IComparer<LauncherData> _comparer; 
+        protected readonly List<LauncherData> _launchers = new List<LauncherData>();
 
         public event NotifyCollectionChangedEventHandler CollectionChanged;
 
@@ -50,46 +50,12 @@ namespace LauncherZLib.Launcher
 
         public virtual void Add(LauncherData item)
         {
-            if (Count == 0)
-            {
-                _launchers.Add(item);
-                DispatchCollectionChangedEvent(
+            int idx = AddImpl(item);
+            DispatchCollectionChangedEvent(
                     new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
-            }
-            else
-            {
-                // perform binary search and insert
-                int l = 0; // highest priority
-                int h = Count - 1; // lowest priority
-                while (l < h)
-                {
-                    int m = (l + h)/2;
-                    int result = _comparer.Compare(item, _launchers[m]);
-                    if (result > 0)
-                    {
-                        h = m - 1;
-                    }
-                    else if (result < 0)
-                    {
-                        l = m + 1;
-                    }
-                    else
-                    {
-                        l = h = m;
-                    }
-                }
-                // for equal priority, we apply the first-come first-served rule
-                // l will be the index for insertion
-                int n = Count;
-                while (l < n && _comparer.Compare(item, _launchers[l]) <= 0)
-                {
-                    l++;
-                }
-                _launchers.Insert(l, item);
-                DispatchCollectionChangedEvent(
-                    new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, l));
-            }
         }
+
+        
 
         public virtual void AddRange(IEnumerable<LauncherData> commands)
         {
@@ -142,7 +108,50 @@ namespace LauncherZLib.Launcher
             return false;
         }
 
-        private void DispatchCollectionChangedEvent(NotifyCollectionChangedEventArgs e)
+        /// <summary>
+        /// Actual implemetation of add.
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns>Index of insertion.</returns>
+        protected virtual int AddImpl(LauncherData item)
+        {
+            if (Count == 0)
+            {
+                _launchers.Add(item);
+                return 0;
+            }
+            // perform binary search and insert
+            int l = 0; // highest priority
+            int h = Count - 1; // lowest priority
+            while (l < h)
+            {
+                int m = (l + h) / 2;
+                int result = _comparer.Compare(item, _launchers[m]);
+                if (result > 0)
+                {
+                    h = m - 1;
+                }
+                else if (result < 0)
+                {
+                    l = m + 1;
+                }
+                else
+                {
+                    l = h = m;
+                }
+            }
+            // for equal priority, we apply the first-come first-served rule
+            // l will be the index for insertion
+            int n = Count;
+            while (l < n && _comparer.Compare(item, _launchers[l]) <= 0)
+            {
+                l++;
+            }
+            _launchers.Insert(l, item);
+            return l;
+        }
+
+        protected void DispatchCollectionChangedEvent(NotifyCollectionChangedEventArgs e)
         {
             NotifyCollectionChangedEventHandler handler = CollectionChanged;
             if (handler != null)

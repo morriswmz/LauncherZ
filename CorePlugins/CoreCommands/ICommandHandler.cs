@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using LauncherZLib.API;
-using LauncherZLib.Event;
+using LauncherZLib.Event.Launcher;
 using LauncherZLib.Launcher;
 
 namespace CorePlugins.CoreCommands

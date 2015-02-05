@@ -4,8 +4,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows.Media;
 using LauncherZLib.API;
-using LauncherZLib.Event;
+using LauncherZLib.Event.Launcher;
 using LauncherZLib.Launcher;
+using LauncherZLib.Utils;
 
 namespace CorePlugins.CoreCommands
 {
@@ -42,14 +43,8 @@ namespace CorePlugins.CoreCommands
         public void HandleTick(LauncherTickEvent e, IPluginContext context)
         {
             var cpu = (int)_cpuCounter.NextValue();
-            var bars = 20 * cpu / 100;
-            var progress = new char[20];
-            int i = 0;
-            for (i = 0; i < bars; i++)
-                progress[i] = '=';
-            for (; i < 20; i++)
-                progress[i] = '-';
-            e.LauncherData.Description = string.Format("[{1}] {0}%", cpu, new string(progress));
+            var bar = StringUtils.CreateProgressBar("[=-]", 20, cpu/100.0);
+            e.LauncherData.Description = string.Format("[{1}] {0}%", cpu, bar);
         }
 
         public void HandleExecute(LauncherExecutedEvent e, IPluginContext context)
