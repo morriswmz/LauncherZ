@@ -69,6 +69,7 @@
     <Compile Include="FormattedText\FormattedTextEngine.cs" />
     <Compile Include="FormattedText\TextFormat.cs" />
     <Compile Include="Launcher\ArgumentCollection.cs" />
+    <Compile Include="Launcher\LauncherDataComparer.cs" />
     <Compile Include="Launcher\TickRate.cs" />
     <Compile Include="Event\EventBase.cs" />
     <Compile Include="Event\EventBus.cs" />

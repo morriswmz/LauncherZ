@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -22,9 +24,10 @@ namespace LauncherZ
 
 
         private DetailWindow detailWindow;
-        private QueryController _queryController = new QueryController(LauncherZApp.Instance.PluginManager, 20);
-        private GlobalHotkey _switchHotkey = new GlobalHotkey("Win+OemQuestion");
-
+        private readonly QueryController _queryController;
+        private readonly GlobalHotkey _switchHotkey;
+        private readonly DispatcherTimer _tickTimer;
+        private int _tickTimerDivider = 0;
         private List<Key> _pressedKeys = new List<Key>();
         private bool _activating = false;
         private bool _deactivating = false;
@@ -33,16 +36,23 @@ namespace LauncherZ
         {
             InitializeComponent();
             // register global hotkey
+            _switchHotkey = new GlobalHotkey("Win+OemQuestion");
             _switchHotkey.Register(this, 0);
             _switchHotkey.HotkeyPressed += SwitchHotkey_HotkeyPressed;
             // init controls
             CtlUserInput.FocusText();
             CtlLauncherList.DataContext = _queryController.Results;
             CtlLauncherList.SelectedIndex = 0;
-            
-            var cultureInfo = Thread.CurrentThread.CurrentCulture;
-            
+            // setup query controller
+            _queryController = new QueryController(LauncherZApp.Instance.PluginManager, 20);
+            _queryController.Results.CollectionChanged += Results_CollectionChanged;
+            // setup tick timer
+            _tickTimer = new DispatcherTimer();
+            _tickTimer.Interval = new TimeSpan(0, 0, 0, 50);
+            _tickTimer.Tick += TickTimer_Tick;
         }
+
+        
 
         private void ShowAndActivate()
         {
@@ -76,6 +86,49 @@ namespace LauncherZ
                     Hide();
                     _deactivating = false;
                 }, DispatcherPriority.ContextIdle);
+            }
+        }
+
+        #region Event Handlers
+
+        private void TickTimer_Tick(object sender, EventArgs e)
+        {
+            if (_queryController.Results.Count == 0)
+            {
+                _tickTimer.Stop();
+                _tickTimerDivider = 0;
+                return;
+            }
+            _tickTimerDivider++;
+            bool tickNormal = _tickTimerDivider % 5 == 0;
+            bool tickSlow = false;
+            if (_tickTimerDivider == 20)
+            {
+                _tickTimerDivider = 0;
+                tickSlow = true;
+            }
+            foreach (var cmd in _queryController.Results.Where(cmd => cmd.ExtendedProperties.Tickable))
+            {
+                bool shouldTick = cmd.ExtendedProperties.CurrentTickRate == TickRate.Fast;
+                shouldTick = shouldTick || (tickNormal && cmd.ExtendedProperties.CurrentTickRate == TickRate.Normal);
+                shouldTick = shouldTick || (tickSlow && cmd.ExtendedProperties.CurrentTickRate == TickRate.Slow);
+                if (shouldTick)
+                {
+                    LauncherZApp.Instance.PluginManager.DistributeEventTo(cmd.PluginId, new LauncherTickEvent(cmd));
+                }
+            }
+        }
+
+        private void Results_CollectionChanged(object sender, NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)
+        {
+            // results updated. check if we need to start/stop tick timer
+            if (_queryController.Results.Count > 0 && !_tickTimer.IsEnabled)
+            {
+                _tickTimer.Start();
+            }
+            else if (_queryController.Results.Count == 0 && _tickTimer.IsEnabled)
+            {
+                _tickTimer.Stop();
             }
         }
 
@@ -185,27 +238,8 @@ namespace LauncherZ
         {
             _switchHotkey.Unregister().Dispose();
         }
+
+        #endregion
     }
 
-    class ActionCommand : ICommand
-    {
-        private Action<object> _action;
-
-        public ActionCommand(Action<object> action)
-        {
-            _action = action;
-        }
-
-        public bool CanExecute(object parameter)
-        {
-            return true;
-        }
-
-        public void Execute(object parameter)
-        {
-            _action(parameter);
-        }
-
-        public event EventHandler CanExecuteChanged;
-    }
 }

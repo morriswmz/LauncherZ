@@ -13,11 +13,12 @@ namespace LauncherZLib.PluginTemplate
         public override void Activate(IPluginContext pluginContext)
         {
             base.Activate(pluginContext);
+            AddCommandHandlers();
         }
 
         public override void Deactivate(IPluginContext pluginContext)
         {
-
+            RemoveCommandHandlers();
             base.Deactivate(pluginContext);
         }
 
@@ -28,7 +29,7 @@ namespace LauncherZLib.PluginTemplate
 
         protected abstract void AddCommandHandlers();
 
-        protected void RemoveCommandHandlers()
+        protected virtual void RemoveCommandHandlers()
         {
             
         }

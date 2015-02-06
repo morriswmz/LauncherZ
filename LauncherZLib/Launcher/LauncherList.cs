@@ -55,11 +55,10 @@ namespace LauncherZLib.Launcher
                     new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
         }
 
-        
-
         public virtual void AddRange(IEnumerable<LauncherData> commands)
         {
             if (commands == null) return;
+            // we have to add one by one as they will be reordered by relevance
             foreach (var commandData in commands)
             {
                 Add(commandData);
