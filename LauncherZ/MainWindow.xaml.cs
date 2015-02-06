@@ -35,20 +35,36 @@ namespace LauncherZ
         public MainWindow()
         {
             InitializeComponent();
+            LauncherZConfig config = LauncherZApp.Instance.Configuration;
             // register global hotkey
-            _switchHotkey = new GlobalHotkey("Win+OemQuestion");
+            if (string.IsNullOrEmpty(config.ActivationKeyCombo))
+            {
+                // todo: log
+                config.ActivationKeyCombo = LauncherZConfig.DefaultActivationKeyCombo;
+            }
+            try
+            {
+                _switchHotkey = new GlobalHotkey(config.ActivationKeyCombo);
+            }
+            catch (Exception ex)
+            {
+                // todo: log
+                config.ActivationKeyCombo = LauncherZConfig.DefaultActivationKeyCombo;
+                _switchHotkey = new GlobalHotkey(config.ActivationKeyCombo);
+            }
             _switchHotkey.Register(this, 0);
             _switchHotkey.HotkeyPressed += SwitchHotkey_HotkeyPressed;
+            // setup query controller
+            _queryController = new QueryController(LauncherZApp.Instance.PluginManager, 20);
+            _queryController.Results.CollectionChanged += Results_CollectionChanged;
             // init controls
             CtlUserInput.FocusText();
             CtlLauncherList.DataContext = _queryController.Results;
             CtlLauncherList.SelectedIndex = 0;
-            // setup query controller
-            _queryController = new QueryController(LauncherZApp.Instance.PluginManager, 20);
-            _queryController.Results.CollectionChanged += Results_CollectionChanged;
             // setup tick timer
             _tickTimer = new DispatcherTimer();
-            _tickTimer.Interval = new TimeSpan(0, 0, 0, 50);
+            _tickTimer.Start();
+            _tickTimer.Interval = new TimeSpan(0, 0, 0, 0, 50);
             _tickTimer.Tick += TickTimer_Tick;
         }
 
@@ -125,10 +141,6 @@ namespace LauncherZ
             if (_queryController.Results.Count > 0 && !_tickTimer.IsEnabled)
             {
                 _tickTimer.Start();
-            }
-            else if (_queryController.Results.Count == 0 && _tickTimer.IsEnabled)
-            {
-                _tickTimer.Stop();
             }
         }
 
