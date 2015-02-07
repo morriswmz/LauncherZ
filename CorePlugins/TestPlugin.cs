@@ -52,12 +52,12 @@ namespace CorePlugins
             Task.Run(() =>
             {
                 Thread.Sleep(1000);
-                _context.EventBus.Post(new QueryResultUpdateEvent(_context, query.QueryId, new LauncherData[]
+                _context.EventBus.Post(new QueryResultUpdateEvent(query.QueryId, new LauncherData[]
                 {
                     new LauncherData(
                         "Test", string.Format("[Delayed by 1000ms] {0}", DateTime.Now),
                         "LauncherZ|IconGear", 1.0)
-                }, false));
+                }));
             });
 
             return Enumerable.Empty<LauncherData>();

@@ -37,6 +37,7 @@ namespace CorePlugins.AppLauncher
         public override void Deactivate(IPluginContext pluginContext)
         {
             _manager.AbortUpdate();
+            _manager.SaveManifestToFile();
         }
 
         public override IEnumerable<LauncherData> Query(LauncherQuery query)

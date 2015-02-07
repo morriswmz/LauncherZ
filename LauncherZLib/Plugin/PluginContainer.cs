@@ -164,16 +164,16 @@ namespace LauncherZLib.Plugin
 
             // set up plugin environment
             if (contextParams.DispatcherService == null)
-                throw new NullReferenceException("DispatcherService cannot be null in PluginContextParameters.");
+                throw new ArgumentException("DispatcherService cannot be null in contextParams.");
             if (contextParams.Logger == null)
-                throw new NullReferenceException("Logger cannot be null in PluginContextParameters.");
+                throw new ArgumentException("Logger cannot be null in contextParams.");
             if (contextParams.ParentEventBus == null)
-                throw new NullReferenceException("ParentEventBus cannot be null in PluginContextParameters.");
+                throw new ArgumentException("ParentEventBus cannot be null in contextParams.");
 
             _dispatcherService = contextParams.DispatcherService;
             _eventBus = new EventBus();
             _eventBusWrapper = new PluginEventBusWrapper(_eventBus, _dispatcherService);
-            _eventRelay = new PluginEventRelay(contextParams.ParentEventBus, _eventBus);
+            _eventRelay = new PluginEventRelay(Id, contextParams.ParentEventBus, _eventBus);
             _logger = contextParams.Logger;
             _locDict = new LocalizationDictionary();
             

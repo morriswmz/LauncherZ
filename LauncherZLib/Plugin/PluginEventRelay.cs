@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using LauncherZLib.API;
 using LauncherZLib.Event;
 using LauncherZLib.Event.Plugin;
+using LauncherZLib.Event.PluginInternal;
 
 namespace LauncherZLib.Plugin
 {
@@ -19,9 +20,12 @@ namespace LauncherZLib.Plugin
 
         private readonly IEventBus _parentEventBus;
         private readonly IEventBus _childEventBus;
+        private readonly string _pluginId;
 
-        public PluginEventRelay(IEventBus parent, IEventBus child)
+        public PluginEventRelay(string pluginId, IEventBus parent, IEventBus child)
         {
+            if (string.IsNullOrEmpty(pluginId))
+                throw new ArgumentException("Plugin id cannot be null or empty.");
             if (parent == null)
                 throw new ArgumentNullException("parent");
             if (child == null)
@@ -29,6 +33,7 @@ namespace LauncherZLib.Plugin
             if (parent == child)
                 throw new ArgumentException("Parent event bus and child event bus should be distinct.");
 
+            _pluginId = pluginId;
             _parentEventBus = parent;
             _childEventBus = child;
             Link();
@@ -62,7 +67,7 @@ namespace LauncherZLib.Plugin
         [SubscribeEvent]
         public void LauncherResultUpdateHandler(QueryResultUpdateEvent e)
         {
-            _parentEventBus.Post(e);
+            _parentEventBus.Post(new QueryResultUpdateEventI(e, _pluginId));
         }
 
         #endregion

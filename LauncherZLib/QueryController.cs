@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using LauncherZLib.Event;
-using LauncherZLib.Event.Plugin;
+using LauncherZLib.Event.Launcher;
+using LauncherZLib.Event.PluginInternal;
 using LauncherZLib.Launcher;
 using LauncherZLib.Plugin;
 
@@ -15,8 +16,6 @@ namespace LauncherZLib
 
         private LauncherList _results;
         private LauncherQuery _currentQuery;
-        private Dictionary<string, bool> _asyncCompleteFlags = new Dictionary<string, bool>(); 
-        
 
         public QueryController(PluginManager manager, int maxResults)
         {
@@ -45,36 +44,41 @@ namespace LauncherZLib
                     break;
                 // assign plugin id
                 var immResults = container.Query(query);
-                foreach (var commandData in immResults)
+                foreach (var launcherData in immResults)
                 {
-                    commandData.PluginId = container.Id;
+                    launcherData.PluginId = container.Id;
+                    _results.Add(launcherData);
+                    _pluginManager.DistributeEventTo(container.Id, new LauncherAddedEvent(launcherData));
                 }
-                _results.AddRange(immResults);
             }
         }
 
         public void ClearCurrentQuery()
         {
+            var removed = new LauncherData[_results.Count];
+            _results.CopyTo(removed, 0);
             _results.Clear();
+            // post events
+            foreach (var launcherData in removed)
+            {
+                _pluginManager.DistributeEventTo(launcherData.PluginId, new LauncherRemovedEvent(launcherData));
+            }
             _currentQuery = null;
         }
 
         #region Event Handling
 
         [SubscribeEvent]
-        public void LauncherResultUpdateHandler(QueryResultUpdateEvent e)
+        public void LauncherResultUpdateHandler(QueryResultUpdateEventI e)
         {
-            if (_currentQuery == null || _currentQuery.QueryId != e.QueryId)
+            if (_currentQuery == null || _currentQuery.QueryId != e.BaseEvent.QueryId)
                 return;
             // assign plugin id;
-            foreach (var commandData in e.Results)
+            foreach (var commandData in e.BaseEvent.Results)
             {
-                commandData.PluginId = e.SourcePluginContext.Id;
+                commandData.PluginId = e.SourceId;
             }
-            _results.AddRange(e.Results);
-            // check final flag
-            if (e.IsFinal)
-                _asyncCompleteFlags[e.SourcePluginContext.Id] = true;
+            _results.AddRange(e.BaseEvent.Results);
         }
 
         #endregion

@@ -63,7 +63,8 @@
     <Compile Include="Event\Launcher\LauncherRemovedEvent.cs" />
     <Compile Include="Event\Launcher\LauncherSelectedEvent.cs" />
     <Compile Include="Event\Launcher\LauncherTickEvent.cs" />
-    <Compile Include="Event\Plugin\PluginSourcedEvent.cs" />
+    <Compile Include="Event\PluginInternal\PluginEventInternal.cs" />
+    <Compile Include="Event\PluginInternal\QueryResultUpdateEventI.cs" />
     <Compile Include="Event\Plugin\QueryResultUpdateEvent.cs" />
     <Compile Include="FormattedText\FormattedSegment.cs" />
     <Compile Include="FormattedText\FormattedTextEngine.cs" />
