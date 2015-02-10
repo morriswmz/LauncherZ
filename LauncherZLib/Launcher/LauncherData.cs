@@ -7,14 +7,14 @@ namespace LauncherZLib.Launcher
     public class LauncherData : INotifyPropertyChanged
     {
 
-        private static readonly FontFamily DefaultFontFamily = new FontFamily("Global User Interface");
+        private static readonly string DefaultFontFamily = "Global User Interface";
 
         private string _title = "";
         private string _description = "";
         private bool _isDescriptionVisible = true;
         private bool _isTitleVisible = true;
-        private FontFamily _titleFont = DefaultFontFamily;
-        private FontFamily _descriptionFont = DefaultFontFamily;
+        private string _titleFont = DefaultFontFamily;
+        private string _descriptionFont = DefaultFontFamily;
         private string _iconLocation = "";
         private readonly double _relevance;
         private readonly LauncherExtendedProperties _launcherEx;
@@ -108,13 +108,13 @@ namespace LauncherZLib.Launcher
         /// <summary>
         /// Gets or sets the font family of the title.
         /// </summary>
-        public FontFamily TitleFont
+        public string TitleFont
         {
             get { return _titleFont; }
             set
             {
-                FontFamily newFont = value ?? DefaultFontFamily;
-                if (!_titleFont.Equals(newFont))
+                string newFont = value ?? DefaultFontFamily;
+                if (!_titleFont.Equals(newFont, StringComparison.OrdinalIgnoreCase))
                 {
                     _titleFont = newFont;
                     DispatchPropertyChangedEvent("TitleFont");
@@ -125,13 +125,13 @@ namespace LauncherZLib.Launcher
         /// <summary>
         /// Gets or sets the font family of the description.
         /// </summary>
-        public FontFamily DescriptionFont
+        public string DescriptionFont
         {
             get { return _descriptionFont; }
             set
             {
-                FontFamily newFont = value ?? DefaultFontFamily;
-                if (!_descriptionFont.Equals(newFont))
+                string newFont = value ?? DefaultFontFamily;
+                if (!_descriptionFont.Equals(newFont, StringComparison.OrdinalIgnoreCase))
                 {
                     _descriptionFont = newFont;
                     DispatchPropertyChangedEvent("DescriptionFont");
@@ -210,7 +210,10 @@ namespace LauncherZLib.Launcher
                 "They are [[[~_Stackable_~]]]. " +
                 "Creation Time: " + DateTime.Now.ToLongTimeString(),
                 "LauncherZ|IconBlank", 0.0, new LauncherExtendedProperties(false)
-            ) {}
+                )
+        {
+            DescriptionFont = "Seoge UI";
+        }
 
         public LauncherDataDesignTime() : this(1) { }
     }

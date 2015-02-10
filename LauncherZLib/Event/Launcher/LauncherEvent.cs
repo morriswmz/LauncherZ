@@ -15,7 +15,7 @@ namespace LauncherZLib.Event.Launcher
         }
 
         /// <summary>
-        /// This event's default behavior cannot be prevented.
+        /// The default behavior of this event cannot be prevented.
         /// Attempting to call this method will result in NotSupportedException.
         /// </summary>
         /// <exception cref="T:System.NotSupportedException">

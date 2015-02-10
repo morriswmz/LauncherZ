@@ -157,7 +157,7 @@ namespace LauncherZLib.Utils
         public bool HasWinModifier { get { return (_modifiers & User32.MOD_WIN) > 0; } }
 
         /// <summary>
-        /// Registers the global hotkey.
+        /// Registers the global hotkey for specified window.
         /// If the global hotkey is already registered, <see cref="T:System.InvalidOperationException"/>
         /// will be thrown.
         /// </summary>
@@ -171,7 +171,9 @@ namespace LauncherZLib.Utils
             _id = id;
             var winIterop = new WindowInteropHelper(window);
             winIterop.EnsureHandle();
-            _hWnd = winIterop.Handle; // DO NOT DISPOSE THIS! WILL DESTROY THE ACTUAL WINDOW!
+            _hWnd = winIterop.Handle;
+            // DO NOT DISPOSE THIS! WILL DESTROY THE ACTUAL WINDOW!
+            // This method actually retrieves existing HwndSource instead of creating new one.
             _hSource = HwndSource.FromHwnd(_hWnd);
             if (_hSource == null)
             {

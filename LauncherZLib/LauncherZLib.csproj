@@ -51,7 +51,6 @@
     <Compile Include="API\IAutoCompletionProvider.cs" />
     <Compile Include="API\IDispatcherService.cs" />
     <Compile Include="API\IEventBus.cs" />
-    <Compile Include="API\IIconLocationResolver.cs" />
     <Compile Include="API\ILogger.cs" />
     <Compile Include="API\ILoggerProvider.cs" />
     <Compile Include="API\IPluginContext.cs" />
@@ -69,6 +68,10 @@
     <Compile Include="FormattedText\FormattedSegment.cs" />
     <Compile Include="FormattedText\FormattedTextEngine.cs" />
     <Compile Include="FormattedText\TextFormat.cs" />
+    <Compile Include="Icon\IconLoader.cs" />
+    <Compile Include="Icon\IconLocation.cs" />
+    <Compile Include="Icon\IconManager.cs" />
+    <Compile Include="API\IIconLocationResolver.cs" />
     <Compile Include="Launcher\ArgumentCollection.cs" />
     <Compile Include="Launcher\LauncherDataComparer.cs" />
     <Compile Include="Launcher\TickRate.cs" />
@@ -78,9 +81,6 @@
     <Compile Include="Event\KeyBoardEvent.cs" />
     <Compile Include="Event\SubscribeEventAttribute.cs" />
     <Compile Include="I18N\LocalizationDictionary.cs" />
-    <Compile Include="Icon\IconLoader.cs" />
-    <Compile Include="Icon\IconLocation.cs" />
-    <Compile Include="Icon\IconManager.cs" />
     <Compile Include="Matching\FlexLexicon.cs" />
     <Compile Include="Matching\FlexMatch.cs" />
     <Compile Include="Matching\FlexMatchCollection.cs" />

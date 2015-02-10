@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using LauncherZLib.Launcher;
 
 namespace LauncherZLib.Event.Plugin
@@ -19,6 +20,18 @@ namespace LauncherZLib.Event.Plugin
         {
             QueryId = queryId;
             Results = results;
+        }
+
+        /// <summary>
+        /// The default behavior of this event cannot be prevented.
+        /// Attempting to call this method will result in NotSupportedException.
+        /// </summary>
+        /// <exception cref="T:System.NotSupportedException">
+        /// Thrown upon calling this method.
+        /// </exception>
+        public override void PreventDefault()
+        {
+            throw new NotSupportedException();
         }
     }
 }

@@ -5,13 +5,14 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:LauncherZ.Controls"
              xmlns:cmd="clr-namespace:LauncherZLib.Launcher;assembly=LauncherZLib"
+             xmlns:valueConverters="clr-namespace:LauncherZ.Controls.ValueConverters"
              x:Class="LauncherZ.Controls.LauncherDataItem"
              x:Name="TaskDataEntryControl"
              mc:Ignorable="d"
              d:DesignWidth="460"
              d:DataContext="{d:DesignInstance {x:Type cmd:LauncherDataDesignTime}, IsDesignTimeCreatable = True}">
     <UserControl.Resources>
-        <local:VisibilityConverter x:Key="VisibilityConverter"/>
+        <valueConverters:VisibilityConverter x:Key="VisibilityConverter"/>
     </UserControl.Resources>
     <Border>
         <Grid Margin="0" FlowDirection="LeftToRight">

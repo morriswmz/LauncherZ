@@ -35,7 +35,7 @@ namespace CorePlugins.CoreCommands
                 new LauncherData(context.Localization["CpuCommandTitle"], "", @"LauncherZ|IconGear", 1.0,
                         new CommandExtendedProperties(true, TickRate.Normal, query.Arguments))
                 {
-                    DescriptionFont = new FontFamily("Segoe UI Mono")
+                    DescriptionFont = "Helvatica"
                 }
             };
         }
