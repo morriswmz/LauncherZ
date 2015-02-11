@@ -10,6 +10,7 @@ using LauncherZLib.Utils;
 
 namespace LauncherZLib.Icon
 {
+    [Obsolete]
     public class IconManager
     {
 
