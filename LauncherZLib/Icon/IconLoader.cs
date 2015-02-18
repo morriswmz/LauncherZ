@@ -29,7 +29,7 @@ namespace LauncherZLib.Icon
 
         public static bool IsSupportedImageFileExtension(string ext)
         {
-            return ".png.jpg.bmp".IndexOf(ext, StringComparison.OrdinalIgnoreCase) >= 0;
+            return !string.IsNullOrEmpty(ext) && ".PNG.JPG.BMP".IndexOf(ext, StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         public static BitmapSource LoadDirectoryIcon(IconSize size)

@@ -29,10 +29,11 @@ namespace LauncherZ
         private const string AppConfigFileName = "global_config.json";
         private bool _appInitialized = false;
 
+        private FileIconProvider _fileIconProvider;
+        private StaticIconProvider _staticIconProvider;
+
         #endregion
-
-        
-
+            
         /// <summary>
         /// The current LaucherZApp instance.
         /// Same reference as Application.Current but no casting is required.
@@ -40,9 +41,9 @@ namespace LauncherZ
         public static LauncherZApp Instance { get; private set; }
 
         /// <summary>
-        /// IconManager of LauncherZ.
+        /// IconLibrary of LauncherZ.
         /// </summary>
-        internal IconManager IconManager { get; private set; }
+        internal IconLibrary IconLibrary { get; private set; }
 
         internal SimpleLogger Logger { get; private set; }
 
@@ -144,13 +145,19 @@ namespace LauncherZ
                 Logger.Warning("Using default configuration.");
                 Configuration = new LauncherZConfig();
             }
-            Logger.Info("Initialized.");
-            // initialize components
+            // init icon library
+            _staticIconProvider = new StaticIconProvider();
+            _fileIconProvider = new FileIconProvider(Logger.CreateLogger("FileIconProvider"));
+            var iconBorderBrush = FindResource("IconBorderBrush") as Brush;
+            _fileIconProvider.ThumbnailBorderBrush = iconBorderBrush ?? Brushes.White;
+            IconLibrary = new IconLibrary();
+            IconLibrary.RegisterProvider(_staticIconProvider);
+            IconLibrary.RegisterProvider(_fileIconProvider);
+            RegitserInternalIcons();
+            IconLibrary.DefaultIcon = _staticIconProvider.ProvideIcon(new IconLocation("LauncherZ", "IconBlank"));
+            // init and load plugins
             AppDispatcherService = new SimpleDispatcherService(Dispatcher);
             PluginManager = new PluginManager(Logger, AppDispatcherService);
-            IconManager = new IconManager(512, PluginManager);
-            RegitserInternalIcons();
-            // load plugins
             PluginManager.LoadAllFrom(Path.GetFullPath(@".\Plugins"), PluginDataPath);
             PluginManager.LoadAllFrom(string.Format("{0}{1}Plugins", AppDataBasePath, Path.DirectorySeparatorChar), PluginDataPath);
             // set plugin priorities from configuration
@@ -164,7 +171,7 @@ namespace LauncherZ
             {
                 Configuration.Priorities.Add(pluginId, PluginManager.GetPluginPriority(pluginId));
             }
-
+            Logger.Fine("App started successfully.");
             _appInitialized = true;
         }
 
@@ -210,11 +217,8 @@ namespace LauncherZ
             foreach (var s in internalIconName)
             {
                 var bitmapImage = FindResource(s) as BitmapImage;
-                IconManager.AddIcon(new IconLocation("LauncherZ", s), bitmapImage, true);
+                _staticIconProvider.RegisterIcon(new IconLocation("LauncherZ", s), bitmapImage);
             }
-            IconManager.DefaultIcon = IconManager.GetIcon(new IconLocation("LauncherZ", "IconBlank"));
-            var iconBorderBrush = FindResource("IconBorderBrush") as Brush;
-            IconManager.ThumbnailBorderBrush = iconBorderBrush ?? Brushes.White;
         }
 
         private void InitializeLogger()

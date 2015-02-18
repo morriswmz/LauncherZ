@@ -3,23 +3,28 @@
 namespace LauncherZLib.Icon
 {
 
-    public class IconLocation : IEquatable<IconLocation>
+    public sealed class IconLocation : IEquatable<IconLocation>
     {
 
-        public static readonly char Separator = '|';
+        public static readonly string Separator = "://";
+
+        private readonly string _domainInvariant;
 
         /// <summary>
-        /// Domain of the icon resource. Usually the provider id (e.g. LauncherZ).
-        /// Note: Case sensitive.
+        /// <para>Domain of the icon resource. This property is case insensitive. </para>
+        ////<para>By default, two domains "launcherz" and "file" are defined.</para>
         /// </summary>
+        /// <remarks>
+        /// When comparing, domain value will be converted to uppercase using
+        /// <see cref="M:System.String.ToUpperInvariant"/>.
+        /// This behavior is consistent with
+        /// <see cref="F:System.StringComparison.OrdinalIgnoreCase"/>.
+        /// </remarks>
         public string Domain { get; private set; }
         
         /// <summary>
-        /// Path of the icon resource relative to the domain.
-        /// If domain is null or empty, it should be the absolute path.
-        /// e.g. "LauncherZ|Icons/default.png" will be expaned to
-        ///     [FolderOfLauncherZAssembly]\Icons\default.png
-        /// Note: Forward and backslash are interchangable.
+        /// <para>Path of the icon resource relative to the domain.</para>
+        /// <para>This property is case sensitive.</para>
         /// </summary>
         public string Path { get; private set; }
 
@@ -27,22 +32,30 @@ namespace LauncherZLib.Icon
         /// Creates a new icon location.
         /// </summary>
         /// <param name="location"></param>
+        /// <example>
+        /// <code>
+        /// var loc = new IconLocation("File://assets/myicon.png");
+        /// string domain = loc.Domain; // "File"
+        /// string path = loc.Path; // "assets/myicon.png"
+        /// </code>
+        /// </example>
         public IconLocation(string location)
         {
             if (string.IsNullOrEmpty(location))
                 throw new ArgumentNullException("location");
-            int idx = location.IndexOf(Separator);
+            int idx = location.IndexOf(Separator, StringComparison.Ordinal);
             if (idx >= 0)
             {
                 Domain = location.Substring(0, idx);
-                Path = location.Substring(idx + 1);
+                Path = location.Substring(idx + Separator.Length);
             }
             else
             {
                 Domain = "";
                 Path = location;
             }
-            Path = Path.Replace('/', '\\');
+            Path = Path.Replace('\\', '/');
+            _domainInvariant = Domain.ToUpperInvariant();
         }
 
         /// <summary>
@@ -52,15 +65,21 @@ namespace LauncherZLib.Icon
         /// <param name="path"></param>
         public IconLocation(string domain, string path)
         {
-            Domain = domain;
+            if (domain == null)
+                throw new ArgumentNullException("domain");
+            if (path == null)
+                throw new ArgumentNullException("path");
+
+            Domain = domain.ToUpperInvariant();
             Path = path;
+            _domainInvariant = Domain.ToUpperInvariant();
         }
 
         public bool Equals(IconLocation other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return string.Equals(Domain, other.Domain) && string.Equals(Path, other.Path);
+            return string.Equals(_domainInvariant, other._domainInvariant) && string.Equals(Path, other.Path);
         }
 
         public override bool Equals(object obj)
@@ -75,7 +94,7 @@ namespace LauncherZLib.Icon
         {
             unchecked
             {
-                return ((Domain != null ? Domain.GetHashCode() : 0)*397) ^ (Path != null ? Path.GetHashCode() : 0);
+                return ((_domainInvariant != null ? _domainInvariant.GetHashCode() : 0)*397) ^ (Path != null ? Path.GetHashCode() : 0);
             }
         }
 

@@ -114,6 +114,7 @@
     <Compile Include="DetailWindow.xaml.cs">
       <DependentUpon>DetailWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Icon\LauncherZIconProvider.cs" />
     <Compile Include="LauncherZConfig.cs" />
     <Page Include="Controls\LauncherDataItem.xaml">
       <SubType>Designer</SubType>

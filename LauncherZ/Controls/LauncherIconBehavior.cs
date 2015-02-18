@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
@@ -35,8 +36,8 @@ namespace LauncherZ.Controls
                 return;
             }
 
-            IconManager iconManager = LauncherZApp.Instance == null ? null : LauncherZApp.Instance.IconManager;
-            if (iconManager == null)
+            IconLibrary iconLibrary = LauncherZApp.Instance == null ? null : LauncherZApp.Instance.IconLibrary;
+            if (iconLibrary == null)
             {
                 return;
             }
@@ -48,24 +49,29 @@ namespace LauncherZ.Controls
 
             if (string.IsNullOrEmpty(iconLocationStr))
             {
-                image.Source = iconManager.DefaultIcon;
+                image.Source = iconLibrary.DefaultIcon;
                 return;
             }
 
             var iconLocation = new IconLocation(iconLocationStr);
 
-            if (!iconManager.ContainsIcon(iconLocation))
+            switch (iconLibrary.GetIconAvailability(iconLocation))
             {
-                image.Source = iconManager.DefaultIcon;
-                iconManager.AddIconAsync(iconLocation, false, (location, icon) =>
-                {
-                    if (location.ToString() == GetIconLocation(image))
-                        image.Source = icon;
-                });
-            }
-            else
-            {
-                image.Source = iconManager.GetIcon(iconLocation);
+                case IconAvailability.NotAvailable:
+                    image.Source = iconLibrary.DefaultIcon;
+                    break;
+                case IconAvailability.Available:
+                    image.Source = iconLibrary.GetIcon(iconLocation);
+                    break;
+                case IconAvailability.AvailableLater:
+                    iconLibrary.GetIconAsync(iconLocation, (location, icon) =>
+                    {
+                        if (new IconLocation(GetIconLocation(image)).Equals(location))
+                            image.Source = icon;
+                    });
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
         }
     }

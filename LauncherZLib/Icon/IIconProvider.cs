@@ -2,6 +2,9 @@
 
 namespace LauncherZLib.Icon
 {
+    /// <summary>
+    /// Describes an icon provider.
+    /// </summary>
     public interface IIconProvider
     {
         /// <summary>
@@ -16,6 +19,9 @@ namespace LauncherZLib.Icon
         /// </summary>
         /// <param name="location"></param>
         /// <returns></returns>
+        /// <exception cref="T:System.ArgumentNullException">
+        /// Thrown when <paramref name="location"/> is null.
+        /// </exception>
         BitmapSource ProvideIcon(IconLocation location);
 
         /// <summary>
@@ -23,6 +29,9 @@ namespace LauncherZLib.Icon
         /// </summary>
         /// <param name="location"></param>
         /// <returns></returns>
+        /// <exception cref="T:System.ArgumentNullException">
+        /// Thrown when <paramref name="location"/> is null.
+        /// </exception>
         IconAvailability GetIconAvailability(IconLocation location);
 
     }

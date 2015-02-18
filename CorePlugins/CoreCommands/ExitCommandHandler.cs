@@ -23,7 +23,7 @@ namespace CorePlugins.CoreCommands
                 new LauncherData(
                     context.Localization["ExitCommandTitle"],
                     context.Localization["ExitCommandDescription"],
-                    "LauncherZ|IconGear", 1.0,
+                    "LauncherZ://IconGear", 1.0,
                     new CommandExtendedProperties(false, query.Arguments))
             };
         }

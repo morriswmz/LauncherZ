@@ -7,14 +7,16 @@ using System.Threading.Tasks;
 namespace LauncherZLib.Utils
 {
     /// <summary>
-    /// A simple thread-safe cache implementation.
+    /// A simple cache implementation.
     /// </summary>
-    /// <typeparam name="TKey"></typeparam>
-    /// <typeparam name="TValue"></typeparam>
+    /// <typeparam name="TKey">Key type.</typeparam>
+    /// <typeparam name="TValue">Entry type.</typeparam>
+    /// <remarks>
+    /// This class is not thread-safe.
+    /// </remarks>
     public class SimpleCache<TKey, TValue>
     {
 
-        private readonly object _lock = new object();
         private readonly int _capacity;
         private readonly Dictionary<TKey, CacheEntry> _entries;
         private readonly CacheEntry _head;
@@ -55,13 +57,7 @@ namespace LauncherZLib.Utils
         /// </summary>
         public int Count
         {
-            get
-            {
-                lock (_lock)
-                {
-                    return _entries.Count;
-                }
-            }
+            get { return _entries.Count; }
         }
 
         /// <summary>
@@ -71,10 +67,7 @@ namespace LauncherZLib.Utils
         /// <returns></returns>
         public bool ContainsKey(TKey key)
         {
-            lock (_lock)
-            {
-                return _entries.ContainsKey(key);
-            }
+            return _entries.ContainsKey(key);
         }
 
         /// <summary>
@@ -85,36 +78,33 @@ namespace LauncherZLib.Utils
         /// <param name="value"></param>
         public void Put(TKey key, TValue value)
         {
-            lock (_lock)
+            if (_entries.ContainsKey(key))
             {
-                if (_entries.ContainsKey(key))
+                _entries[key].Value = value;
+                RefreshImpl(key);
+            }
+            else
+            {
+                var entry = new CacheEntry()
                 {
-                    _entries[key].Value = value;
-                    RefreshImpl(key);
-                }
-                else
+                    Key = key,
+                    Value = value
+                };
+                // add to the beginning
+                entry.Prev = _head;
+                entry.Next = _head.Next;
+                _head.Next.Prev = entry;
+                _head.Next = entry;
+                _entries[key] = entry;
+                // check capacity
+                if (Count > Capacity)
                 {
-                    var entry = new CacheEntry()
-                    {
-                        Key = key,
-                        Value = value
-                    };
-                    // add to the beginning
-                    entry.Prev = _head;
-                    entry.Next = _head.Next;
-                    _head.Next.Prev = entry;
-                    _head.Next = entry;
-                    _entries[key] = entry;
-                    // check capacity
-                    if (Count > Capacity)
-                    {
-                        CacheEntry victim = _tail.Prev;
-                        _tail.Prev = victim.Prev;
-                        victim.Prev.Next = _tail;
-                        victim.Prev = null;
-                        victim.Next = null;
-                        _entries.Remove(victim.Key);
-                    }
+                    CacheEntry victim = _tail.Prev;
+                    _tail.Prev = victim.Prev;
+                    victim.Prev.Next = _tail;
+                    victim.Prev = null;
+                    victim.Next = null;
+                    _entries.Remove(victim.Key);
                 }
             }
         }
@@ -127,13 +117,10 @@ namespace LauncherZLib.Utils
         /// <exception cref="KeyNotFoundException"></exception>
         public TValue Get(TKey key)
         {
-            lock (_lock)
-            {
-                if (!_entries.ContainsKey(key))
-                    throw new KeyNotFoundException();
-                RefreshImpl(key);
-                return _entries[key].Value;
-            }
+            if (!_entries.ContainsKey(key))
+                throw new KeyNotFoundException();
+            RefreshImpl(key);
+            return _entries[key].Value;
         }
 
         /// <summary>
@@ -147,19 +134,16 @@ namespace LauncherZLib.Utils
         /// <returns>True is key exists.</returns>
         public bool TryGet(TKey key, out TValue value)
         {
-            lock (_lock)
+            if (_entries.ContainsKey(key))
             {
-                if (_entries.ContainsKey(key))
-                {
-                    value = _entries[key].Value;
-                    RefreshImpl(key);
-                    return true;
-                }
-                else
-                {
-                    value = default(TValue);
-                    return false;
-                }
+                value = _entries[key].Value;
+                RefreshImpl(key);
+                return true;
+            }
+            else
+            {
+                value = default(TValue);
+                return false;
             }
         }
 
@@ -170,12 +154,10 @@ namespace LauncherZLib.Utils
         /// <exception cref="KeyNotFoundException"></exception>
         public void Refresh(TKey key)
         {
-            lock (_lock)
-            {
-                if (!_entries.ContainsKey(key))
-                    throw new KeyNotFoundException();
-                RefreshImpl(key);
-            }
+            if (!_entries.ContainsKey(key))
+                throw new KeyNotFoundException();
+            RefreshImpl(key);
+
         }
 
         /// <summary>
@@ -183,14 +165,11 @@ namespace LauncherZLib.Utils
         /// </summary>
         public void Clear()
         {
-            lock (_lock)
-            {
-                _entries.Clear();
-                _head.Next = _tail;
-                _tail.Prev = _head;
-            }
+            _entries.Clear();
+            _head.Next = _tail;
+            _tail.Prev = _head;
         }
-        
+
         /// <summary>
         /// Internal implementation of refresh function.
         /// </summary>

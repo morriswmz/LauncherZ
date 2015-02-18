@@ -32,7 +32,7 @@ namespace CorePlugins.CoreCommands
         {
             return new LauncherData[]
             {
-                new LauncherData(context.Localization["CpuCommandTitle"], "", @"LauncherZ|IconGear", 1.0,
+                new LauncherData(context.Localization["CpuCommandTitle"], "", @"LauncherZ://IconGear", 1.0,
                         new CommandExtendedProperties(true, TickRate.Normal, query.Arguments))
                 {
                     DescriptionFont = "Helvatica"

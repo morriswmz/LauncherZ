@@ -68,14 +68,15 @@
     <Compile Include="FormattedText\FormattedSegment.cs" />
     <Compile Include="FormattedText\FormattedTextEngine.cs" />
     <Compile Include="FormattedText\TextFormat.cs" />
+    <Compile Include="Icon\FileIconProvider.cs" />
     <Compile Include="Icon\IconAvailability.cs" />
     <Compile Include="Icon\IconLoader.cs" />
     <Compile Include="Icon\IconLocation.cs" />
-    <Compile Include="Icon\IconManager.cs" />
     <Compile Include="API\IIconLocationResolver.cs" />
     <Compile Include="Icon\IconLibrary.cs" />
     <Compile Include="Icon\IIconProvider.cs" />
     <Compile Include="Icon\IIconRegisterer.cs" />
+    <Compile Include="Icon\StaticIconProvider.cs" />
     <Compile Include="Launcher\ArgumentCollection.cs" />
     <Compile Include="Launcher\LauncherDataComparer.cs" />
     <Compile Include="Launcher\TickRate.cs" />
