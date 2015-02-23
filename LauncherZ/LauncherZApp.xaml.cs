@@ -10,7 +10,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
-using LauncherZLib.API;
+using LauncherZLib.Event.Plugin;
 using LauncherZLib.Icon;
 using LauncherZLib.Plugin;
 using LauncherZLib.Utils;
@@ -155,6 +155,7 @@ namespace LauncherZ
             IconLibrary.RegisterProvider(_fileIconProvider);
             RegitserInternalIcons();
             IconLibrary.DefaultIcon = _staticIconProvider.ProvideIcon(new IconLocation("LauncherZ", "IconBlank"));
+            _fileIconProvider.MissingFileIcon = IconLibrary.DefaultIcon;
             // init and load plugins
             AppDispatcherService = new SimpleDispatcherService(Dispatcher);
             PluginManager = new PluginManager(Logger, AppDispatcherService);
@@ -171,6 +172,9 @@ namespace LauncherZ
             {
                 Configuration.Priorities.Add(pluginId, PluginManager.GetPluginPriority(pluginId));
             }
+            // notify plugins
+            PluginManager.DistributeEvent(new PluginIconRegisterationEvent(_staticIconProvider));
+            // finish
             Logger.Fine("App started successfully.");
             _appInitialized = true;
         }

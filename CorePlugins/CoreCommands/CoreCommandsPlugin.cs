@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using LauncherZLib.API;
 using LauncherZLib.Event;
 using LauncherZLib.Event.Launcher;
 using LauncherZLib.Launcher;
+using LauncherZLib.Plugin;
 
 namespace CorePlugins.CoreCommands
 {

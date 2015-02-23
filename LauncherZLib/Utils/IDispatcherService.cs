@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Threading;
 
-namespace LauncherZLib.API
+namespace LauncherZLib.Utils
 {
     /// <summary>
     /// Exposes asynchronous invocation and access checking of a Dispatcher.

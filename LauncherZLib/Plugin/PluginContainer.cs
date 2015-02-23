@@ -4,10 +4,10 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Threading;
-using LauncherZLib.API;
 using LauncherZLib.Event;
 using LauncherZLib.I18N;
 using LauncherZLib.Launcher;
+using LauncherZLib.Utils;
 
 namespace LauncherZLib.Plugin
 {
@@ -134,15 +134,9 @@ namespace LauncherZLib.Plugin
         /// <summary>
         /// 
         /// </summary>
-        internal Action<string, string> CrashHandler { get; set; } 
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="plugin"></param>
         /// <param name="info"></param>
-        /// <param name="logger"></param>
-        /// <param name="dispatcher"></param>
+        /// <param name="contextParams"></param>
         public PluginContainer(IPlugin plugin, PluginInfo info, PluginContextParameters contextParams)
         {
             if (plugin == null)
@@ -214,16 +208,6 @@ namespace LauncherZLib.Plugin
             // always mark as deactivated, despite exceptions
             _eventRelay.Unlink();
             _plugin.Deactivate(this);
-        }
-
-        public void SendCrashNotification(string friendlyMsg)
-        {
-            CrashHandler(_id, friendlyMsg);
-        }
-
-        public void DoCrashCleanup()
-        {
-            Status = PluginStatus.Crashed;
         }
 
         public int CompareTo(PluginContainer other)

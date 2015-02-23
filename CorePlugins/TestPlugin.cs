@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using LauncherZLib.API;
 using LauncherZLib.Event;
 using LauncherZLib.Event.Plugin;
 using LauncherZLib.Launcher;

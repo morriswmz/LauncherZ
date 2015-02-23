@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Windows.Threading;
-using LauncherZLib.API;
 
 namespace LauncherZLib.Utils
 {

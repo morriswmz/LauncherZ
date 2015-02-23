@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Collections.Generic;
 using LauncherZLib.Launcher;
 
-namespace LauncherZLib.API
+namespace LauncherZLib.Plugin
 {
 
     /// <summary>

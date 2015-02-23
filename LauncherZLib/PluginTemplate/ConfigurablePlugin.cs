@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using LauncherZLib.API;
+using LauncherZLib.Plugin;
 using LauncherZLib.Utils;
 using Newtonsoft.Json;
 

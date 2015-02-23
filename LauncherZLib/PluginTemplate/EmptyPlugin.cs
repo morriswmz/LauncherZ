@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using LauncherZLib.API;
 using LauncherZLib.Launcher;
+using LauncherZLib.Plugin;
 
 namespace LauncherZLib.PluginTemplate
 {

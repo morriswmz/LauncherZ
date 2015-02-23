@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using LauncherZLib.API;
 using LauncherZLib.Event;
 using LauncherZLib.Icon;
 using LauncherZLib.Utils;
 
 namespace LauncherZLib.Plugin
 {
-    public sealed class PluginManager : IAutoCompletionProvider, IIconLocationResolver
+    public sealed class PluginManager : IAutoCompletionProvider
     {
         // note that id is case insensitive
         private readonly Dictionary<string, PluginContainer> _loadedPlugins = new Dictionary<string, PluginContainer>(StringComparer.OrdinalIgnoreCase);
@@ -385,7 +384,6 @@ namespace LauncherZLib.Plugin
             {
                 _logger.Error(string.Format(
                     "Plugin {0} crashed with message: {1}", container, friendlyMsg));
-                container.DoCrashCleanup();
                 DispatchPluginCrashedEvent(pluginId, friendlyMsg);
                 // update collection
                 _activePluginIds.Remove(pluginId);
@@ -460,10 +458,7 @@ namespace LauncherZLib.Plugin
                         Logger = _loggerProvider.CreateLogger(info.Id),
                         ParentEventBus = _eventBus
                     };
-                    var container = new PluginContainer(plugin, info, contextParams)
-                    {
-                        CrashHandler = PluginCrashHandler
-                    };
+                    var container = new PluginContainer(plugin, info, contextParams);
                     return container;
                 }
             }
@@ -502,23 +497,6 @@ namespace LauncherZLib.Plugin
             throw new NotImplementedException();
         }
 
-        public bool TryResolve(IconLocation location, out string path)
-        {
-            // if domain is empty, treat path as absolute path
-            if (string.IsNullOrEmpty(location.Domain))
-            {
-                path = location.Path;
-                return true;
-            }
-            // if domain is non-empty
-            if (!_loadedPlugins.ContainsKey(location.Domain))
-            {
-                path = string.Empty;
-                return false;
-            }
-            path = Path.Combine(_loadedPlugins[location.Domain].SourceDirectory, location.Path);
-            return true;
-        }
     }
 
 }

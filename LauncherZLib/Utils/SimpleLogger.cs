@@ -7,7 +7,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media.Converters;
-using LauncherZLib.API;
 
 namespace LauncherZLib.Utils
 {

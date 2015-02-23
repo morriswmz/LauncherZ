@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using LauncherZLib.API;
 using LauncherZLib.Launcher;
+using LauncherZLib.Plugin;
 
 namespace LauncherZLib.PluginTemplate
 {

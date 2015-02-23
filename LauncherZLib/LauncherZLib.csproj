@@ -48,13 +48,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="API\IAutoCompletionProvider.cs" />
-    <Compile Include="API\IDispatcherService.cs" />
-    <Compile Include="API\IEventBus.cs" />
-    <Compile Include="API\ILogger.cs" />
-    <Compile Include="API\ILoggerProvider.cs" />
-    <Compile Include="API\IPluginContext.cs" />
-    <Compile Include="API\IPlugin.cs" />
+    <Compile Include="Event\IEventBus.cs" />
     <Compile Include="Event\Launcher\LauncherAddedEvent.cs" />
     <Compile Include="Event\Launcher\LauncherDeselectedEvent.cs" />
     <Compile Include="Event\Launcher\LauncherEvent.cs" />
@@ -64,6 +58,7 @@
     <Compile Include="Event\Launcher\LauncherTickEvent.cs" />
     <Compile Include="Event\PluginInternal\PluginEventInternal.cs" />
     <Compile Include="Event\PluginInternal\QueryResultUpdateEventI.cs" />
+    <Compile Include="Event\Plugin\PluginIconRegisterationEvent.cs" />
     <Compile Include="Event\Plugin\QueryResultUpdateEvent.cs" />
     <Compile Include="FormattedText\FormattedSegment.cs" />
     <Compile Include="FormattedText\FormattedTextEngine.cs" />
@@ -72,7 +67,6 @@
     <Compile Include="Icon\IconAvailability.cs" />
     <Compile Include="Icon\IconLoader.cs" />
     <Compile Include="Icon\IconLocation.cs" />
-    <Compile Include="API\IIconLocationResolver.cs" />
     <Compile Include="Icon\IconLibrary.cs" />
     <Compile Include="Icon\IIconProvider.cs" />
     <Compile Include="Icon\IIconRegisterer.cs" />
@@ -96,6 +90,8 @@
     <Compile Include="PluginTemplate\ConfigurablePlugin.cs" />
     <Compile Include="PluginTemplate\EmptyPlugin.cs" />
     <Compile Include="PluginTemplate\ICommandHandler.cs" />
+    <Compile Include="Plugin\IPlugin.cs" />
+    <Compile Include="Plugin\IPluginContext.cs" />
     <Compile Include="Plugin\PluginContextParameters.cs" />
     <Compile Include="Plugin\PluginEventBusWrapper.cs" />
     <Compile Include="Plugin\PluginEventRelay.cs" />
@@ -113,12 +109,17 @@
     <Compile Include="QueryController.cs" />
     <Compile Include="Utils\FileSystemUtils.cs" />
     <Compile Include="Utils\GlobalHotkey.cs" />
+    <Compile Include="Utils\IAutoCompletionProvider.cs" />
+    <Compile Include="Utils\IDispatcherService.cs" />
+    <Compile Include="Utils\ILogger.cs" />
+    <Compile Include="Utils\ILoggerProvider.cs" />
     <Compile Include="Utils\JsonUtils.cs" />
     <Compile Include="Utils\KeyboardUtils.cs" />
     <Compile Include="Utils\SafeDirectoryWalker.cs" />
     <Compile Include="Utils\SimpleCache.cs" />
     <Compile Include="Utils\SimpleDispatcherService.cs" />
     <Compile Include="Utils\SimpleLogger.cs" />
+    <Compile Include="Utils\SimpleScheduler.cs" />
     <Compile Include="Utils\StringUtils.cs" />
     <Compile Include="Win32\Kernel32.cs" />
     <Compile Include="Win32\Shell32.cs" />

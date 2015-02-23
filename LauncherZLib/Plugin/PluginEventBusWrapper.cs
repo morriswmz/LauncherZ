@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Threading;
-using LauncherZLib.API;
 using LauncherZLib.Event;
+using LauncherZLib.Utils;
 
 namespace LauncherZLib.Plugin
 {

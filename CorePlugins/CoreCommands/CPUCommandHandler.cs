@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Media;
-using LauncherZLib.API;
 using LauncherZLib.Event.Launcher;
 using LauncherZLib.Launcher;
+using LauncherZLib.Plugin;
 using LauncherZLib.Utils;
 
 namespace CorePlugins.CoreCommands
