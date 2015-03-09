@@ -17,7 +17,7 @@ namespace LauncherZLib.Utils
 
         public virtual int SetTimeout(Action action, int seconds)
         {
-            
+            throw new NotImplementedException();
         }
 
         public virtual void ClearTimeout(int id)
@@ -27,7 +27,7 @@ namespace LauncherZLib.Utils
 
         public virtual int SetInterval(Action action, int seconds)
         {
-            
+            throw new NotImplementedException();
         }
 
         public virtual void ClearInterval(int id)

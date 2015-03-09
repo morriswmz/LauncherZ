@@ -10,7 +10,7 @@ namespace LauncherZLib.Matching
     public class FlexMatcher
     {
 
-        private readonly FlexLexicon _lexicon = new FlexLexicon();
+        private int _maxFlexKeywordLength = 16;
 
         public FlexMatcher()
         {
@@ -18,15 +18,23 @@ namespace LauncherZLib.Matching
         }
 
         /// <summary>
-        /// Gets the assigned lexicon.
+        /// <para>Gets or sets the maximum allowed length of a keyword in flex-matching mode.</para>
+        /// <para>This parameter ensures that if given keyword is too long only exact matching will
+        /// be performed.</para>
+        /// <para>Default value is 16. Minimum value is 1.</para>
         /// </summary>
-        public FlexLexicon Lexicon { get { return _lexicon; } }
+        public int MaxFlexKeywordLength
+        {
+            get { return _maxFlexKeywordLength; }
+            set { _maxFlexKeywordLength = Math.Max(1, value); }
+        }
 
         /// <summary>
         /// Matches a string against several keywords.
         /// </summary>
         /// <param name="str"></param>
         /// <param name="keywords"></param>
+        /// <param name="lexicon"></param>
         /// <returns></returns>
         /// <remarks>
         /// <para>
@@ -38,8 +46,18 @@ namespace LauncherZLib.Matching
         /// to specify culture information in corresponding methods.
         /// </para>
         /// </remarks>
-        public FlexMatchResult Match(string str, string[] keywords)
+        /// <exception cref="T:System.ArgumentNullException">
+        /// Thrown when any of the arguments is null.
+        /// </exception>
+        public FlexMatchResult Match(string str, string[] keywords, FlexLexicon lexicon)
         {
+            if (str == null)
+                throw new ArgumentNullException("str");
+            if (keywords == null)
+                throw new ArgumentNullException("keywords");
+            if (lexicon == null)
+                throw new ArgumentNullException("lexicon");
+
             bool exactOnly = keywords.Length > 1;
 
             // 0: normalize to uppercase
@@ -106,7 +124,7 @@ namespace LauncherZLib.Matching
                     // since both keyword and string are normalized
                     // matched = ordinally equal || (kc is simple char && lexicon match)
                     matched = sc.Equals(kc, StringComparison.Ordinal) ||
-                                (kc.Length == 1 && _lexicon.Match(sc, kc[0]));
+                                (kc.Length == 1 && lexicon.Match(sc, kc[0]));
                     if (matched)
                     {
                         flexMatches.Add(new FlexMatch(teS.ElementIndex, sc.Length, str.Substring(teS.ElementIndex, sc.Length)));

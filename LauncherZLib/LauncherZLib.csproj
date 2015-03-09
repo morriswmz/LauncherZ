@@ -48,6 +48,8 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Event\Application\ApplicationEvent.cs" />
+    <Compile Include="Event\Application\ApplicationReadyEvent.cs" />
     <Compile Include="Event\IEventBus.cs" />
     <Compile Include="Event\Launcher\LauncherAddedEvent.cs" />
     <Compile Include="Event\Launcher\LauncherDeselectedEvent.cs" />
@@ -58,7 +60,6 @@
     <Compile Include="Event\Launcher\LauncherTickEvent.cs" />
     <Compile Include="Event\PluginInternal\PluginEventInternal.cs" />
     <Compile Include="Event\PluginInternal\QueryResultUpdateEventI.cs" />
-    <Compile Include="Event\Plugin\PluginIconRegisterationEvent.cs" />
     <Compile Include="Event\Plugin\QueryResultUpdateEvent.cs" />
     <Compile Include="FormattedText\FormattedSegment.cs" />
     <Compile Include="FormattedText\FormattedTextEngine.cs" />

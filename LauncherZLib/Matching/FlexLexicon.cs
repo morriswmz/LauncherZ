@@ -4,7 +4,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace LauncherZLib.Matching
 {
@@ -16,7 +15,12 @@ namespace LauncherZLib.Matching
     /// </summary>
     public class FlexLexicon
     {
-        private readonly Dictionary<string, string> _dict = new Dictionary<string, string>(2048);
+        /// <summary>
+        /// Global lexicon. Share the knowledge here.
+        /// </summary>
+        public static readonly FlexLexicon GlobalLexicon = new FlexLexicon();
+
+        protected readonly Dictionary<string, string> _dict = new Dictionary<string, string>(2048);
 
         /// <summary>
         /// <para>Checks if given character has short form match.</para>
@@ -27,7 +31,7 @@ namespace LauncherZLib.Matching
         /// <param name="replacement">Possible replacement character. Will be converted to uppercase
         /// under <b>InvariantCulture</b>.</param>
         /// <returns></returns>
-        public bool Match(string character, char replacement)
+        public virtual bool Match(string character, char replacement)
         {
             string abbrs;
             replacement = char.ToUpperInvariant(replacement);
@@ -46,7 +50,7 @@ namespace LauncherZLib.Matching
         /// separators.</para>
         /// </summary>
         /// <param name="path"></param>
-        public void AddFromFile(string path)
+        public virtual void AddFromFile(string path)
         {
             int lineNo = 0;
             using (var sw = new StreamReader(path, Encoding.UTF8))
@@ -101,7 +105,7 @@ namespace LauncherZLib.Matching
         /// automatically for internal storage.
         /// </para>
         /// </remarks>
-        public void Add(string character, string replacement)
+        public virtual void Add(string character, string replacement)
         {
             TextElementEnumerator te = StringInfo.GetTextElementEnumerator(character);
             replacement = replacement.ToUpperInvariant();
@@ -130,7 +134,7 @@ namespace LauncherZLib.Matching
         /// <summary>
         /// Clears the lexicon.
         /// </summary>
-        public void Clear()
+        public virtual void Clear()
         {
             _dict.Clear();
         }

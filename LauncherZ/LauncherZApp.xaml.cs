@@ -12,6 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using LauncherZLib.Event.Plugin;
 using LauncherZLib.Icon;
+using LauncherZLib.Matching;
 using LauncherZLib.Plugin;
 using LauncherZLib.Utils;
 using Newtonsoft.Json;
@@ -33,12 +34,30 @@ namespace LauncherZ
         private StaticIconProvider _staticIconProvider;
 
         #endregion
-            
+
+        #region Public Properties
+
         /// <summary>
         /// The current LaucherZApp instance.
         /// Same reference as Application.Current but no casting is required.
         /// </summary>
         public static LauncherZApp Instance { get; private set; }
+        
+        /// <summary>
+        /// GUID of LauncherZ.
+        /// </summary>
+        public string AppGuid { get; private set; }
+
+        public string LauncherZDataBasePath { get; private set; }
+        public string PluginDataPath { get; private set; }
+        public string LogPath { get; private set; }
+        public string LexiconPath { get; private set; }
+
+        #endregion
+
+        #region Internal Properties
+
+        internal LauncherZConfig Configuration { get; private set; }
 
         /// <summary>
         /// IconLibrary of LauncherZ.
@@ -51,16 +70,7 @@ namespace LauncherZ
 
         internal IDispatcherService AppDispatcherService { get; private set; }
 
-        /// <summary>
-        /// GUID of LauncherZ.
-        /// </summary>
-        public string AppGuid { get; private set; }
-
-        public string AppDataBasePath { get; private set; }
-        public string PluginDataPath { get; private set; }
-        public string LogPath { get; private set; }
-
-        internal LauncherZConfig Configuration { get; private set; }
+        #endregion
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
@@ -107,7 +117,7 @@ namespace LauncherZ
                 try
                 {
                     JsonUtils.StreamSerialize(
-                        Path.Combine(AppDataBasePath, AppConfigFileName), Configuration, Formatting.Indented);
+                        Path.Combine(LauncherZDataBasePath, AppConfigFileName), Configuration, Formatting.Indented);
                 }
                 catch (Exception ex)
                 {
@@ -134,7 +144,7 @@ namespace LauncherZ
             try
             {
                 Configuration = JsonUtils.StreamDeserialize<LauncherZConfig>(
-                    Path.Combine(AppDataBasePath, AppConfigFileName));
+                    Path.Combine(LauncherZDataBasePath, AppConfigFileName));
             }
             catch (Exception ex)
             {
@@ -160,7 +170,7 @@ namespace LauncherZ
             AppDispatcherService = new SimpleDispatcherService(Dispatcher);
             PluginManager = new PluginManager(Logger, AppDispatcherService);
             PluginManager.LoadAllFrom(Path.GetFullPath(@".\Plugins"), PluginDataPath);
-            PluginManager.LoadAllFrom(string.Format("{0}{1}Plugins", AppDataBasePath, Path.DirectorySeparatorChar), PluginDataPath);
+            PluginManager.LoadAllFrom(string.Format("{0}{1}Plugins", LauncherZDataBasePath, Path.DirectorySeparatorChar), PluginDataPath);
             // set plugin priorities from configuration
             foreach (var pair in Configuration.Priorities)
             {
@@ -172,8 +182,9 @@ namespace LauncherZ
             {
                 Configuration.Priorities.Add(pluginId, PluginManager.GetPluginPriority(pluginId));
             }
-            // notify plugins
-            PluginManager.DistributeEvent(new PluginIconRegisterationEvent(_staticIconProvider));
+            // load global lexicons
+            LoadLexiconsFrom(Path.GetFullPath(@".\Lexicons"));
+            LoadLexiconsFrom(LexiconPath);
             // finish
             Logger.Fine("App started successfully.");
             _appInitialized = true;
@@ -197,22 +208,29 @@ namespace LauncherZ
             string userAppDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             
 #if DEBUG
-            string appDataBasePath = string.Format("{0}\\LauncherZ.Debug.{1}", userAppDataPath, AppGuid.Substring(0,8));
+            string launcherZDataBasePath = Path.Combine(userAppDataPath, "LauncherZ.Debug." + AppGuid.Substring(0,8));
 #else
-            string appDataBasePath = string.Format("{0}\\LauncherZ.{1}", userAppDataPath, AppGuid.Substring(0, 8));
+            string appDataBasePath = Path.Combine(userAppDataPath, "LauncherZ." + AppGuid.Substring(0, 8));
 #endif
-            if (!Directory.Exists(appDataBasePath))
-                Directory.CreateDirectory(appDataBasePath);
-            string pluginDataPath = appDataBasePath + "\\PluginData";
+            if (!Directory.Exists(launcherZDataBasePath))
+                Directory.CreateDirectory(launcherZDataBasePath);
+
+            string pluginDataPath = Path.Combine(launcherZDataBasePath, "PluginData");
             if (!Directory.Exists(pluginDataPath))
                 Directory.CreateDirectory(pluginDataPath);
-            string logPath = appDataBasePath + "\\Logs";
+            
+            string logPath = Path.Combine(launcherZDataBasePath, "Logs");
             if (!Directory.Exists(logPath))
                 Directory.CreateDirectory(logPath);
+            
+            string lexiconPath = Path.Combine(launcherZDataBasePath, "Lexicons");
+            if (!Directory.Exists(lexiconPath))
+                Directory.CreateDirectory(lexiconPath);
 
-            AppDataBasePath = appDataBasePath;
+            LauncherZDataBasePath = launcherZDataBasePath;
             PluginDataPath = pluginDataPath;
             LogPath = logPath;
+            LexiconPath = lexiconPath;
         }
 
         private void RegitserInternalIcons()
@@ -222,6 +240,39 @@ namespace LauncherZ
             {
                 var bitmapImage = FindResource(s) as BitmapImage;
                 _staticIconProvider.RegisterIcon(new IconLocation("LauncherZ", s), bitmapImage);
+            }
+        }
+
+        private void LoadLexiconsFrom(string path)
+        {
+            
+            if (!Directory.Exists(path))
+                return;
+
+            string[] lexicons;
+            try
+            {
+                lexicons = Directory.GetFiles(path, "*.txt");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(string.Format("Faild to get lexicon files from directory \"{0}\". Details:{1}{2}",
+                    path, Environment.NewLine, ex));
+                return;
+            }
+            foreach (var l in lexicons)
+            {
+                try
+                {
+                    FlexLexicon.GlobalLexicon.AddFromFile(l);
+                    Logger.Fine(string.Format("Loaded lexicon file \"{0}\".", l));
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(string.Format(
+                        "An exception occurred while loading lexicon from \"{0}\". Details:{1}{2}",
+                        l, Environment.NewLine, ex));
+                }
             }
         }
 

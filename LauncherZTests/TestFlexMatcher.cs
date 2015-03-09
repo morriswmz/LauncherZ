@@ -80,7 +80,8 @@ namespace LauncherZTests
         public void TestFlexMatching()
         {
             var fm = new FlexMatcher();
-            fm.Lexicon.AddFromFile(@"LexiconSamples\zh-CN.txt");
+            var fl = new FlexLexicon();
+            fl.AddFromFile(@"LexiconSamples\zh-CN.txt");
 
             var englishInput = "Bag Age Gear Bar";
             var englishKeywords1 = new string[] {"ba", "ag", "ge"};
@@ -105,7 +106,7 @@ namespace LauncherZTests
                     new FlexMatch(2, 1, "上"),
                     new FlexMatch(3, 1, "海"),
                     new FlexMatch(5, 1, "C"),
-                    new FlexMatch(11, 1, "h")
+                    new FlexMatch(11, 1, "S")
                 }));
             var mixedKeywords2 = new string[] {"zgsh]"};
             var mixedResult2 = new FlexMatchResult(true, FlexMatchCollection.Empty, true,
@@ -113,13 +114,13 @@ namespace LauncherZTests
 
             FlexMatchResult result;
 
-            result = fm.Match(englishInput, englishKeywords1);
+            result = fm.Match(englishInput, englishKeywords1, fl);
             CompareResults(englishResult1, result);
-            result = fm.Match(englishInput, englishKeywords2);
+            result = fm.Match(englishInput, englishKeywords2, fl);
             CompareResults(englishResult2, result);
-            result = fm.Match(mixedInput, mixedKeywords1);
+            result = fm.Match(mixedInput, mixedKeywords1, fl);
             CompareResults(mixedResult1, result);
-            result = fm.Match(mixedInput, mixedKeywords2);
+            result = fm.Match(mixedInput, mixedKeywords2, fl);
             CompareResults(mixedResult2, result);
         }
 

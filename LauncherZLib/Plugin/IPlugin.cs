@@ -5,7 +5,20 @@ namespace LauncherZLib.Plugin
 {
 
     /// <summary>
-    /// Describes a plugin for LauncherZ.
+    /// <para>Describes a plugin for LauncherZ.</para>
+    /// <para>Implementation guidelines:</para>
+    /// <list type="bullet">
+    ///     <item>
+    ///         <description>
+    ///             All methods implementation should be synchronous.
+    ///         </description>
+    ///     </item>
+    ///     <item>
+    ///         <description>
+    ///             
+    ///         </description>
+    ///     </item>
+    /// </list>
     /// </summary>
     public interface IPlugin
     {
