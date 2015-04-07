@@ -5,5 +5,6 @@
     /* en-US */
     "ExitCommandTitle": "Exit LauncherZ",
     "ExitCommandDescription": "Press [Enter] to exit.",
-    "CpuCommandTitle":  "Total CPU usage"
+    "CpuCommandTitle": "Total CPU usage",
+    "CpuCommandDescription": "Press [Enter] to open task manager."
 }

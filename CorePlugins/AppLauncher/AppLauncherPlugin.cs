@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -9,32 +10,51 @@ using LauncherZLib.FormattedText;
 using LauncherZLib.Launcher;
 using LauncherZLib.Matching;
 using LauncherZLib.Plugin;
-using LauncherZLib.PluginTemplate;
+using LauncherZLib.Plugin.Service;
+using LauncherZLib.Plugin.Template;
+using LauncherZLib.Utils;
 
 namespace CorePlugins.AppLauncher
 {
+    [Plugin("LZAppLauncher", FriendlyName = "LauncherZ Application Launcher", Authors = "morriswmz", Version = "0.1.0.0")]
+    [Description("Launches installed applications.")]
     public class AppLauncherPlugin : EmptyPlugin
     {
 
         private AppManifestManager _manager;
         private FlexMatcher _matcher = new FlexMatcher();
         private FlexScorer _scorer = new FlexScorer();
+        private ITimerService _timerService;
+        private int _saveTimerId = -1;
         private string _manifestFilePath;
 
-        public override void Activate(IPluginContext pluginContext)
+        public override void Activate(IPluginServiceProvider serviceProvider)
         {
-            base.Activate(pluginContext);
-            _manifestFilePath = Path.Combine(Context.SuggestedDataDirectory, "apps.json");
-            _manager = new AppManifestManager(_manifestFilePath, Context.Logger);
+            base.Activate(serviceProvider);
+
+            _timerService = serviceProvider.CanProvideService<ITimerService>()
+                ? serviceProvider.GetService<ITimerService>()
+                : null;
+            if (_timerService != null)
+            {
+                _saveTimerId = _timerService.SetInterval(() => _manager.SaveManifestToFile(), new TimeSpan(0, 0, 30, 0));
+            }
+            _manifestFilePath = Path.Combine(PluginInfo.SuggestedPluginDataDirectory, "apps.json");
+            _manager = new AppManifestManager(_manifestFilePath, Logger);
             if (!_manager.LoadManifestFromFile() || _manager.IsManifestEmpty)
             {
                 _manager.ScheduleUpdateManifest();
             }
-            Context.EventBus.Register(this);
+            EventBus.Register(this);
         }
 
-        public override void Deactivate(IPluginContext pluginContext)
+        public override void Deactivate(IPluginServiceProvider serviceProvider)
         {
+            if (_saveTimerId >= 0)
+            {
+                _timerService.ClearInterval(_saveTimerId);
+                _saveTimerId = -1;
+            }
             _manager.AbortUpdate();
             _manager.SaveManifestToFile();
         }
@@ -77,7 +97,7 @@ namespace CorePlugins.AppLauncher
                 }
                 catch (Exception)
                 {
-                    Context.Logger.Warning(string.Format("Unable to start process from: {0}", prop.LinkFileLocation));
+                    Logger.Warning(string.Format("Unable to start process from: {0}", prop.LinkFileLocation));
                 }
             }
         }

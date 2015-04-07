@@ -27,7 +27,7 @@ namespace LauncherZLib.Event.PluginInternal
         /// </summary>
         public TE BaseEvent { get; private set; }
 
-        protected PluginEventInternal(TE baseEvent, string sourceId)
+        protected PluginEventInternal(string sourceId, TE baseEvent)
         {
             if (baseEvent == null)
                 throw new ArgumentNullException("baseEvent");

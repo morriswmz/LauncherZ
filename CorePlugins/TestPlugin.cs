@@ -1,32 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using LauncherZLib.Event;
 using LauncherZLib.Event.Plugin;
 using LauncherZLib.Launcher;
 using LauncherZLib.Plugin;
+using LauncherZLib.Plugin.Service;
 
 namespace CorePlugins
 {
+
     public class TestPlugin : IPlugin
     {
 
-        private IPluginContext _context;
+        private IEventBus _eventBus;
         private Random _random = new Random();
 
-        public void Activate(IPluginContext pluginContext)
+        public void Activate(IPluginServiceProvider serviceProvider)
         {
-            _context = pluginContext;
-            _context.EventBus.Register(this);
+            _eventBus = serviceProvider.GetService<IEventBus>();
+            _eventBus.Register(this);
         }
 
-        public void Deactivate(IPluginContext pluginContext)
+        public void Deactivate(IPluginServiceProvider serviceProvider)
         {
-            _context = null;
+
         }
 
         public IEnumerable<LauncherData> Query(LauncherQuery query)
@@ -51,7 +51,7 @@ namespace CorePlugins
             Task.Run(() =>
             {
                 Thread.Sleep(1000);
-                _context.EventBus.Post(new QueryResultUpdateEvent(query.QueryId, new LauncherData[]
+                _eventBus.Post(new QueryResultUpdateEvent(query.QueryId, new LauncherData[]
                 {
                     new LauncherData(
                         "Test", string.Format("[Delayed by 1000ms] {0}", DateTime.Now),

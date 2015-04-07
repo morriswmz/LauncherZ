@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace LauncherZLib.Utils
 {
+
+   
+
     /// <summary>
     /// Walks through every file safely.
     /// </summary>
@@ -27,7 +30,6 @@ namespace LauncherZLib.Utils
         }
 
         public delegate bool DirectoryWalkerCallback(FileInfo fi);
-
         /// <summary>
         /// Gets or gets whether hidden files/directories should be ignored.
         /// Default is true.
@@ -118,9 +120,9 @@ namespace LauncherZLib.Utils
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // safely ignore exceptions
+                // safely ignore
             }
             return true;
         }

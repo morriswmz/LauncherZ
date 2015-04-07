@@ -10,7 +10,7 @@ namespace LauncherZLib.I18N
     /// <summary>
     /// A simple localization dictionary. 
     /// </summary>
-    public class LocalizationDictionary
+    public class LocalizationDictionary : ILocalizationDictionary
     {
         private static readonly List<string> PossibleCultureNames;
 
@@ -35,19 +35,11 @@ namespace LauncherZLib.I18N
 
         }
 
-        /// <summary>
-        /// Gets the translated string.
-        /// </summary>
-        /// <param name="strName"></param>
-        /// <returns>Translated string, or original string when fails.</returns>
         public string this[string strName]
         {
             get { return Translate(strName); }
         }
 
-        /// <summary>
-        /// Gets the current culture associated with the LocalizationDictionary.
-        /// </summary>
         public CultureInfo CurrentCulture
         {
             get { return _culture; }
@@ -65,40 +57,21 @@ namespace LauncherZLib.I18N
             }
         }
 
-        /// <summary>
-        /// Translates given string.
-        /// </summary>
-        /// <param name="strName"></param>
-        /// <returns></returns>
         public string Translate(string strName)
         {
             return !_strings.ContainsKey(strName) ? strName : _strings[strName];
         }
 
-        /// <summary>
-        /// Checks if given string can be translated.
-        /// </summary>
-        /// <param name="strName"></param>
-        /// <returns></returns>
         public bool CanTranslate(string strName)
         {
             return _strings.ContainsKey(strName);
         }
 
-        /// <summary>
-        /// Loads specific language file with fallback.
-        /// </summary>
-        /// <param name="fileName"></param>
         public void LoadLanguageFile(string fileName)
         {
             LoadLanguageFile(fileName, true);
         }
 
-        /// <summary>
-        /// Loads specific language file.
-        /// </summary>
-        /// <param name="fileName"></param>
-        /// <param name="fallback">If true, will attempt to load language file for fallback language.</param>
         public void LoadLanguageFile(string fileName, bool fallback)
         {
             string baseFileName = TrimCultureNameFromPath(fileName);
@@ -137,9 +110,6 @@ namespace LauncherZLib.I18N
                 "Unable to find localization file: {0}. Fallback files not found.", expectedFileName));
         }
 
-        /// <summary>
-        /// Reloads all language files.
-        /// </summary>
         public void ReloadAllLanguageFiles()
         {
             _strings.Clear();

@@ -14,6 +14,7 @@ using LauncherZLib.Event.Plugin;
 using LauncherZLib.Icon;
 using LauncherZLib.Matching;
 using LauncherZLib.Plugin;
+using LauncherZLib.Plugin.Service;
 using LauncherZLib.Utils;
 using Newtonsoft.Json;
 
@@ -69,6 +70,8 @@ namespace LauncherZ
         internal PluginManager PluginManager { get; private set; }
 
         internal IDispatcherService AppDispatcherService { get; private set; }
+
+        internal ITimerService AppTimerService { get; private set; }
 
         #endregion
 
@@ -155,6 +158,7 @@ namespace LauncherZ
                 Logger.Warning("Using default configuration.");
                 Configuration = new LauncherZConfig();
             }
+           
             // init icon library
             _staticIconProvider = new StaticIconProvider();
             _fileIconProvider = new FileIconProvider(Logger.CreateLogger("FileIconProvider"));
@@ -166,11 +170,21 @@ namespace LauncherZ
             RegitserInternalIcons();
             IconLibrary.DefaultIcon = _staticIconProvider.ProvideIcon(new IconLocation("LauncherZ", "IconBlank"));
             _fileIconProvider.MissingFileIcon = IconLibrary.DefaultIcon;
+            
             // init and load plugins
             AppDispatcherService = new SimpleDispatcherService(Dispatcher);
-            PluginManager = new PluginManager(Logger, AppDispatcherService);
-            PluginManager.LoadAllFrom(Path.GetFullPath(@".\Plugins"), PluginDataPath);
-            PluginManager.LoadAllFrom(string.Format("{0}{1}Plugins", LauncherZDataBasePath, Path.DirectorySeparatorChar), PluginDataPath);
+            AppTimerService = new SimpleTimer(Dispatcher);
+
+            var pspFactory = new PluginServiceProviderFactory();
+            pspFactory.CommonServices.Add(typeof(IDispatcherService), AppDispatcherService);
+            pspFactory.CommonServices.Add(typeof(ITimerService), AppTimerService);
+
+            PluginManager = new PluginManager(Logger, AppDispatcherService, pspFactory);
+            PluginManager.LoadAllFrom(new String[]
+            {
+                Path.GetFullPath(@".\Plugins"),
+                string.Format("{0}{1}Plugins", LauncherZDataBasePath, Path.DirectorySeparatorChar)
+            }, PluginDataPath);
             // set plugin priorities from configuration
             foreach (var pair in Configuration.Priorities)
             {

@@ -1,30 +1,45 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using LauncherZLib.Event;
 using LauncherZLib.Event.Launcher;
+using LauncherZLib.I18N;
 using LauncherZLib.Launcher;
 using LauncherZLib.Plugin;
+using LauncherZLib.Plugin.Service;
 
 namespace CorePlugins.CoreCommands
 {
-    public class CoreCommandsPlugin : IPlugin
+    [Plugin("LZCoreCommands", FriendlyName = "LauncherZ Core Commands", Authors = "morriswmz", Version = "0.1.0.0")]
+    [Description("Provides basic commands.")]
+    public class CoreCommandsPlugin : IPlugin, ICommandPlugin
     {
-        private IPluginContext _pluginContext;
-        private readonly Dictionary<string, ICommandHandler> _handlers = new Dictionary<string, ICommandHandler>(StringComparer.OrdinalIgnoreCase); 
+        private readonly Dictionary<string, CommandHandler> _handlers = new Dictionary<string, CommandHandler>(StringComparer.OrdinalIgnoreCase);
 
-        public void Activate(IPluginContext pluginContext)
+        public IPluginServiceProvider PluginServiceProvider { get; private set; }
+
+        public IPluginInfoProvider PluginInfo { get; private set; }
+
+        public ILocalizationDictionary Localization { get; private set; }
+
+        public IEventBus EventBus { get; private set; }
+
+        public void Activate(IPluginServiceProvider serviceProvider)
         {
-            _pluginContext = pluginContext;
-            _pluginContext.EventBus.Register(this);
-            _pluginContext.Localization.LoadLanguageFile(
-                Path.Combine(_pluginContext.SourceDirectory, @"I18N\CoreCommandsStrings.json"));
-            AddHandler(new CpuCommandHandler());
-            AddHandler(new ExitCommandHandler());
+            PluginServiceProvider = serviceProvider;
+            PluginInfo = PluginServiceProvider.GetService<IPluginInfoProvider>();
+            EventBus = PluginServiceProvider.GetService<IEventBus>();
+            EventBus.Register(this);
+            Localization = PluginServiceProvider.GetService<ILocalizationDictionary>();
+            Localization.LoadLanguageFile(
+                Path.Combine(PluginInfo.PluginSourceDirectory, @"I18N\CoreCommandsStrings.json"));
+            AddHandler(new CpuCommandHandler(this));
+            AddHandler(new ExitCommandHandler(this));
         }
 
-        public void Deactivate(IPluginContext pluginContext)
+        public void Deactivate(IPluginServiceProvider serviceProvider)
         {
             foreach (var commandHanlder in _handlers.Values)
             {
@@ -36,10 +51,10 @@ namespace CorePlugins.CoreCommands
 
         public IEnumerable<LauncherData> Query(LauncherQuery query)
         {
-            ICommandHandler handler;
+            CommandHandler handler;
             if (_handlers.TryGetValue(query.Arguments[0], out handler))
             {
-                return handler.HandleQuery(query, _pluginContext);
+                return handler.HandleQuery(query);
             }
             else
             {
@@ -54,10 +69,10 @@ namespace CorePlugins.CoreCommands
             var ccProp = e.LauncherData.ExtendedProperties as CommandExtendedProperties;
             if (ccProp != null)
             {
-                ICommandHandler handler;
+                CommandHandler handler;
                 if (_handlers.TryGetValue(ccProp.Arguments[0], out handler))
                 {
-                    handler.HandleTick(e, _pluginContext);
+                    handler.HandleTick(e);
                 }
             }
         }
@@ -68,18 +83,19 @@ namespace CorePlugins.CoreCommands
             var ccProp = e.LauncherData.ExtendedProperties as CommandExtendedProperties;
             if (ccProp != null)
             {
-                ICommandHandler handler;
+                CommandHandler handler;
                 if (_handlers.TryGetValue(ccProp.Arguments[0], out handler))
                 {
-                    handler.HandleExecute(e, _pluginContext);
+                    handler.HandleExecute(e);
                 }
             }
         }
 
-        private void AddHandler(ICommandHandler handler)
+        private void AddHandler(CommandHandler handler)
         {
             _handlers.Add(handler.CommandName, handler);
         }
 
+        
     }
 }

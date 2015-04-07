@@ -43,12 +43,12 @@ namespace LauncherZLib
                 if (_results.Count > _maxResults)
                     break;
                 // assign plugin id
-                var immResults = container.Query(query);
+                var immResults = container.PluginInstance.Query(query);
                 foreach (var launcherData in immResults)
                 {
-                    launcherData.PluginId = container.Id;
+                    launcherData.PluginId = container.PluginId;
                     _results.Add(launcherData);
-                    _pluginManager.DistributeEventTo(container.Id, new LauncherAddedEvent(launcherData));
+                    _pluginManager.DistributeEventTo(container.PluginId, new LauncherAddedEvent(launcherData));
                 }
             }
         }

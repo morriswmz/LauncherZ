@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using LauncherZLib.Launcher;
-using LauncherZLib.Plugin;
 
-namespace LauncherZLib.PluginTemplate
+namespace LauncherZLib.Plugin.Template
 {
+    /*
     public abstract class CommandPlugin<T> : ConfigurablePlugin<T> where T : class
     {
 
@@ -33,6 +33,6 @@ namespace LauncherZLib.PluginTemplate
         {
             
         }
-
-    }
+        
+    }*/
 }

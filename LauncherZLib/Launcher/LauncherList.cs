@@ -52,7 +52,7 @@ namespace LauncherZLib.Launcher
         {
             int idx = AddImpl(item);
             DispatchCollectionChangedEvent(
-                    new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
+                    new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, idx));
         }
 
         public virtual void AddRange(IEnumerable<LauncherData> commands)

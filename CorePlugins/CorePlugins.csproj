@@ -56,8 +56,9 @@
     <Compile Include="CoreCommands\CommandExtendedProperties.cs" />
     <Compile Include="CoreCommands\CpuCommandHandler.cs" />
     <Compile Include="CoreCommands\ExitCommandHandler.cs" />
-    <Compile Include="CoreCommands\ICommandHandler.cs" />
+    <Compile Include="CoreCommands\CommandHandler.cs" />
     <Compile Include="CoreCommands\CoreCommandsPlugin.cs" />
+    <Compile Include="CoreCommands\ICommandPlugin.cs" />
     <Compile Include="TestPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -72,9 +73,6 @@
     <Content Include="I18N\CoreCommandsStrings.en-US.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <None Include="manifest.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="IWshRuntimeLibrary">

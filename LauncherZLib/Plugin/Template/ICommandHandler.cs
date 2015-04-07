@@ -1,4 +1,4 @@
-﻿namespace LauncherZLib.PluginTemplate
+﻿namespace LauncherZLib.Plugin.Template
 {
     public interface ICommandHandler
     {

@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using LauncherZLib.Plugin;
 using LauncherZLib.Utils;
 using Newtonsoft.Json;
 
-namespace LauncherZLib.PluginTemplate
-{
+namespace LauncherZLib.Plugin.Template
+{/*
     /// <summary>
     /// Describes a configurable plugin.
     /// </summary>
@@ -58,21 +53,21 @@ namespace LauncherZLib.PluginTemplate
                 try
                 {
                     Configuration = JsonUtils.StreamDeserialize<T>(path);
-                    Context.Logger.Fine(string.Format(
+                    ServiceProvider.Logger.Fine(string.Format(
                         "Successfully loaded configuration from: {0}.", path));
                 }
                 catch (Exception ex)
                 {
-                    Context.Logger.Error(string.Format(
+                    ServiceProvider.Logger.Error(string.Format(
                         "An exception occurred while loading configuration." +
                         "File might be unaccessible or corrupted. Detailts:{0}{1}",
                         Environment.NewLine, ex));
-                    Context.Logger.Warning("Loading default configuration as fallback.");
+                    ServiceProvider.Logger.Warning("Loading default configuration as fallback.");
                     Configuration = CreateDefaultConfiguration();
                     // possible corrupted file, replace with default
                     if (ex is JsonException)
                     {
-                        Context.Logger.Info("Attempting to overwrite existing configuration with default configuration");
+                        ServiceProvider.Logger.Info("Attempting to overwrite existing configuration with default configuration");
                         SaveConfiguration();
                     }
                 }
@@ -92,7 +87,7 @@ namespace LauncherZLib.PluginTemplate
             var dirPath = Path.GetDirectoryName(path);
             if (dirPath == null)
             {
-                Context.Logger.Error(string.Format("Invalid configuration file path: {0}.", path));
+                ServiceProvider.Logger.Error(string.Format("Invalid configuration file path: {0}.", path));
                 return;
             }
             if (!Directory.Exists(dirPath))
@@ -103,7 +98,7 @@ namespace LauncherZLib.PluginTemplate
                 }
                 catch (Exception)
                 {
-                    Context.Logger.Error(string.Format(
+                    ServiceProvider.Logger.Error(string.Format(
                         "Failed to create directory for configuration file: {0}.", path));
                     return;
                 }
@@ -112,11 +107,11 @@ namespace LauncherZLib.PluginTemplate
             try
             {
                 JsonUtils.StreamSerialize(path, Configuration, Formatting.Indented);
-                Context.Logger.Fine(string.Format("Successfully saved configuration file: {0}.", path));
+                ServiceProvider.Logger.Fine(string.Format("Successfully saved configuration file: {0}.", path));
             }
             catch (Exception ex)
             {
-                Context.Logger.Error(string.Format(
+                ServiceProvider.Logger.Error(string.Format(
                     "An exception occurred while saving configuration file. Details: {0}{1}",
                     Environment.NewLine, ex));
             }
@@ -128,9 +123,9 @@ namespace LauncherZLib.PluginTemplate
         /// <returns>Full path of the configuration file. Should be consistent.</returns>
         protected virtual string GetConfigurationFilePath()
         {
-            return Path.Combine(Context.SuggestedDataDirectory, "config.json");
+            return Path.Combine(ServiceProvider.SuggestedDataDirectory, "config.json");
         }
 
     }
-
+    */
 }

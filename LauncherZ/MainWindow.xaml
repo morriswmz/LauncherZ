@@ -20,7 +20,8 @@
         <Border MinHeight="120" Style="{DynamicResource WindowBorderStyle}">
             <StackPanel>
                 <controls:LauncherInput x:Name="CtlUserInput" HintText="LauncherZ" Height="76" PreviewKeyUp="CtlUserInput_PreviewKeyUp" ResponseDelay="300" DelayedTextChanged="CtlUserInput_OnDelayedTextChanged"/>
-                <controls:LauncherListView x:Name="CtlLauncherList" d:DataContext="{d:DesignInstance {x:Type task:LauncherListDesignTime}, IsDesignTimeCreatable=True}" Margin="10,0,10,10" MaxHeight="200" SelectionChanged="CtlLauncherList_SelectionChanged" />
+                <controls:LauncherListView x:Name="CtlLauncherList" d:DataContext="{d:DesignInstance {x:Type task:LauncherListDesignTime}, IsDesignTimeCreatable=True}" Margin="10,0,10,10" MaxHeight="200" SelectionChanged="CtlLauncherList_SelectionChanged">
+                </controls:LauncherListView>
             </StackPanel>
         </Border>
     </Grid>

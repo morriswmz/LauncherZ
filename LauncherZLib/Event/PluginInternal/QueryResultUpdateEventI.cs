@@ -4,8 +4,8 @@ namespace LauncherZLib.Event.PluginInternal
 {
     public class QueryResultUpdateEventI : PluginEventInternal<QueryResultUpdateEvent>
     {
-        public QueryResultUpdateEventI(QueryResultUpdateEvent baseEvent, string sourceId)
-            : base(baseEvent, sourceId)
+        public QueryResultUpdateEventI(string sourceId, QueryResultUpdateEvent baseEvent)
+            : base(sourceId, baseEvent)
         {
 
         }

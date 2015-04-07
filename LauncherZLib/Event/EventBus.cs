@@ -15,17 +15,17 @@ namespace LauncherZLib.Event
     {
 
         // holds all registered handlers, flexible
-        private readonly Dictionary<Type, List<EventHandlerNode>> _handlers = new Dictionary<Type, List<EventHandlerNode>>();
+        protected readonly Dictionary<Type, List<EventHandlerNode>> Handlers = new Dictionary<Type, List<EventHandlerNode>>();
         
         // caches all registered handlers, used when posting events
         // so it is safe to register/unregister event handlers in event handlers
-        private Dictionary<Type, EventHandlerNode[]> _handlerCache = new Dictionary<Type, EventHandlerNode[]>(); 
+        protected Dictionary<Type, EventHandlerNode[]> HandlerCache = new Dictionary<Type, EventHandlerNode[]>(); 
         
         // maps registered objects to associated handlers
-        private readonly Dictionary<object, List<EventHandlerNode>> _objectMap = new Dictionary<object, List<EventHandlerNode>>();
+        protected readonly Dictionary<object, List<EventHandlerNode>> ObjectMap = new Dictionary<object, List<EventHandlerNode>>();
         
-        private bool _rebuildFlag = false;
-        private object _lock = new object();
+        protected bool RebuildFlag = false;
+        private readonly object _lock = new object();
 
         /// <summary>
         /// Registers an event handler.
@@ -33,40 +33,11 @@ namespace LauncherZLib.Event
         /// </summary>
         /// <param name="obj"></param>
         /// <seealso cref="T:LauncherZLib.Event.SubscribeEventAttribute"/>
-        public void Register(object obj)
+        public virtual void Register(object obj)
         {
             lock (_lock)
             {
-                // check if already registered
-                if (_objectMap.ContainsKey(obj))
-                    return;
-
-                foreach (
-                    var methodInfo in
-                        obj.GetType().GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance))
-                {
-                    // check attribute
-                    if (!methodInfo.GetCustomAttributes(typeof (SubscribeEventAttribute), false).Any())
-                        continue;
-                    // check method
-                    if (methodInfo.IsStatic || methodInfo.IsAbstract || methodInfo.IsGenericMethod)
-                        throw new InvalidHandlerException("Event handler cannot be static, abstract or generic.");
-
-                    // create and add
-                    EventHandlerNode node = CreateHandlerNode(obj, methodInfo);
-                    if (node != null)
-                    {
-                        // add handler
-                        if (!_handlers.ContainsKey(node.EventType))
-                            _handlers[node.EventType] = new List<EventHandlerNode>();
-                        _handlers[node.EventType].Add(node);
-
-                        if (!_objectMap.ContainsKey(obj))
-                            _objectMap[obj] = new List<EventHandlerNode>();
-                        _objectMap[obj].Add(node);
-                        _rebuildFlag = true;
-                    }
-                }
+                RegisterImpl(obj);
             }
         }
 
@@ -75,7 +46,7 @@ namespace LauncherZLib.Event
         /// No action will be taken if given event handler is not registered.
         /// </summary>
         /// <param name="obj"></param>
-        public void Unregister(object obj)
+        public virtual void Unregister(object obj)
         {
             lock (_lock)
             {
@@ -86,11 +57,11 @@ namespace LauncherZLib.Event
         /// <summary>
         /// Unregisters all event handlers.
         /// </summary>
-        public void UnregisterAll()
+        public virtual void UnregisterAll()
         {
             lock (_lock)
             {
-                object[] objects = _objectMap.Keys.ToArray();
+                object[] objects = ObjectMap.Keys.ToArray();
                 foreach (var o in objects)
                 {
                     UnregisterImpl(o);
@@ -107,13 +78,16 @@ namespace LauncherZLib.Event
         /// while handling the event will not affect the cached event handler list.
         /// Although this class is thread-safe, you should still think carefully in multi-threaded environment.
         /// </remarks>
-        public void Post(EventBase e)
+        public virtual void Post(EventBase e)
         {
-            if (_rebuildFlag)
+            if (e == null)
+                throw new ArgumentNullException("e");
+
+            if (RebuildFlag)
                 RebuildCache();
             // do not put any lock here, you don't want a deadlock
             EventHandlerNode[] handlers;
-            if (_handlerCache.TryGetValue(e.GetType(), out handlers))
+            if (HandlerCache.TryGetValue(e.GetType(), out handlers))
             {
                 foreach (var node in handlers)
                 {
@@ -122,40 +96,74 @@ namespace LauncherZLib.Event
             }
         }
 
-        private void UnregisterImpl(object obj)
+        protected void RegisterImpl(object obj)
         {
-            if (!_objectMap.ContainsKey(obj))
+            // check if already registered
+            if (ObjectMap.ContainsKey(obj))
                 return;
-            foreach (var node in _objectMap[obj])
+
+            foreach (
+                var methodInfo in
+                    obj.GetType().GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance))
             {
-                _handlers[node.EventType].Remove(node);
+                // check attribute
+                if (!methodInfo.GetCustomAttributes(typeof(SubscribeEventAttribute), false).Any())
+                    continue;
+                // check method
+                if (methodInfo.IsStatic || methodInfo.IsAbstract || methodInfo.IsGenericMethod)
+                    throw new InvalidHandlerException("Event handler cannot be static, abstract or generic.");
+
+                // create and add
+                EventHandlerNode node = CreateHandlerNode(obj, methodInfo);
+                if (node != null)
+                {
+                    // add handler
+                    if (!Handlers.ContainsKey(node.EventType))
+                        Handlers[node.EventType] = new List<EventHandlerNode>();
+                    Handlers[node.EventType].Add(node);
+
+                    if (!ObjectMap.ContainsKey(obj))
+                        ObjectMap[obj] = new List<EventHandlerNode>();
+                    ObjectMap[obj].Add(node);
+                    RebuildFlag = true;
+                }
             }
-            _objectMap[obj].Clear();
-            _objectMap.Remove(obj);
-            _rebuildFlag = true;
         }
 
-        private void RebuildCache()
+        protected void UnregisterImpl(object obj)
+        {
+            if (!ObjectMap.ContainsKey(obj))
+                return;
+            foreach (var node in ObjectMap[obj])
+            {
+                Handlers[node.EventType].Remove(node);
+            }
+            ObjectMap[obj].Clear();
+            ObjectMap.Remove(obj);
+            RebuildFlag = true;
+        }
+
+        protected void RebuildCache()
         {
             lock (_lock)
             {
                 // sometimes another post call may be blocked when caching is being rebuilt
                 // when it continues, we don't want to rebuild the same cache twice
-                if (!_rebuildFlag)
+                if (!RebuildFlag)
                     return;
                 // we do not modify the original cache here
                 // so it won't breaking ongoing post calls
                 var newCache = new Dictionary<Type, EventHandlerNode[]>();
-                foreach (var pair in _handlers)
+                foreach (var pair in Handlers)
                 {
                     newCache[pair.Key] = pair.Value.ToArray();
                 }
-                _handlerCache = newCache;
-                _rebuildFlag = false;
+                HandlerCache = newCache;
+                RebuildFlag = false;
             }
         }
         
-        private EventHandlerNode CreateHandlerNode(object obj, MethodInfo method)
+        protected EventHandlerNode CreateHandlerNode(object obj, MethodInfo method)
         {
             // check parameters
             ParameterInfo[] paramInfos = method.GetParameters();
@@ -201,7 +209,7 @@ namespace LauncherZLib.Event
             
         }
 
-        sealed class EventHandlerNode
+        protected sealed class EventHandlerNode
         {
             public Type EventType { get; private set; }
             public object Instance { get; private set; }

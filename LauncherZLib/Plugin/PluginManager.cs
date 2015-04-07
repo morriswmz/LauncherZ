@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
+using System.Text;
 using LauncherZLib.Event;
-using LauncherZLib.Icon;
+using LauncherZLib.I18N;
+using LauncherZLib.Plugin.Loader;
+using LauncherZLib.Plugin.Service;
 using LauncherZLib.Utils;
 
 namespace LauncherZLib.Plugin
@@ -12,36 +14,19 @@ namespace LauncherZLib.Plugin
     public sealed class PluginManager : IAutoCompletionProvider
     {
         // note that id is case insensitive
+        private readonly PluginServiceProviderFactory _serviceProviderFactory;
         private readonly Dictionary<string, PluginContainer> _loadedPlugins = new Dictionary<string, PluginContainer>(StringComparer.OrdinalIgnoreCase);
         private readonly HashSet<string> _deactivatedPluginIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         private readonly HashSet<string> _activePluginIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         private readonly List<PluginContainer> _sortedActiveContainers = new List<PluginContainer>();
+        private readonly ReadOnlyCollection<PluginContainer> _sortedActiveContainersReadonly;
         private readonly IEventBus _eventBus = new EventBus();
         private readonly ILoggerProvider _loggerProvider;
         private readonly ILogger _logger;
         private readonly IDispatcherService _dispatcherService;
 
-        #region Events
-
-        /// <summary>
-        /// Triggered when a plugin is successfully activated.
-        /// </summary>
-        public event EventHandler<PluginManagerEventArgs> PluginActivated;
-        
-        /// <summary>
-        /// Triggered when a plugin is deactivated.
-        /// The deactivation process may be unsuccessful.
-        /// The deactivation may be also caused by plugin crash.
-        /// </summary>
-        public event EventHandler<PluginManagerEventArgs> PluginDeactivated;
-        
-        /// <summary>
-        /// Triggered when a plugin crashes.
-        /// The crash may be reported by the plugin, or occur during activation/deactivation.
-        /// </summary>
-        public event EventHandler<PluginCrashedEventArgs> PluginCrashed;
-
-        #endregion
+        private bool _allPluginLoaded = false;
+        private bool _pluginSorted = false;
 
         /// <summary>
         /// Creates a plugin manager.
@@ -51,7 +36,7 @@ namespace LauncherZLib.Plugin
         /// Dispatcher service of the main UI thread.
         /// Asynchrous callbacks will be invoke via this dispatcher service.
         /// </param>
-        public PluginManager(ILoggerProvider loggerProvider, IDispatcherService dispatcherService)
+        public PluginManager(ILoggerProvider loggerProvider, IDispatcherService dispatcherService, PluginServiceProviderFactory pspFactory)
         {
             if (loggerProvider == null)
                 throw new ArgumentNullException("loggerProvider");
@@ -61,6 +46,8 @@ namespace LauncherZLib.Plugin
             _loggerProvider = loggerProvider;
             _logger = _loggerProvider.CreateLogger("PluginManager");
             _dispatcherService = dispatcherService;
+            _serviceProviderFactory = pspFactory;
+            _sortedActiveContainersReadonly = _sortedActiveContainers.AsReadOnly(); 
         }
 
         /// <summary>
@@ -68,7 +55,15 @@ namespace LauncherZLib.Plugin
         /// </summary>
         public ReadOnlyCollection<PluginContainer> SortedActivePlugins
         {
-            get { return _sortedActiveContainers.AsReadOnly(); }
+            get
+            {
+                if (!_pluginSorted)
+                {
+                    _sortedActiveContainers.Sort((x, y) => y.PluginPriority.CompareTo(x.PluginPriority));
+                    _pluginSorted = true;
+                }
+                return _sortedActiveContainersReadonly;
+            }
         }
 
         /// <summary>
@@ -122,16 +117,15 @@ namespace LauncherZLib.Plugin
             try
             {
                 // activate
-                container.Activate();
+                container.PluginInstance.Activate(container.ServiceProvider);
+                container.Status = PluginStatus.Activated;
                 _logger.Info(string.Format("Successfully activated {0}.", container));
                 // remove from disabled
                 _deactivatedPluginIds.Remove(pluginId);
                 // rebuild active list
                 _activePluginIds.Add(pluginId);
                 _sortedActiveContainers.Add(container);
-                _sortedActiveContainers.Sort();
-                // dispatch event
-                DispatchPluginActivatedEvent(pluginId);
+                _pluginSorted = false;
                 return true;
             }
             catch (Exception ex)
@@ -139,7 +133,7 @@ namespace LauncherZLib.Plugin
                 _logger.Error(string.Format(
                     "An exception occured while activitng the plugin {0}. Details: {1}{2}",
                     container, Environment.NewLine, ex));
-                DispatchPluginCrashedEvent(pluginId, "An exception occured while activiting the plugin.");
+                container.Status = PluginStatus.Crashed;
                 return false;
             }
         }
@@ -164,14 +158,15 @@ namespace LauncherZLib.Plugin
             try
             {
                 // deactivate
-                container.Deactivate();
+                container.PluginInstance.Deactivate(container.ServiceProvider);
+                container.Status = PluginStatus.Deactivated;
             }
             catch (Exception ex)
             {
                 _logger.Error(string.Format(
                     "An exception occured while deactivating the plugin {0}. Details: {1}{2}",
                     container, Environment.NewLine, ex));
-                DispatchPluginCrashedEvent(pluginId, "An exception occured while deactivating the plugin.");
+                container.Status = PluginStatus.Crashed;
                 return false;
             }
             finally
@@ -183,7 +178,6 @@ namespace LauncherZLib.Plugin
                 // just remove, no need to sort again
                 _sortedActiveContainers.Remove(container);
                 // dispatch event
-                DispatchPluginDeactivatedEvent(pluginId);
             }
             return true;
         }
@@ -213,7 +207,7 @@ namespace LauncherZLib.Plugin
             PluginContainer container;
             if (_loadedPlugins.TryGetValue(pluginId, out container))
             {
-                return container.Priority;
+                return container.PluginPriority;
             }
             return 0.0;
         }
@@ -229,7 +223,7 @@ namespace LauncherZLib.Plugin
             PluginContainer container;
             if (_loadedPlugins.TryGetValue(pluginId, out container))
             {
-                container.Priority = priority;
+                container.PluginPriority = priority;
             }
         }
 
@@ -237,66 +231,69 @@ namespace LauncherZLib.Plugin
         /// Discovers and loads plugins from given folder.
         /// </summary>
         /// <param name="searchPath">Folder to load plugins from.</param>
-        /// <param name="dataPath">Base folder for plugins to store their data. Each plugin will have a sub-folder
-        /// in this folder to store their own data.</param>
-        public void LoadAllFrom(string searchPath, string dataPath)
+        /// <param name="dataDirBase">Base directory for plugin data storage.</param>
+        public void LoadAllFrom(IEnumerable<string> searchPath, string dataDirBase)
         {
-            if (!Directory.Exists(searchPath))
+            if (_allPluginLoaded)
                 return;
-            // trim trailing slash
-            searchPath = searchPath.TrimEnd(Path.DirectorySeparatorChar);
-            dataPath = dataPath.TrimEnd(Path.DirectorySeparatorChar);
 
-            string[] directories = Directory.GetDirectories(searchPath);
-            foreach (string dir in directories)
+            // discover
+            var discoverer = new PluginDiscoverer(_logger);
+            discoverer.SearchDirectories.AddRange(searchPath);
+            IEnumerable<PluginDiscoveryInfo> candidates = discoverer.DiscoverAll();
+            var conflicts = candidates.GroupBy(c => c.Id).Where(g => g.Count() > 1).ToList();
+            if (conflicts.Count > 0)
             {
-                var infos = new List<PluginInfo>();
+                var sb = new StringBuilder("Conflicting plugin id detected.");
+                foreach (var conflict in conflicts)
+                {
+                    sb.AppendLine(string.Format("The following plugins have the same id \"{0}\"", conflict.Key));
+                    foreach (var p in conflict)
+                    {
+                        sb.AppendLine(string.Format("\"{0}\" in \"{1}\"", p.FriendlyName, p.SourceDirectory));
+                    }
+                }
+                return;
+            }
+            // load
+            var loader = new PluginLoader(_logger);
+            foreach (var pdi in candidates)
+            {
+                IPlugin pluginInstance = null;
                 try
                 {
-                    infos.AddRange(LoadManifestFrom(dir));
+                    pluginInstance = loader.Load(pdi);
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error(string.Format("An exception occurr while reading manifest file from: {0}. Details:{1}{2}", dir, Environment.NewLine, ex));
+                    _logger.Error(string.Format(
+                        "An exception occured while loading plugin with id \"{0}\". Details:{1}{2}",
+                        pdi.Id, Environment.NewLine, ex
+                        ));
                 }
-                if (infos.Count == 0)
+                if (pluginInstance != null)
                 {
-                    _logger.Warning(string.Format("Empty manifest file found: {0}", dir));
-                    continue;
-                }
-                foreach (var info in infos)
-                {
-                    info.SourceDirectory = dir;
-                    info.DataDirectory = string.Format("{0}{1}{2}",
-                        dataPath, Path.DirectorySeparatorChar, info.Id);
-                    try
-                    {
-                        PluginContainer container = LoadPlugin(info);
-                        if (container != null)
+                    IPluginServiceProvider serviceProvider = _serviceProviderFactory.Create(
+                        new Dictionary<Type, object>()
                         {
-                            _loadedPlugins.Add(container.Id, container);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.Error(string.Format("An exception occurr while loading plugin from: {0}. Details:{1}{2}", dir, Environment.NewLine, ex));
-                    }
+                            {typeof (IPluginInfoProvider), new StaticPluginInfoProvider(pdi, dataDirBase)},
+                            {typeof (ILogger), _loggerProvider.CreateLogger(pdi.Id)},
+                            {typeof (IEventBus), new PluginEventBus(pdi.Id, _eventBus, _dispatcherService)},
+                            {typeof (ILocalizationDictionary), new LocalizationDictionary()}
+                        });
+                    var pc = new PluginContainer(pluginInstance, pdi, serviceProvider);
+                    _loadedPlugins.Add(pc.PluginId, pc);
                 }
-                
             }
-
             // activate
-            foreach (var pluginId in _loadedPlugins.Keys)
+            foreach (var k in _loadedPlugins.Keys.Except(_deactivatedPluginIds))
             {
-                if (!_deactivatedPluginIds.Contains(pluginId))
-                {
-                    Activate(pluginId);
-                }
+                Activate(k);
             }
-            
-            _sortedActiveContainers.Sort();
-        }
 
+            _allPluginLoaded = true;
+        }
+        
         /// <summary>
         /// Broadcasts an event to all activated plugins.
         /// </summary>
@@ -306,7 +303,7 @@ namespace LauncherZLib.Plugin
             foreach (var container in _sortedActiveContainers)
             {
                 if (container.Status == PluginStatus.Activated)
-                container.EventBus.Post(e);
+                container.PluginEventBus.Post(e);
             }
         }
 
@@ -322,7 +319,7 @@ namespace LauncherZLib.Plugin
             if (!_loadedPlugins.TryGetValue(pluginId, out container))
                 return;
             if (container.Status == PluginStatus.Activated)
-                container.EventBus.Post(e);
+                container.PluginEventBus.Post(e);
         }
 
         /// <summary>
@@ -347,27 +344,6 @@ namespace LauncherZLib.Plugin
             _eventBus.Unregister(handler);
         }
 
-        private void DispatchPluginActivatedEvent(string pluginId)
-        {
-            var handler = PluginActivated;
-            if (handler != null)
-                handler(this, new PluginManagerEventArgs(pluginId));
-        }
-
-        private void DispatchPluginDeactivatedEvent(string pluginId)
-        {
-            var handler = PluginDeactivated;
-            if (handler != null)
-                handler(this, new PluginManagerEventArgs(pluginId));
-        }
-
-        private void DispatchPluginCrashedEvent(string pluginId, string friendlyMsg)
-        {
-            var handler = PluginCrashed;
-            if (handler != null)
-                handler(this, new PluginCrashedEventArgs(pluginId, friendlyMsg));
-        }
-
         private void PluginCrashHandler(string pluginId, string friendlyMsg)
         {
             PluginContainer container;
@@ -384,114 +360,15 @@ namespace LauncherZLib.Plugin
             {
                 _logger.Error(string.Format(
                     "Plugin {0} crashed with message: {1}", container, friendlyMsg));
-                DispatchPluginCrashedEvent(pluginId, friendlyMsg);
                 // update collection
                 _activePluginIds.Remove(pluginId);
                 _sortedActiveContainers.Remove(container);
                 _deactivatedPluginIds.Add(pluginId);
                 _logger.Info(string.Format("Deactivated {0} if possible.", container));
-                DispatchPluginDeactivatedEvent(pluginId);
             });
         }
 
-        private IEnumerable<PluginInfo> LoadManifestFrom(string dir)
-        {
-            string jsonPath = string.Format("{0}{1}{2}", dir, Path.DirectorySeparatorChar, "manifest.json");
-            if (!File.Exists(jsonPath))
-            {
-                throw new FileNotFoundException("\"manifest.json\" not found.");
-            }
-
-            // read manifest.json
-            var manifest = JsonUtils.StreamDeserialize<PluginManifest>(jsonPath);
-            return (manifest == null || manifest.Plugins == null) ? Enumerable.Empty<PluginInfo>() : manifest.Plugins;
-        }
-
-        private PluginContainer LoadPlugin(PluginInfo info)
-        {
-            if (string.IsNullOrEmpty(info.Id))
-            {
-                throw new FormatException("Id is empty or missing.");
-            }
-            if (info.Id.Equals("LauncherZ", StringComparison.OrdinalIgnoreCase))
-            {
-                throw new Exception("Id cannot be LauncherZ.");
-            }
-            if (_loadedPlugins.ContainsKey(info.Id))
-            {
-                var message = string.Format(
-                    "Id \"{0}\" is already used by the following plugin: {1}.",
-                    info.Id, _loadedPlugins[info.Id]);
-                throw new Exception(message);
-            }
-            if (!_deactivatedPluginIds.Contains(info.Id))
-            {
-                if (!info.Id.IsProperId())
-                {
-                    throw new FormatException(string.Format("Invalid id \"{0}\".", info.Id));
-                }
-
-                IPlugin plugin = null;
-                if (info.PluginType == PluginType.Assembly)
-                {
-                    plugin = LoadAssemblyPlugin(info);
-                }
-                else if (info.PluginType == PluginType.Xml)
-                {
-                    plugin = LoadXmlProvider(info);
-                }
-                else if (info.PluginType == PluginType.Command)
-                {
-                    plugin = LoadCommandLineProvider(info);
-                }
-                else
-                {
-                    // todo: log this
-                }
-
-                // load into container if not null
-                if (plugin != null)
-                {
-                    var contextParams = new PluginContextParameters()
-                    {
-                        DispatcherService = _dispatcherService,
-                        Logger = _loggerProvider.CreateLogger(info.Id),
-                        ParentEventBus = _eventBus
-                    };
-                    var container = new PluginContainer(plugin, info, contextParams);
-                    return container;
-                }
-            }
-            return null;
-        }
-
-        
-        private static IPlugin LoadAssemblyPlugin(PluginInfo info)
-        {
-            // normalize
-            if (info.Assembly.StartsWith(".\\") || info.Assembly.StartsWith(".//"))
-                info.Assembly = info.Assembly.Substring(2);
-            string assemblyPath = string.Format("{0}{1}{2}",
-                info.SourceDirectory, Path.DirectorySeparatorChar, info.Assembly);
-            if (!File.Exists(assemblyPath))
-            {
-                // todo: log this
-                return null;
-            }
-            return Activator.CreateInstanceFrom(assemblyPath, info.PluginClass).Unwrap() as IPlugin;
-        }
-
-        private static IPlugin LoadXmlProvider(PluginInfo info)
-        {
-            return null;
-        }
-
-        private static IPlugin LoadCommandLineProvider(PluginInfo info)
-        {
-            return null;
-        }
-
-
+       
         public IEnumerable<string> GetAutoCompletions(string context, int limit)
         {
             throw new NotImplementedException();

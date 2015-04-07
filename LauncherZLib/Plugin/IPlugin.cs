@@ -1,38 +1,26 @@
 ﻿using System.Collections.Generic;
 using LauncherZLib.Launcher;
+using LauncherZLib.Plugin.Service;
 
 namespace LauncherZLib.Plugin
 {
 
     /// <summary>
     /// <para>Describes a plugin for LauncherZ.</para>
-    /// <para>Implementation guidelines:</para>
-    /// <list type="bullet">
-    ///     <item>
-    ///         <description>
-    ///             All methods implementation should be synchronous.
-    ///         </description>
-    ///     </item>
-    ///     <item>
-    ///         <description>
-    ///             
-    ///         </description>
-    ///     </item>
-    /// </list>
     /// </summary>
     public interface IPlugin
     {
         /// <summary>
         /// Activates the plugin.
         /// </summary>
-        /// <param name="pluginContext"></param>
-        void Activate(IPluginContext pluginContext);
+        /// <param name="serviceProvider"></param>
+        void Activate(IPluginServiceProvider serviceProvider);
 
         /// <summary>
         /// Deactivates the plugin.
         /// </summary>
-        /// <param name="pluginContext"></param>
-        void Deactivate(IPluginContext pluginContext);
+        /// <param name="serviceProvider"></param>
+        void Deactivate(IPluginServiceProvider serviceProvider);
 
         /// <summary>
         /// Queries available commands.

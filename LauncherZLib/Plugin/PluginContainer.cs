@@ -1,213 +1,94 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Windows;
-using System.Windows.Threading;
 using LauncherZLib.Event;
 using LauncherZLib.I18N;
-using LauncherZLib.Launcher;
-using LauncherZLib.Utils;
+using LauncherZLib.Plugin.Loader;
+using LauncherZLib.Plugin.Service;
 
 namespace LauncherZLib.Plugin
 {
 
     /// <summary>
-    /// Contains a plugin, stores its information and provides a IPluginContext.
+    /// Contains a plugin, stores its information.
     /// </summary>
-    public sealed class PluginContainer : IPluginContext, IComparable<PluginContainer>
+    
+    public sealed class PluginContainer : IComparable<PluginContainer>
     {
 
-        private readonly IPlugin _plugin;
-        private readonly string _id;
-        private readonly string _name;
-        private readonly List<string> _authors;
-        private readonly Version _version;
-        private readonly string _description;
         private double _priority = 0.0;
-        private readonly string _sourceDirectory;
-        private readonly string _suggestedDataDirectory;
-        private readonly bool _isAsync;
+        private readonly IPluginInfoProvider _pluginInfo;
 
-        private readonly IDispatcherService _dispatcherService;
-        private readonly EventBus _eventBus;
-        private readonly PluginEventBusWrapper _eventBusWrapper;
-        private readonly PluginEventRelay _eventRelay;
-        private readonly LocalizationDictionary _locDict;
-        private readonly ILogger _logger;
+        public string PluginId { get { return _pluginInfo.PluginId; } }
 
-        
-        private bool _activiting;
+        public string PluginFriendlyName { get { return _pluginInfo.PluginFriendlyName; } }
 
         /// <summary>
-        /// Gets the id of the plugin, as defined in the manifest file.
+        /// Gets the localized friendly name.
         /// </summary>
-        public string Id { get { return _id; } }
-
-        /// <summary>
-        /// Gets the localized name of the plugin.
-        /// If LocalizationDictionary cannot translate the "Name", will return the
-        /// plugin name defined in the manifest file.
-        /// </summary>
-        public string Name
+        public string LocalizedPluginFriendlyName
         {
-            get
-            {
-                return _locDict.CanTranslate("Name") ? _locDict["Name"] : _name;
-            }
+            get { return TranslateWithFallback("PluginFriendlyName", PluginFriendlyName); }
         }
 
-        /// <summary>
-        /// Gets a collection of authors of this plugin, as defined in the manifest file.
-        /// </summary>
-        public ReadOnlyCollection<string> Authors { get { return _authors.AsReadOnly(); } }
+        public IEnumerable<string> PluginAuthors { get { return _pluginInfo.PluginAuthors; } }
+
+        public Version PluginVersion { get { return _pluginInfo.PluginVersion; }}
+
+        public string PluginDescription { get { return _pluginInfo.PluginDescription; } }
 
         /// <summary>
-        /// 
+        /// Gets the localized plugin description.
         /// </summary>
-        public Version Version { get { return _version; } }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public string Description
+        public string LocalizedPluginDescription
         {
-            get
-            {
-                return _locDict.CanTranslate("Description") ? _locDict["Description"] : _description;
-            }
+            get { return TranslateWithFallback("PluginDescription", PluginDescription); }
         }
-        
+
+        public string PluginSourceDirectory { get { return _pluginInfo.PluginSourceDirectory; } }
+
         /// <summary>
         /// Gets or sets the priority of this plugin.
         /// Value is constrained between 0 and 1 inclusive.
         /// </summary>
-        public double Priority { 
+        public double PluginPriority
+        {
             get { return _priority; }
-            set {
+            set
+            {
                 _priority = double.IsNaN(value) ? 0.0 : Math.Max(0.0, Math.Min(value, 1.0));
             }
         }
 
         /// <summary>
-        /// 
+        /// Gets the plugin instance.
         /// </summary>
-        public string SourceDirectory { get { return _sourceDirectory; } }
+        public IPlugin PluginInstance { get; private set; }
 
         /// <summary>
-        /// 
+        /// Gets the associated plugin service provider.
         /// </summary>
-        public string SuggestedDataDirectory { get { return _suggestedDataDirectory; } }
+        public IPluginServiceProvider ServiceProvider { get; private set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public IPlugin Plugin { get { return _plugin; } }
+        public IEventBus PluginEventBus { get; private set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public IEventBus EventBus { get { return _eventBusWrapper; } }
+        public PluginStatus Status { get; set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        internal IEventBus UnwrappedEventBus { get { return _eventBus; } }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public LocalizationDictionary Localization { get { return _locDict; } }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public bool IsAsync { get { return _isAsync; } }
-
-        public PluginStatus Status { get; private set; }
-
-        /// <summary>
-        /// Gets the logger created for this plugin.
-        /// </summary>
-        public ILogger Logger { get { return _logger; } }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="plugin"></param>
-        /// <param name="info"></param>
-        /// <param name="contextParams"></param>
-        public PluginContainer(IPlugin plugin, PluginInfo info, PluginContextParameters contextParams)
+        public PluginContainer(IPlugin pluginInstance, PluginDiscoveryInfo discoveryInfo, IPluginServiceProvider serviceProvider)
         {
-            if (plugin == null)
-                throw new ArgumentNullException("plugin");
-            if (info == null)
-                throw new ArgumentNullException("info");
-            if (contextParams == null)
-                throw new ArgumentNullException("contextParams");
+            if (pluginInstance == null)
+                throw new ArgumentNullException("pluginInstance");
+            if (discoveryInfo == null)
+                throw new ArgumentNullException("discoveryInfo");
+            if (serviceProvider == null)
+                throw new ArgumentNullException("serviceProvider");
 
-            _plugin = plugin;
-            // copy plugin information
-            _id = info.Id;
-            _name = info.Name;
-            _authors = info.Authors;
-            _version = new Version(info.Version);
-            _description = info.Description;
-            _sourceDirectory = info.SourceDirectory;
-            _suggestedDataDirectory = info.DataDirectory;
-
-            // set up plugin environment
-            if (contextParams.DispatcherService == null)
-                throw new ArgumentException("DispatcherService cannot be null in contextParams.");
-            if (contextParams.Logger == null)
-                throw new ArgumentException("Logger cannot be null in contextParams.");
-            if (contextParams.ParentEventBus == null)
-                throw new ArgumentException("ParentEventBus cannot be null in contextParams.");
-
-            _dispatcherService = contextParams.DispatcherService;
-            _eventBus = new EventBus();
-            _eventBusWrapper = new PluginEventBusWrapper(_eventBus, _dispatcherService);
-            _eventRelay = new PluginEventRelay(Id, contextParams.ParentEventBus, _eventBus);
-            _logger = contextParams.Logger;
-            _locDict = new LocalizationDictionary();
+            ServiceProvider = serviceProvider;
+            VerifyServices();
             
+            PluginInstance = pluginInstance;
+            _pluginInfo = serviceProvider.GetService<IPluginInfoProvider>();
+            PluginEventBus = serviceProvider.GetService<IEventBus>();
             Status = PluginStatus.Deactivated;
-        }
-
-        public IEnumerable<LauncherData> Query(LauncherQuery query)
-        {
-            if (Status != PluginStatus.Activated)
-                throw new InvalidOperationException();
-
-            IEnumerable<LauncherData> results = _plugin.Query(query);
-            return results ?? Enumerable.Empty<LauncherData>();
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public void Activate()
-        {
-            if (Status != PluginStatus.Deactivated)
-                return;
-
-            _plugin.Activate(this);
-            _eventRelay.Link();
-            Status = PluginStatus.Activated;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public void Deactivate()
-        {
-            if (Status != PluginStatus.Activated)
-                return;
-
-            Status = PluginStatus.Deactivated;
-            // always mark as deactivated, despite exceptions
-            _eventRelay.Unlink();
-            _plugin.Deactivate(this);
         }
 
         public int CompareTo(PluginContainer other)
@@ -215,10 +96,26 @@ namespace LauncherZLib.Plugin
             return _priority.CompareTo(other._priority);
         }
 
+        private void VerifyServices()
+        {
+            if (!ServiceProvider.CanProvideService<IPluginInfoProvider>())
+                throw new Exception("Specified plugin service provider must provide IPluginInfoProvider service.");
+            if (!ServiceProvider.CanProvideService<IEventBus>())
+                throw new Exception("Specified plugin service provider must provide IEventBus service.");
+        }
+
+        private string TranslateWithFallback(string key, string fallback)
+        {
+            if (ServiceProvider != null && ServiceProvider.CanProvideService<ILocalizationDictionary>())
+                return ServiceProvider.GetService<ILocalizationDictionary>().Translate(key);
+            return fallback;
+        }
+
         public override string ToString()
         {
-            string authors = string.Join(", ", _authors);
-            return string.Format("{{Name={0}, Version={1}, Authors=[{2}]}}", Name, _version, authors);
+            return string.Format(
+                "{{Name={0}, Version={1}, Authors=[{2}]}}",
+                PluginFriendlyName, PluginVersion, string.Join(", ", PluginAuthors));
         }
     }
 }

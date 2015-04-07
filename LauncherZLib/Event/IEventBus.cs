@@ -16,11 +16,6 @@
         void Unregister(object obj);
 
         /// <summary>
-        /// Resets the event bus.
-        /// </summary>
-        void UnregisterAll();
-
-        /// <summary>
         /// Posts an event.
         /// </summary>
         /// <param name="e"></param>
