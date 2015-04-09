@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Windows.Media;
 
 namespace LauncherZLib.Launcher
@@ -49,7 +50,7 @@ namespace LauncherZLib.Launcher
                 if (_title != value)
                 {
                     _title = value;
-                    RaisePropertyChangedEvent("Title");
+                    RaisePropertyChangedEvent();
                 }
             }
         }
@@ -66,7 +67,7 @@ namespace LauncherZLib.Launcher
                 if (_description != value)
                 {
                     _description = value;
-                    RaisePropertyChangedEvent("Description");
+                    RaisePropertyChangedEvent();
                 }
             }
         }
@@ -83,7 +84,7 @@ namespace LauncherZLib.Launcher
                 if (_isTitleVisible != value)
                 {
                     _isTitleVisible = value;
-                    RaisePropertyChangedEvent("IsTitleVisible");
+                    RaisePropertyChangedEvent();
                 }
             }
         }
@@ -100,7 +101,7 @@ namespace LauncherZLib.Launcher
                 if (_isDescriptionVisible != value)
                 {
                     _isDescriptionVisible = value;
-                    RaisePropertyChangedEvent("IsDescriptionVisible");
+                    RaisePropertyChangedEvent();
                 }
             }
         }
@@ -117,7 +118,7 @@ namespace LauncherZLib.Launcher
                 if (!_titleFont.Equals(newFont, StringComparison.OrdinalIgnoreCase))
                 {
                     _titleFont = newFont;
-                    RaisePropertyChangedEvent("TitleFont");
+                    RaisePropertyChangedEvent();
                 }
             }
         }
@@ -134,7 +135,7 @@ namespace LauncherZLib.Launcher
                 if (!_descriptionFont.Equals(newFont, StringComparison.OrdinalIgnoreCase))
                 {
                     _descriptionFont = newFont;
-                    RaisePropertyChangedEvent("DescriptionFont");
+                    RaisePropertyChangedEvent();
                 }
             }
         }
@@ -161,7 +162,7 @@ namespace LauncherZLib.Launcher
                 if (_iconLocation != value)
                 {
                     _iconLocation = value;
-                    RaisePropertyChangedEvent("IconLocation");
+                    RaisePropertyChangedEvent();
                 }
             }
         }
@@ -182,7 +183,7 @@ namespace LauncherZLib.Launcher
         
         #endregion
 
-        protected void RaisePropertyChangedEvent(string propName)
+        protected void RaisePropertyChangedEvent([CallerMemberName] string propName = null)
         {
             var handler = PropertyChanged;
             if (handler != null)
