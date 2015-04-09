@@ -11,7 +11,7 @@
         Background="Transparent" AllowsTransparency="True"
         PreviewKeyDown="MainWindow_OnPreviewKeyDown"
         PreviewKeyUp="MainWindow_PreviewKeyUp"
-        Deactivated="MainWindow_Deactivated" Closed="MainWindow_Closed"
+        Deactivated="MainWindow_Deactivated" Closed="MainWindow_Closed" Visibility="Visible"
         >
     <Grid Margin="0,0,0,0">
         <Grid.RowDefinitions>

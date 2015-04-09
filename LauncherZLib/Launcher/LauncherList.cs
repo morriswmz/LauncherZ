@@ -94,6 +94,11 @@ namespace LauncherZLib.Launcher
             }
         }
 
+        public virtual int IndexOf(object item)
+        {
+            return _launchers.IndexOf(item);
+        }
+
         public virtual bool Remove(LauncherData item)
         {
             int idx = _launchers.IndexOf(item);

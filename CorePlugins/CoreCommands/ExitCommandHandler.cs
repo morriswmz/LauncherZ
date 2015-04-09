@@ -1,34 +1,43 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Windows;
-using LauncherZLib.Event.Launcher;
 using LauncherZLib.Launcher;
+using LauncherZLib.Plugin.Service;
+using LauncherZLib.Plugin.Template;
 
 namespace CorePlugins.CoreCommands
 {
-    public class ExitCommandHandler : CommandHandler
+    public class ExitCommandHandler : CoreCommandHandler
     {
-        public ExitCommandHandler(ICommandPlugin plugin) : base(plugin)
+        public ExitCommandHandler(IPluginServiceProvider serviceProvider) : base(serviceProvider)
         {
         }
 
-        public override string CommandName { get { return "EXIT"; } }
+        public override string CommandName
+        {
+            get { return "EXIT"; }
+        }
 
+        public override bool SubscribeToEvents
+        {
+            get { return false; }
+        }
+        
         public override IEnumerable<LauncherData> HandleQuery(LauncherQuery query)
         {
             return new LauncherData[]
             {
                 new LauncherData(
-                    Plugin.Localization["ExitCommandTitle"],
-                    Plugin.Localization["ExitCommandDescription"],
+                    Localization["ExitCommandTitle"],
+                    Localization["ExitCommandDescription"],
                     "LauncherZ://IconGear", 1.0,
-                    new CommandExtendedProperties(false, query.Arguments))
+                    new CommandExtendedProperties(query.Arguments))
             };
         }
 
-        public override void HandleExecute(LauncherExecutedEvent e)
+        public override PostLaunchAction HandleLaunch(LauncherData launcherData)
         {
             Application.Current.Shutdown();
+            return PostLaunchAction.Default;
         }
 
     }

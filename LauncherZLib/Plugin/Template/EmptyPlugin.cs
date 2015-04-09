@@ -45,5 +45,10 @@ namespace LauncherZLib.Plugin.Template
         public abstract void Deactivate(IPluginServiceProvider serviceProvider);
 
         public abstract IEnumerable<LauncherData> Query(LauncherQuery query);
+
+        public virtual PostLaunchAction Launch(LauncherData launcherData)
+        {
+            return PostLaunchAction.Default;
+        }
     }
 }

@@ -1,35 +1,36 @@
 ﻿using System;
 using System.IO;
+using LauncherZLib.Plugin.Service;
 using LauncherZLib.Utils;
 using Newtonsoft.Json;
 
 namespace LauncherZLib.Plugin.Template
-{/*
+{
     /// <summary>
     /// Describes a configurable plugin.
     /// </summary>
-    /// <typeparam name="T">Class of the configuration.</typeparam>
-    public abstract class ConfigurablePlugin<T> : EmptyPlugin
-        where T : class
+    /// <typeparam name="TC">Class of the configuration. Will be serialized/deserialized in JSON format.</typeparam>
+    public abstract class ConfigurablePlugin<TC> : EmptyPlugin
+        where TC : class
     {
         /// <summary>
         /// Plugin configuration.
         /// </summary>
-        protected T Configuration;
+        protected TC Configuration;
          
         /// <summary>
         /// Creates default configuration.
         /// </summary>
         /// <returns>Default configuration. Should never be null.</returns>
-        protected abstract T CreateDefaultConfiguration();
+        protected abstract TC CreateDefaultConfiguration();
 
-        public override void Activate(IPluginContext pluginContext)
+        public override void Activate(IPluginServiceProvider serviceProvider)
         {
-            base.Activate(pluginContext);
+            base.Activate(serviceProvider);
             LoadConfiguration();
         }
 
-        public override void Deactivate(IPluginContext pluginContext)
+        public override void Deactivate(IPluginServiceProvider serviceProvider)
         {
             SaveConfiguration();
         }
@@ -52,22 +53,22 @@ namespace LauncherZLib.Plugin.Template
             {
                 try
                 {
-                    Configuration = JsonUtils.StreamDeserialize<T>(path);
-                    ServiceProvider.Logger.Fine(string.Format(
+                    Configuration = JsonUtils.StreamDeserialize<TC>(path);
+                    Logger.Fine(string.Format(
                         "Successfully loaded configuration from: {0}.", path));
                 }
                 catch (Exception ex)
                 {
-                    ServiceProvider.Logger.Error(string.Format(
+                    Logger.Error(string.Format(
                         "An exception occurred while loading configuration." +
                         "File might be unaccessible or corrupted. Detailts:{0}{1}",
                         Environment.NewLine, ex));
-                    ServiceProvider.Logger.Warning("Loading default configuration as fallback.");
+                    Logger.Warning("Loading default configuration as fallback.");
                     Configuration = CreateDefaultConfiguration();
                     // possible corrupted file, replace with default
                     if (ex is JsonException)
                     {
-                        ServiceProvider.Logger.Info("Attempting to overwrite existing configuration with default configuration");
+                        Logger.Info("Attempting to overwrite existing configuration with default configuration");
                         SaveConfiguration();
                     }
                 }
@@ -87,7 +88,7 @@ namespace LauncherZLib.Plugin.Template
             var dirPath = Path.GetDirectoryName(path);
             if (dirPath == null)
             {
-                ServiceProvider.Logger.Error(string.Format("Invalid configuration file path: {0}.", path));
+                Logger.Error(string.Format("Invalid configuration file path: {0}.", path));
                 return;
             }
             if (!Directory.Exists(dirPath))
@@ -98,7 +99,7 @@ namespace LauncherZLib.Plugin.Template
                 }
                 catch (Exception)
                 {
-                    ServiceProvider.Logger.Error(string.Format(
+                    Logger.Error(string.Format(
                         "Failed to create directory for configuration file: {0}.", path));
                     return;
                 }
@@ -107,11 +108,11 @@ namespace LauncherZLib.Plugin.Template
             try
             {
                 JsonUtils.StreamSerialize(path, Configuration, Formatting.Indented);
-                ServiceProvider.Logger.Fine(string.Format("Successfully saved configuration file: {0}.", path));
+                Logger.Fine(string.Format("Successfully saved configuration file: {0}.", path));
             }
             catch (Exception ex)
             {
-                ServiceProvider.Logger.Error(string.Format(
+                Logger.Error(string.Format(
                     "An exception occurred while saving configuration file. Details: {0}{1}",
                     Environment.NewLine, ex));
             }
@@ -123,9 +124,8 @@ namespace LauncherZLib.Plugin.Template
         /// <returns>Full path of the configuration file. Should be consistent.</returns>
         protected virtual string GetConfigurationFilePath()
         {
-            return Path.Combine(ServiceProvider.SuggestedDataDirectory, "config.json");
+            return Path.Combine(PluginInfo.SuggestedPluginDataDirectory, "config.json");
         }
 
     }
-    */
 }

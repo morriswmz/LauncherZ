@@ -61,6 +61,12 @@ namespace CorePlugins
 
             return Enumerable.Empty<LauncherData>();
         }
+
+        public PostLaunchAction Launch(LauncherData launcherData)
+        {
+            return PostLaunchAction.Default;
+        }
+
         /*
         [SubscribeEvent]
         public void LauncherTickHandler(LauncherTickEvent e)

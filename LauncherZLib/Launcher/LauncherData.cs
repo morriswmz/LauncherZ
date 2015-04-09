@@ -49,7 +49,7 @@ namespace LauncherZLib.Launcher
                 if (_title != value)
                 {
                     _title = value;
-                    DispatchPropertyChangedEvent("Title");
+                    RaisePropertyChangedEvent("Title");
                 }
             }
         }
@@ -66,7 +66,7 @@ namespace LauncherZLib.Launcher
                 if (_description != value)
                 {
                     _description = value;
-                    DispatchPropertyChangedEvent("Description");
+                    RaisePropertyChangedEvent("Description");
                 }
             }
         }
@@ -83,7 +83,7 @@ namespace LauncherZLib.Launcher
                 if (_isTitleVisible != value)
                 {
                     _isTitleVisible = value;
-                    DispatchPropertyChangedEvent("IsTitleVisible");
+                    RaisePropertyChangedEvent("IsTitleVisible");
                 }
             }
         }
@@ -100,7 +100,7 @@ namespace LauncherZLib.Launcher
                 if (_isDescriptionVisible != value)
                 {
                     _isDescriptionVisible = value;
-                    DispatchPropertyChangedEvent("IsDescriptionVisible");
+                    RaisePropertyChangedEvent("IsDescriptionVisible");
                 }
             }
         }
@@ -117,7 +117,7 @@ namespace LauncherZLib.Launcher
                 if (!_titleFont.Equals(newFont, StringComparison.OrdinalIgnoreCase))
                 {
                     _titleFont = newFont;
-                    DispatchPropertyChangedEvent("TitleFont");
+                    RaisePropertyChangedEvent("TitleFont");
                 }
             }
         }
@@ -134,7 +134,7 @@ namespace LauncherZLib.Launcher
                 if (!_descriptionFont.Equals(newFont, StringComparison.OrdinalIgnoreCase))
                 {
                     _descriptionFont = newFont;
-                    DispatchPropertyChangedEvent("DescriptionFont");
+                    RaisePropertyChangedEvent("DescriptionFont");
                 }
             }
         }
@@ -161,7 +161,7 @@ namespace LauncherZLib.Launcher
                 if (_iconLocation != value)
                 {
                     _iconLocation = value;
-                    DispatchPropertyChangedEvent("IconLocation");
+                    RaisePropertyChangedEvent("IconLocation");
                 }
             }
         }
@@ -182,7 +182,7 @@ namespace LauncherZLib.Launcher
         
         #endregion
 
-        protected void DispatchPropertyChangedEvent(string propName)
+        protected void RaisePropertyChangedEvent(string propName)
         {
             var handler = PropertyChanged;
             if (handler != null)

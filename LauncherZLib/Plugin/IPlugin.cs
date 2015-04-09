@@ -29,7 +29,12 @@ namespace LauncherZLib.Plugin
         /// <returns>A collection of commands. You should return an empty collection if no
         /// commands are available.</returns>
         IEnumerable<LauncherData> Query(LauncherQuery query);
-        
 
+        /// <summary>
+        /// Launch!
+        /// </summary>
+        /// <param name="launcherData"></param>
+        /// <returns></returns>
+        PostLaunchAction Launch(LauncherData launcherData);
     }
 }

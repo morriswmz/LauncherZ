@@ -53,12 +53,11 @@
     <Compile Include="AppLauncher\AppManifest.cs" />
     <Compile Include="AppLauncher\AppManifestManager.cs" />
     <Compile Include="AppLauncher\AppQueryResult.cs" />
-    <Compile Include="CoreCommands\CommandExtendedProperties.cs" />
+    <Compile Include="CoreCommands\CoreCommandsConfig.cs" />
     <Compile Include="CoreCommands\CpuCommandHandler.cs" />
     <Compile Include="CoreCommands\ExitCommandHandler.cs" />
-    <Compile Include="CoreCommands\CommandHandler.cs" />
+    <Compile Include="CoreCommands\CoreCommandHandler.cs" />
     <Compile Include="CoreCommands\CoreCommandsPlugin.cs" />
-    <Compile Include="CoreCommands\ICommandPlugin.cs" />
     <Compile Include="TestPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -75,6 +75,7 @@
     <Compile Include="Icon\StaticIconProvider.cs" />
     <Compile Include="Launcher\ArgumentCollection.cs" />
     <Compile Include="Launcher\LauncherDataComparer.cs" />
+    <Compile Include="Launcher\PostLaunchAction.cs" />
     <Compile Include="Launcher\TickRate.cs" />
     <Compile Include="Event\EventBase.cs" />
     <Compile Include="Event\EventBus.cs" />
@@ -103,6 +104,7 @@
     <Compile Include="Plugin\PluginContainer.cs" />
     <Compile Include="Plugin\PluginManager.cs" />
     <Compile Include="Plugin\PluginType.cs" />
+    <Compile Include="Plugin\Template\CommandExtendedProperties.cs" />
     <Compile Include="Plugin\Template\CommandPlugin.cs" />
     <Compile Include="Plugin\Template\ConfigurablePlugin.cs" />
     <Compile Include="Plugin\Template\EmptyPlugin.cs" />

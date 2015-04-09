@@ -1,18 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using LauncherZLib.Event;
 using LauncherZLib.Event.Launcher;
 using LauncherZLib.Launcher;
+using LauncherZLib.Plugin.Service;
+using LauncherZLib.Plugin.Template;
 using LauncherZLib.Utils;
 
 namespace CorePlugins.CoreCommands
 {
-    public class CpuCommandHandler : CommandHandler, IDisposable
+    public class CpuCommandHandler : CoreCommandHandler, IDisposable
     {
         private readonly PerformanceCounter _cpuCounter;
         private bool _disposed = false;
 
-        public CpuCommandHandler(ICommandPlugin plugin) : base(plugin)
+        public CpuCommandHandler(IPluginServiceProvider serviceProvider) : base(serviceProvider)
         {
             _cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
         }
@@ -22,35 +25,14 @@ namespace CorePlugins.CoreCommands
             Dispose(false);
         }
 
-        public override string CommandName { get { return "CPU"; } }
-
-
-        public override IEnumerable<LauncherData> HandleQuery(LauncherQuery query)
+        public override string CommandName
         {
-            return new LauncherData[]
-            {
-                new LauncherData(
-                    Plugin.Localization["CpuCommandTitle"],
-                    Plugin.Localization["CpuCommandDescription"],
-                    @"LauncherZ://IconGear", 1.0,
-                    new CommandExtendedProperties(true, TickRate.Normal, query.Arguments)
-                )
-                {
-                    DescriptionFont = "Segoe UI Mono"
-                }
-            };
+            get { return "CPU"; }
         }
 
-        public override void HandleTick(LauncherTickEvent e)
+        public override bool SubscribeToEvents
         {
-            var cpu = (int)_cpuCounter.NextValue();
-            var bar = StringUtils.CreateProgressBar("[= ]", 20, cpu/100.0);
-            e.LauncherData.Description = string.Format("[{0}] {1}%\n{2}", bar, cpu, Plugin.Localization["CpuCommandDescription"]);
-        }
-
-        public override void HandleExecute(LauncherExecutedEvent e)
-        {
-            Process.Start("taskmgr");
+            get { return true; }
         }
 
         public void Dispose()
@@ -70,6 +52,36 @@ namespace CorePlugins.CoreCommands
             }
 
             _disposed = true;
+        }
+
+        public override IEnumerable<LauncherData> HandleQuery(LauncherQuery query)
+        {
+            return new LauncherData[]
+            {
+                new LauncherData(
+                    Localization["CpuCommandTitle"],
+                    Localization["CpuCommandDescription"],
+                    @"LauncherZ://IconGear", 1.0,
+                    new CommandExtendedProperties(query.Arguments, true, TickRate.Normal)
+                )
+                {
+                    DescriptionFont = "Segoe UI Mono"
+                }
+            };
+        }
+
+        public override PostLaunchAction HandleLaunch(LauncherData launcherData)
+        {
+            Process.Start("taskmgr");
+            return PostLaunchAction.Default;
+        }
+
+        [SubscribeEvent]
+        public void LauncherTickEventHandler(LauncherTickEvent e)
+        {
+            var cpu = (int)_cpuCounter.NextValue();
+            var bar = StringUtils.CreateProgressBar("[= ]", 20, cpu / 100.0);
+            e.LauncherData.Description = string.Format("[{0}] {1}%\n{2}", bar, cpu, Localization["CpuCommandDescription"]);
         }
 
     }

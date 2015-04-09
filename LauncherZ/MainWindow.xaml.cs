@@ -60,7 +60,7 @@ namespace LauncherZ
             // init controls
             CtlUserInput.FocusText();
             CtlLauncherList.DataContext = _queryController.Results;
-            CtlLauncherList.SelectedIndex = 0;
+            CtlLauncherList.SelectedIndexOld = 0;
             // setup tick timer
             _tickTimer = new DispatcherTimer();
             _tickTimer.Start();
@@ -184,11 +184,13 @@ namespace LauncherZ
         {
             if (e.Key.Equals(Key.Enter))
             {
-                LauncherData launcherData = CtlLauncherList.SelectedLauncher;
+                LauncherData launcherData = CtlLauncherList.SelectedLauncherOld;
                 if (launcherData != null)
                 {
-                    var executedEvent = new LauncherExecutedEvent(launcherData, _queryController.CurrentQuery);
-                    LauncherZApp.Instance.PluginManager.DistributeEventTo(launcherData.PluginId, executedEvent);
+                    PostLaunchAction action = LauncherZApp.Instance.PluginManager
+                        .GetPluginContainer(launcherData.PluginId)
+                        .PluginInstance
+                        .Launch(launcherData);
                     if (executedEvent.IsDefaultPrevented)
                     {
                         if (executedEvent.HideWindow)
