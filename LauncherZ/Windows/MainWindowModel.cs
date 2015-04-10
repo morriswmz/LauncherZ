@@ -1,14 +1,12 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Windows;
 using LauncherZLib.Launcher;
 
-namespace LauncherZ
+namespace LauncherZ.Windows
 {
     internal sealed class MainWindowModel : INotifyPropertyChanged
     {
 
-        private Visibility _windowVisibility = Visibility.Visible;
         private string _inputText = "";
         private LauncherList _launchers;
         private LauncherData _selectedLauncher;
@@ -49,19 +47,6 @@ namespace LauncherZ
                 if (_selectedLauncher != value)
                 {
                     _selectedLauncher = value;
-                    RaisePropertyChangedEvent();
-                }
-            }
-        }
-
-        public Visibility WindowVisibility
-        {
-            get { return _windowVisibility; }
-            set
-            {
-                if (_windowVisibility != value)
-                {
-                    _windowVisibility = value;
                     RaisePropertyChangedEvent();
                 }
             }

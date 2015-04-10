@@ -155,7 +155,7 @@ namespace LauncherZ.Controls
         private double _targetVerticalOffset = 0.0;
         private bool _scrolling = false;
 
-        private int _selectionUpdateSource = false;
+        private int _selectionUpdateSource = NoSelectionUpdateSource;
 
         #endregion
 

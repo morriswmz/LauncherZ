@@ -2,26 +2,22 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Threading;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
 using LauncherZ.Controls;
 using LauncherZLib;
-using LauncherZLib.Event;
 using LauncherZLib.Event.Launcher;
 using LauncherZLib.Launcher;
 using LauncherZLib.Utils;
 
-namespace LauncherZ
+namespace LauncherZ.Windows
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
-
 
         private DetailWindow detailWindow;
         private readonly QueryController _queryController;
