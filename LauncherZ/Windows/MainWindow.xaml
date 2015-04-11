@@ -1,25 +1,24 @@
-﻿<Window xml:lang="en-US"
+﻿<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:controls="clr-namespace:LauncherZ.Controls"
-        xmlns:task="clr-namespace:LauncherZLib.Launcher;assembly=LauncherZLib"
+        xmlns:local="clr-namespace:LauncherZ.Windows" xml:lang="en-US" x:Name="MainWindowInstance"
         mc:Ignorable="d" x:Class="LauncherZ.Windows.MainWindow"
         Title="LauncherX" Width="500" WindowStartupLocation="CenterScreen"
         SizeToContent="Height" ResizeMode="NoResize" WindowStyle="None"
-        Background="Transparent" AllowsTransparency="True"
-        PreviewKeyDown="MainWindow_OnPreviewKeyDown"
-        PreviewKeyUp="MainWindow_PreviewKeyUp"
-        Deactivated="MainWindow_Deactivated" Closed="MainWindow_Closed" Visibility="{Binding Path=WindowVisibility}"
+        Background="Transparent" AllowsTransparency="True" Activated="MainWindow_Activated"
         >
+    <Window.DataContext>
+        <local:MainWindowModel>
+        </local:MainWindowModel>
+    </Window.DataContext>
     <Grid Margin="0,0,0,0">
         <Border MinHeight="120" Style="{DynamicResource WindowBorderStyle}">
             <StackPanel>
                 <TextBlock x:Name="CtlHintText" Margin="14,10,14,0" TextWrapping="Wrap" Text="LauncherZ" Foreground="{DynamicResource DefaultTextBrush}" FontSize="14"/>
-                <TextBox x:Name="CtlInputBox" Padding="2,4" Margin="10,4,10,10" Style="{DynamicResource InputTextBoxStyle}" Text="{Binding Path=InputText, Mode=TwoWay}" Height="36"></TextBox>
-                <!--<controls:LauncherInput x:Name="CtlUserInput" HintText="LauncherZ" Height="76" PreviewKeyUp="CtlUserInput_PreviewKeyUp" ResponseDelay="300" DelayedTextChanged="CtlUserInput_OnDelayedTextChanged"/>-->
-                <controls:LauncherListView x:Name="CtlLauncherList" DataContext="{Binding Path=Launchers}" SelectedLauncher="{Binding Path=SelectedLaunhcer, Mode=TwoWay}" d:DataContext="{d:DesignInstance {x:Type task:LauncherListDesignTime}, IsDesignTimeCreatable=True}" Margin="10,0,10,10" MaxHeight="200" SelectionChanged="CtlLauncherList_SelectionChanged">
-                </controls:LauncherListView>
+                <TextBox x:Name="CtlInputBox" Padding="2,4" Margin="10,4,10,10" Style="{DynamicResource InputTextBoxStyle}" Text="{Binding InputText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="32"/>
+                <controls:LauncherListView x:Name="CtlLauncherList" Margin="10,0,10,10" MaxHeight="200" SelectedLauncher="{Binding DataContext.SelectedLauncher, ElementName=MainWindowInstance, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DataContext="{Binding Launchers}" Focusable="False"/>
             </StackPanel>
         </Border>
     </Grid>

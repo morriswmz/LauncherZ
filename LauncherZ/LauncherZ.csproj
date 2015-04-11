@@ -104,9 +104,6 @@
       <DependentUpon>LauncherDataItem.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\LauncherIconBehavior.cs" />
-    <Compile Include="Controls\LauncherInput.xaml.cs">
-      <DependentUpon>LauncherInput.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Controls\LauncherListView.xaml.cs">
       <DependentUpon>LauncherListView.xaml</DependentUpon>
     </Compile>
@@ -120,10 +117,6 @@
     <Page Include="Controls\LauncherDataItem.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Controls\LauncherInput.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
     <Page Include="Controls\LauncherListView.xaml">
       <Generator>MSBuild:Compile</Generator>

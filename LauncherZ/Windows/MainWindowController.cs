@@ -32,22 +32,21 @@ namespace LauncherZ.Windows
         private GlobalHotkey _switchHotkey;
         private int _tickTimerDivider = 0;
         private TimeSpan _inputResponseDelay = new TimeSpan(0, 0, 0, 0, 200);
-        private LauncherList _launchers;
         private LauncherData _lastSelectedLauncher;
         private bool _mwDeactivating;
         private bool _mwActivating;
 
-        public MainWindowController(MainWindow mw, MainWindowModel mwModel, LauncherZApp app)
+        public MainWindowController(MainWindow mw, LauncherZApp app)
         {
             if (mw == null)
                 throw new ArgumentNullException("mw");
-            if (mwModel == null)
-                throw new ArgumentNullException("mwModel");
+            if (mw.DataContext == null)
+                throw new Exception("View model of MainWindow is null.");
             if (app == null)
                 throw new ArgumentNullException("app");
 
             _mw = mw;
-            _mwModel = mwModel;
+            _mwModel = (MainWindowModel) mw.DataContext;
             _app = app;
 
             Initialize();
@@ -100,6 +99,8 @@ namespace LauncherZ.Windows
 
             // hook window events
             _mw.PreviewKeyUp += MainWindow_PreviewKeyUp;
+            _mw.PreviewKeyDown += MainWindow_PreviewKeyDown;
+            _mw.Deactivated += MainWindow_Deactivated;
         }
 
         private void ClearAndHideMainWindow()
@@ -137,6 +138,35 @@ namespace LauncherZ.Windows
             }
         }
 
+        private void SelectNextLauncher()
+        {
+            if (_mwModel.Launchers != null && _mwModel.Launchers.Count > 0)
+            {
+                int idx = _mwModel.Launchers.IndexOf(_mwModel.SelectedLauncher);
+                _mwModel.SelectedLauncher = _mwModel.Launchers[idx < _mwModel.Launchers.Count - 1 ? idx + 1 : 0];
+            }
+        }
+
+        private void SelectPreviousLauncher()
+        {
+            if (_mwModel.Launchers != null && _mwModel.Launchers.Count > 0)
+            {
+                int idx = _mwModel.Launchers.IndexOf(_mwModel.SelectedLauncher);
+                _mwModel.SelectedLauncher = _mwModel.Launchers[idx > 0 ? idx - 1 : _mwModel.Launchers.Count - 1];
+            }
+        }
+
+        #region Event Handlers
+
+        private void MainWindow_Deactivated(object sender, EventArgs eventArgs)
+        {
+#if DEBUG
+#else
+            ClearAndHideMainWindow();
+#endif
+
+        }
+
         private void MainWindow_PreviewKeyUp(object sender, KeyEventArgs e)
         {
             if (e.Key.Equals(Key.Enter))
@@ -154,15 +184,41 @@ namespace LauncherZ.Windows
                     }
                     else
                     {
-                        
+                        if (action.ModifyInput)
+                        {
+                            _mwModel.InputText = action.ModifiedInput;
+                        }
+                        if (action.EnterExclusiveMode)
+                        {
+                            
+                        }
                     }
                     e.Handled = true;
                 }
             }
         }
-
         
-
+        private void MainWindow_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Down:
+                    SelectNextLauncher();
+                    e.Handled = true;
+                    break;
+                case Key.Up:
+                    SelectPreviousLauncher();
+                    e.Handled = true;
+                    break;
+                case Key.Escape:
+                    ClearAndHideMainWindow();
+                    e.Handled = true;
+                    break;
+                default:
+                    _mw.FocusInput();
+                    break;
+            }
+        }
 
         private void QueryController_ResultUpdate(object sender, ResultUpdatedEventArgs e)
         {
@@ -208,7 +264,7 @@ namespace LauncherZ.Windows
         private void Launchers_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             // results updated. check if we need to start/stop tick timer
-            if (_launchers.Count > 0 && !_tickTimer.IsEnabled)
+            if (_mwModel.Launchers.Count > 0 && !_tickTimer.IsEnabled)
             {
                 _tickTimer.Start();
             }
@@ -216,7 +272,7 @@ namespace LauncherZ.Windows
 
         private void TickTimer_Tick(object sender, EventArgs eventArgs)
         {
-            if (_launchers.Count == 0)
+            if (_mwModel.Launchers.Count == 0)
             {
                 _tickTimer.Stop();
                 _tickTimerDivider = 0;
@@ -230,7 +286,7 @@ namespace LauncherZ.Windows
                 _tickTimerDivider = 0;
                 tickSlow = true;
             }
-            foreach (var cmd in _launchers.Where(cmd => cmd.ExtendedProperties.Tickable))
+            foreach (var cmd in _mwModel.Launchers.Where(cmd => cmd.ExtendedProperties.Tickable))
             {
                 bool shouldTick = cmd.ExtendedProperties.CurrentTickRate == TickRate.Fast;
                 shouldTick = shouldTick || (tickNormal && cmd.ExtendedProperties.CurrentTickRate == TickRate.Normal);
@@ -244,12 +300,9 @@ namespace LauncherZ.Windows
 
         private void InputDelayTimer_Tick(object sender, EventArgs eventArgs)
         {
-            if (string.IsNullOrWhiteSpace(_mwModel.InputText))
-            {
-                _queryController.ClearCurrentQuery();
-                _mwModel.Launchers.Clear();
-            }
-            else
+            _queryController.ClearCurrentQuery();
+            _mwModel.Launchers.Clear();
+            if (!string.IsNullOrWhiteSpace(_mwModel.InputText))
             {
                 _queryController.DistributeQuery(new LauncherQuery(_mwModel.InputText.Trim()));
             }
@@ -258,9 +311,10 @@ namespace LauncherZ.Windows
 
         private void SwitchHotkey_HotkeyPressed(object sender, EventArgs e)
         {
-            
+            ShowAndActivateMainWindow();
         }
 
+        #endregion
 
     }
 

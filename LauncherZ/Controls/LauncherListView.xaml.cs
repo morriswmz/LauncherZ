@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -18,16 +18,11 @@ namespace LauncherZ.Controls
     public partial class LauncherListView : UserControl
     {
 
-        #region Constants
-
-        private const int NoSelectionUpdateSource = 0;
-        private const int FromSelectedIndex = 1;
-        private const int FromSelectedLauncher = 2;
-
-        #endregion
-
         #region Dependency Property Declarations
 
+        /// <summary>
+        /// Gets or sets if smoothing scrolling is enabled.
+        /// </summary>
         [Description("Gets or sets if smooth scrolling is enabled.")]
         public bool SmoothScrolling
         {
@@ -35,11 +30,12 @@ namespace LauncherZ.Controls
             set { SetValue(SmoothScrollingProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for SmoothScrolling.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty SmoothScrollingProperty =
             DependencyProperty.Register("SmoothScrolling", typeof(bool), typeof(LauncherListView), new PropertyMetadata(true));
 
-
+        /// <summary>
+        /// Gets or sets the selected launcher.
+        /// </summary>
         [Description("Gets or sets the selected launcher.")]
         public LauncherData SelectedLauncher
         {
@@ -47,16 +43,56 @@ namespace LauncherZ.Controls
             set { SetValue(SelectedLauncherProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for SelectedLauncher.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty SelectedLauncherProperty =
             DependencyProperty.Register("SelectedLauncher", typeof(LauncherData), typeof(LauncherListView),
             new FrameworkPropertyMetadata(
                 null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault | FrameworkPropertyMetadataOptions.Journal,
                 SelectedLauncherChangedCallback, SelectedLauncherCoerceCallback));
 
+        /// <summary>
+        /// Gets the selected index.
+        /// </summary>
+        [Description("Gets the selected index.")]
+        public int SelectedIndex
+        {
+            get { return (int)GetValue(SelectedIndexProperty); }
+            protected set { SetValue(SelectedIndexPropertyKey, value);}
+        }
+
+        public static readonly DependencyPropertyKey SelectedIndexPropertyKey =
+            DependencyProperty.RegisterReadOnly("SelectedIndex", typeof(int), typeof(LauncherListView), new PropertyMetadata(-1));
+
+        public static readonly DependencyProperty SelectedIndexProperty = SelectedIndexPropertyKey.DependencyProperty;
+        
+
+        #endregion
+        
+        #region Private Fields
+
+        private readonly Queue<LauncherDataItem> _recycledItems = new Queue<LauncherDataItem>(); 
+        private LauncherList _launcherList;
+
+        private bool _updatingHighlightBox = false;
+        private double _targetVerticalOffset = 0.0;
+        private bool _scrolling = false;
+
+        #endregion
+
+        public LauncherListView()
+        {
+            
+            InitializeComponent();
+            DataContextChanged += LauncherListView_DataContextChanged;
+            CtlHighlightBox.Visibility = Visibility.Collapsed;
+            CompositionTarget.Rendering += CompositionTarget_Rendering;
+           
+        }
+
+        #region Static Methods
+
         private static object SelectedLauncherCoerceCallback(DependencyObject d, object baseValue)
         {
-            var llv = (LauncherListView) d;
+            var llv = (LauncherListView)d;
             // null is acceptable
             if (baseValue == null)
                 return null;
@@ -75,195 +111,14 @@ namespace LauncherZ.Controls
 
         private static void SelectedLauncherChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var llv = (LauncherListView) d;
-            if (llv._selectionUpdateSource != NoSelectionUpdateSource)
-                return;
-
-            llv._selectionUpdateSource = FromSelectedLauncher;
+            var llv = (LauncherListView)d;
             var data = e.NewValue as LauncherData;
+            // update selection index
             llv.SelectedIndex = data != null ? llv._launcherList.IndexOf(data) : -1;
-            llv._selectionUpdateSource = NoSelectionUpdateSource;
-        }
-
-        public int SelectedIndex
-        {
-            get { return (int)GetValue(SelectedIndexProperty); }
-            set { SetValue(SelectedIndexProperty, value); }
-        }
-
-        // Using a DependencyProperty as the backing store for MyProperty.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty SelectedIndexProperty =
-            DependencyProperty.Register("SelectedIndex", typeof(int), typeof(LauncherListView),
-            new FrameworkPropertyMetadata(
-                -1, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault | FrameworkPropertyMetadataOptions.Journal,
-                SelectedIndexChangedCallback, SelectedIndexCoerceCallback
-            ), SelectedIndexValidationCallback);
-
-        private static bool SelectedIndexValidationCallback(object value)
-        {
-            return ((int) value) > -1;
-        }
-
-        private static object SelectedIndexCoerceCallback(DependencyObject d, object baseValue)
-        {
-            var llv = (LauncherListView) d;
-            if ((baseValue is int) && (int) baseValue < llv.ItemCount)
-                return llv;
-
-            return DependencyProperty.UnsetValue;
-        }
-
-        private static void SelectedIndexChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var llv = (LauncherListView) d;
-            if (llv._selectionUpdateSource != NoSelectionUpdateSource)
-                return;
-
-            llv._selectionUpdateSource = FromSelectedIndex;
-
-            llv._selectionUpdateSource = NoSelectionUpdateSource;
+            llv.ScheduleUpdateHighlightBox();
         }
 
         #endregion
-
-        #region Events
-
-        public delegate void LauncherSelectionChangedEventHandler(object sender, LauncherSelectionChangedEventArgs e);
-
-        public static readonly RoutedEvent SelectionChangedEvent = EventManager.RegisterRoutedEvent(
-            "SelectionChanged", RoutingStrategy.Bubble, typeof (LauncherSelectionChangedEventHandler),
-            typeof (LauncherListView));
-
-        /// <summary>
-        /// Occurs when selection changes.
-        /// </summary>
-        public event LauncherSelectionChangedEventHandler SelectionChanged
-        {
-            add { AddHandler(SelectionChangedEvent, value); }
-            remove { RemoveHandler(SelectionChangedEvent, value); }
-        }
-        
-        #endregion
-
-        #region Private Fields
-
-        private readonly Queue<LauncherDataItem> _recycledItems = new Queue<LauncherDataItem>(); 
-        private LauncherList _launcherList;
-        private int _selectedIndexOld = -1;
-
-        private bool _updatingHighlightBox = false;
-        private double _targetVerticalOffset = 0.0;
-        private bool _scrolling = false;
-
-        private int _selectionUpdateSource = NoSelectionUpdateSource;
-
-        #endregion
-
-        public LauncherListView()
-        {
-            
-            InitializeComponent();
-            DataContextChanged += LauncherListView_DataContextChanged;
-            CtlLauncherPanel.SizeChanged += CtlLauncherPanelSizeChanged;
-            CtlHighlightBox.Visibility = Visibility.Collapsed;
-            CompositionTarget.Rendering += CompositionTarget_Rendering;
-           
-        }
-
-
-        /// <summary>
-        /// Sets or gets the index of selected item.
-        /// If given index is out of boundary, it will be clamped and no exception will
-        /// be thrown.
-        /// </summary>
-        public int SelectedIndexOld
-        {
-            get { return _selectedIndexOld; }
-            set
-            {
-                int oldValue = _selectedIndexOld;
-                if (ItemCount > 0)
-                {
-                    _selectedIndexOld = Math.Min(Math.Max(0, value), CtlLauncherPanel.Children.Count - 1);
-                }
-                else
-                {
-                    _selectedIndexOld = -1;
-                }
-                if (_selectedIndexOld != oldValue)
-                {
-                    ScheduleUpdateHighlightBox();
-                    // possible index adjustment without change actual data
-                    LauncherData oldLauncherData = oldValue >= 0 ? GetAssociatedLauncherDataAt(oldValue) : null;
-                    LauncherData newLauncherData = _selectedIndexOld >= 0 ? GetAssociatedLauncherDataAt(_selectedIndexOld) : null;
-                    if (oldLauncherData != newLauncherData)
-                    {
-                        RaiseSelectionChangedEvent(oldLauncherData, newLauncherData);
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Retrieves the LauncherData associated with current selection.
-        /// If SelectedIndex is -1, null will be returned.
-        /// </summary>
-        public LauncherData SelectedLauncherOld
-        {
-            get { return GetAssociatedLauncherDataAt(SelectedIndexOld); }
-            set
-            {
-                
-            }
-        }
-
-        /// <summary>
-        /// Gets the number of items.
-        /// </summary>
-        public int ItemCount
-        {
-            get { return CtlLauncherPanel.Children.Count; }
-        }
-
-        
-
-        /// <summary>
-        /// Selects the next item.
-        /// </summary>
-        public void SelectNext()
-        {
-            int n = CtlLauncherPanel.Children.Count;
-            if (n > 0)
-            {
-                SelectedIndexOld = SelectedIndexOld >= n - 1 ? 0 : SelectedIndexOld + 1;
-            }
-        }
-
-        /// <summary>
-        /// Selects the previous item.
-        /// </summary>
-        public void SelectPrevious()
-        {
-            int n = CtlLauncherPanel.Children.Count;
-            if (n > 0)
-            {
-                SelectedIndexOld = SelectedIndexOld > 0 ? SelectedIndexOld - 1 : n - 1;
-            }
-        }
-
-        /// <summary>
-        /// Creates a new item for adding.
-        /// </summary>
-        /// <param name="launcherData"></param>
-        /// <returns></returns>
-        private LauncherDataItem CreateNewItem(LauncherData launcherData)
-        {
-            LauncherDataItem item = _recycledItems.Count > 0 ? _recycledItems.Dequeue() : new LauncherDataItem();
-            item.DataContext = launcherData;
-            item.SizeChanged += Item_SizeChanged;
-            item.Loaded += Item_Loaded;
-            return item;
-        }
 
         /// <summary>
         /// Schedules an update of highlight box.
@@ -291,7 +146,7 @@ namespace LauncherZ.Controls
             {
                 CtlHighlightBox.Visibility = Visibility.Visible;
                 // CtlLauncherPanel is private and can only contain elements of LauncherDataItem
-                var item = (LauncherDataItem) CtlLauncherPanel.Children[SelectedIndexOld];
+                var item = (LauncherDataItem) CtlLauncherPanel.Children[SelectedIndex];
                 Point itemPosition = item.TranslatePoint(new Point(0, 0), CtlLauncherPanel);
                 double iy = itemPosition.Y;
                 CtlHighlightBox.Width = item.ActualWidth;
@@ -345,47 +200,63 @@ namespace LauncherZ.Controls
         }
 
         /// <summary>
-        /// Inserts an new item at specific index.
+        /// Creates a new item for adding.
+        /// </summary>
+        /// <param name="launcherData"></param>
+        /// <returns></returns>
+        private LauncherDataItem CreateNewItem(LauncherData launcherData)
+        {
+            LauncherDataItem item = _recycledItems.Count > 0 ? _recycledItems.Dequeue() : new LauncherDataItem();
+            item.DataContext = launcherData;
+            item.SizeChanged += Item_SizeChanged;
+            item.Loaded += Item_Loaded;
+            item.Focusable = false;
+            return item;
+        }
+
+
+        /// <summary>
+        /// Inserts an new launcher at specific index.
         /// </summary>
         /// <param name="index"></param>
         /// <param name="launcherData"></param>
         private void InsertItemAt(int index, LauncherData launcherData)
         {
-            if (index < 0 || index > ItemCount)
+            int itemCount = CtlLauncherPanel.Children.Count;
+            if (index < 0 || index > itemCount)
                 throw new IndexOutOfRangeException();
+            if (launcherData == null)
+                throw new ArgumentNullException("launcherData");
 
             // do insertion
             // when a new item is added to the visual tree, loaded event
             // will be triggered after layout is completed, call UpdateHighlightBox()
             // in the event handler to ensure correct size and position
             LauncherDataItem item = CreateNewItem(launcherData);
-            if (ItemCount == 0)
+            if (itemCount == 0)
             {
                 // first item
                 CtlLauncherPanel.Children.Add(item);
                 // auto select first item
-                SelectedIndexOld = 0;
+                SelectedLauncher = launcherData;
             }
             else
             {
-                if (SelectedIndexOld == 0 && index == 0)
+                CtlLauncherPanel.Children.Insert(index, item);
+                int sIdx = SelectedIndex;
+                if (sIdx == 0 && index == 0)
                 {
-                    // if 1st item is selected, we don't change selection when
+                    // if 1st item is selected, we don't change selection index when
                     // inserting at index 0
-                    LauncherData oldLauncherData = GetAssociatedLauncherDataAt(0);
-                    CtlLauncherPanel.Children.Insert(index, item);
-                    RaiseSelectionChangedEvent(oldLauncherData, launcherData);
+                    SelectedLauncher = launcherData;
                 }
-                else
+                else if (sIdx >= index)
                 {
-                    // adjust selection if inserted before selection
-                    CtlLauncherPanel.Children.Insert(index, item);
-                    if (index <= SelectedIndexOld)
-                    {
-                        SelectedIndexOld++;
-                    }
+                    sIdx++;
+                    ScheduleUpdateHighlightBox();
                 }
             }
+            VerifyLaunchers();
         }
 
         /// <summary>
@@ -403,53 +274,51 @@ namespace LauncherZ.Controls
         /// <param name="idx"></param>
         private void RemoveItemAt(int idx)
         {
-            if (idx < 0 || idx >= ItemCount)
+            int itemCount = CtlLauncherPanel.Children.Count;
+            if (idx < 0 || idx >= itemCount)
                 throw new IndexOutOfRangeException();
 
-            LauncherData oldLauncherData = GetAssociatedLauncherDataAt(_selectedIndexOld);
-            
+            int originalSelectedIndex = SelectedIndex;
             DoRemoveItem(idx);
 
-            // update scroll and selection
-            // we need to use internel field and raise event here since item is removed
-            // and we can no longer access it in the setter of SelectedIndex
-            if (ItemCount == 0)
+            if (itemCount == 0)
             {
-                _selectedIndexOld = -1;
-                ScheduleUpdateHighlightBox();
-                RaiseSelectionChangedEvent(oldLauncherData, null);
+                // no launcher left
+                SelectedLauncher = null;
                 return;
             }
-            if (idx < SelectedIndexOld || (idx == SelectedIndexOld && idx == ItemCount))
+            if (idx < originalSelectedIndex)
             {
-                _selectedIndexOld--;
+                // removed launcher is before the selected one
+                // selected launcher is not changed but selection index must be adjusted
+                SelectedIndex--;
                 ScheduleUpdateHighlightBox();
-                LauncherData newLauncherData = GetAssociatedLauncherDataAt(_selectedIndexOld);
-                if (newLauncherData != oldLauncherData)
-                {
-                    RaiseSelectionChangedEvent(oldLauncherData, newLauncherData);
-                }
             }
+            else if (idx == originalSelectedIndex)
+            {
+                // selected launcher is removed, change to next one if possible
+                // note the _launcherList has been changed already
+                SelectedLauncher = idx == itemCount ? _launcherList[idx - 1] : _launcherList[idx];
+            }
+            VerifyLaunchers();
         }
 
         /// <summary>
-        /// Removes all items and reset.
+        /// Removes all launchers and reset.
         /// </summary>
         private void RemoveAll()
         {
             if (CtlLauncherPanel.Children.Count == 0)
                 return;
 
-            LauncherData oldLauncherData = GetAssociatedLauncherDataAt(_selectedIndexOld);
-
             while (CtlLauncherPanel.Children.Count > 0)
             {
                 DoRemoveItem(0);
             }
             // update selection, scroll will be automatically adjusted
-            _selectedIndexOld = -1;
+            SelectedLauncher = null;
             ScheduleUpdateHighlightBox();
-            RaiseSelectionChangedEvent(oldLauncherData, null);
+            VerifyLaunchers();
         }
 
         /// <summary>
@@ -464,22 +333,6 @@ namespace LauncherZ.Controls
             item.Loaded -= Item_Loaded;
             CtlLauncherPanel.Children.RemoveAt(idx);
             _recycledItems.Enqueue(item);
-        }
-
-        private LauncherData GetAssociatedLauncherDataAt(int idx)
-        {
-            if (idx < 0 || idx >= CtlLauncherPanel.Children.Count)
-                return null;
-
-            var item = (LauncherDataItem)CtlLauncherPanel.Children[idx];
-            return item.DataContext as LauncherData;
-        }
-
-        private void RaiseSelectionChangedEvent(LauncherData oldItem, LauncherData newItem)
-        {
-            var e = new LauncherSelectionChangedEventArgs(
-                SelectionChangedEvent, this, oldItem, newItem);
-            RaiseEvent(e);
         }
 
         private void CompositionTarget_Rendering(object sender, EventArgs e)
@@ -504,17 +357,10 @@ namespace LauncherZ.Controls
         private void Item_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             // one of the item has its size changed.
-            if (SelectedIndexOld >= CtlLauncherPanel.Children.IndexOf((LauncherDataItem)sender))
+            if (SelectedIndex >= CtlLauncherPanel.Children.IndexOf((LauncherDataItem)sender))
             {
                 ScheduleUpdateHighlightBox();
             }
-        }
-
-        private void CtlLauncherPanelSizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            // if any item is selected, adjust the offset to keep its relative position
-            // with respect to view port unchaged. 
-
         }
 
         private void LauncherListView_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -603,6 +449,19 @@ namespace LauncherZ.Controls
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        [Conditional("DEBUG")]
+        private void VerifyLaunchers()
+        {
+            if (_launcherList != null)
+            {
+                for (int i = 0; i < CtlLauncherPanel.Children.Count; i++)
+                {
+                    Debug.Assert(_launcherList[i] == ((LauncherDataItem) CtlLauncherPanel.Children[i]).DataContext,
+                        "LauncherData mismatch.");
+                }
             }
         }
 

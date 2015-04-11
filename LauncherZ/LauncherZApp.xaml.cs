@@ -1,16 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Threading;
-using LauncherZLib.Event.Plugin;
+using LauncherZ.Windows;
 using LauncherZLib.Icon;
 using LauncherZLib.Matching;
 using LauncherZLib.Plugin;
@@ -99,7 +96,6 @@ namespace LauncherZ
                 if (createNew)
                 {
                     AppGuid = guidAttr.Value;
-                    StartupUri = new Uri("MainWindow.xaml", UriKind.Relative);
                     Instance = this;
                 }
                 else
@@ -109,7 +105,7 @@ namespace LauncherZ
                 }
             }
 
-            InitilizeApp();
+            InitializeApp();
         }
 
         private void Application_Exit(object sender, ExitEventArgs e)
@@ -136,9 +132,22 @@ namespace LauncherZ
             }
         }
 
-        private void InitilizeApp()
+        private void Application_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
+            Logger.Severe(string.Format(
+                "An unhandled exception occurred. Application is unstable and terminating. Details: {0}{1}",
+                Environment.NewLine, e.ExceptionObject));
+            // emergency clean up
+            if (_appInitialized)
+            {
+                Logger.Close();
+            }
+            // leave it unhandled
+        }
+
+        private void InitializeApp()
+        {
+            AppDomain.CurrentDomain.UnhandledException += Application_UnhandledException;
             // create app data folders
             CreateAppDataFolders();
             // initialize logger
@@ -199,22 +208,22 @@ namespace LauncherZ
             // load global lexicons
             LoadLexiconsFrom(Path.GetFullPath(@".\Lexicons"));
             LoadLexiconsFrom(LexiconPath);
+
+            // start main window
+            SetUpMainWindow();
+
             // finish
             Logger.Fine("App started successfully.");
             _appInitialized = true;
         }
 
-        private void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
+        
+
+        private void SetUpMainWindow()
         {
-            Logger.Severe(string.Format(
-                "An unhandled exception occurred. Application is unstable and terminating. Details: {0}{1}",
-                Environment.NewLine, e.ExceptionObject));
-            // emergency clean up
-            if (_appInitialized)
-            {
-                Logger.Close();
-            }
-            // leave it unhandled
+            var mw = new MainWindow(); // view model is initialized in MainWindow.xaml
+            var mainWindowController = new MainWindowController(mw, this);
+            mw.Show();
         }
 
         private void CreateAppDataFolders()

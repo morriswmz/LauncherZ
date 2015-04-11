@@ -96,7 +96,10 @@ namespace LauncherZLib.Launcher
 
         public virtual int IndexOf(object item)
         {
-            return _launchers.IndexOf(item);
+            var data = item as LauncherData;
+            if (data == null)
+                return -1;
+            return _launchers.IndexOf(data);
         }
 
         public virtual bool Remove(LauncherData item)

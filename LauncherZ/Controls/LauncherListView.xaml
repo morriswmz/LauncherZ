@@ -10,7 +10,7 @@
 
         <ScrollViewer x:Name="CtlScrollViewer" x:FieldModifier="private" VerticalScrollBarVisibility="Hidden" HorizontalContentAlignment="Stretch">
             <Grid>
-                <Rectangle x:Name="CtlHighlightBox" x:FieldModifier="private" HorizontalAlignment="Left" Height="80" VerticalAlignment="Top" Width="480" Margin="0" Style="{DynamicResource HighlightBoxStyle}"/>
+                <Rectangle x:Name="CtlHighlightBox" x:FieldModifier="private" HorizontalAlignment="Left" Height="80" VerticalAlignment="Top" Width="480" Margin="0" Style="{DynamicResource HighlightBoxStyle}" Focusable="False"/>
                 <StackPanel x:Name="CtlLauncherPanel" x:FieldModifier="private"/>
             </Grid>
         </ScrollViewer>
