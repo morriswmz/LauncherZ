@@ -1,13 +1,19 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading;
 
 namespace LauncherZLib.Launcher
 {
+    /// <summary>
+    /// Data model for a launcher.
+    /// You may extend this class if you wish to store additional data.
+    /// </summary>
     public class LauncherData : INotifyPropertyChanged
     {
 
         private static readonly string DefaultFontFamily = "Global User Interface";
+        private static long _uidCounter = 0;
 
         private string _title = "";
         private string _description = "";
@@ -17,23 +23,36 @@ namespace LauncherZLib.Launcher
         private string _descriptionFont = DefaultFontFamily;
         private string _iconLocation = "";
         private readonly double _relevance;
-        private readonly LauncherExtendedProperties _launcherEx;
+        private readonly long _uniqueId;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public LauncherData(string title, string description, string iconLocation, double relavance, LauncherExtendedProperties launcherEx)
+        /// <summary>
+        /// Creates a new LauncherData with specified relevance.
+        /// </summary>
+        /// <param name="relavance"></param>
+        public LauncherData(double relavance) : this("Untitled launcher", "No description", "", relavance)
         {
 
+        }
+
+        /// <summary>
+        /// Creates a new LauncherData with details.
+        /// </summary>
+        /// <param name="title"></param>
+        /// <param name="description"></param>
+        /// <param name="iconLocation"></param>
+        /// <param name="relavance"></param>
+        public LauncherData(string title, string description, string iconLocation, double relavance)
+        {
             _title = title;
             _description = description;
             _iconLocation = iconLocation;
             _relevance = relavance;
-            _launcherEx = launcherEx;
+            Tickable = false;
+            CurrentTickRate = TickRate.Normal;
+            _uniqueId = Interlocked.Increment(ref _uidCounter);
         }
-
-        public LauncherData(string title, string description, string iconLocation, double relavance)
-            : this(title, description, iconLocation, relavance, new LauncherExtendedProperties(false))
-        { }
 
         #region Properties
 
@@ -107,6 +126,7 @@ namespace LauncherZLib.Launcher
 
         /// <summary>
         /// Gets or sets the font family of the title.
+        /// Triggers PropertyChanged event.
         /// </summary>
         public string TitleFont
         {
@@ -124,6 +144,7 @@ namespace LauncherZLib.Launcher
 
         /// <summary>
         /// Gets or sets the font family of the description.
+        /// Triggers PropertyChanged event.
         /// </summary>
         public string DescriptionFont
         {
@@ -140,21 +161,13 @@ namespace LauncherZLib.Launcher
         }
 
         /// <summary>
-        /// Gets the relevance level, a value between 0.0 and 1.0.
-        /// 0.0 implies complete irrelevance.
-        /// </summary>
-        public double Relevance
-        {
-            get { return _relevance; }
-        }
-
-        /// <summary>
         /// Gets or sets the icon location in string form.
         /// The value of this property will be used to construct
         /// <see cref="Icon.IconLocation"/>.
         /// Triggers PropertyChanged event.
         /// </summary>
-        public string IconLocation { 
+        public string IconLocation
+        {
             get { return _iconLocation; }
             set
             {
@@ -167,19 +180,43 @@ namespace LauncherZLib.Launcher
         }
 
         /// <summary>
+        /// Gets the relevance level, a value between 0.0 and 1.0.
+        /// 0.0 implies complete irrelevance.
+        /// </summary>
+        public double Relevance
+        {
+            get { return _relevance; }
+        }
+
+        
+        /// <summary>
         /// Gets or sets the plugin id associated with this command.
         /// Internal usage only.
         /// </summary>
         public string PluginId { get; internal set; }
 
         /// <summary>
-        /// Gets the extended properties of this command.
+        /// Gets or sets whether this launcher is tickable.
         /// </summary>
-        public LauncherExtendedProperties ExtendedProperties
-        {
-            get { return _launcherEx; }
-        }
-        
+        public bool Tickable { get; set; }
+
+        /// <summary>
+        /// Gets or sets the tick rate.
+        /// </summary>
+        public TickRate CurrentTickRate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the string data. You may use this property to store extra string data
+        /// without extending this class.
+        /// </summary>
+        public string StringData { get; set; }
+
+        /// <summary>
+        /// Gets the unique id associated with the metadata.
+        /// Each instance will be assigned a unique id.
+        /// </summary>
+        public long UniqueId { get { return _uniqueId;  } }
+
         #endregion
 
         protected void RaisePropertyChangedEvent([CallerMemberName] string propName = null)
@@ -193,7 +230,7 @@ namespace LauncherZLib.Launcher
 
         public override string ToString()
         {
-            return string.Format("[{0}]{1}", Relevance, Title);
+            return string.Format("{0}|{1}", Relevance, Title);
         }
     }
 
@@ -209,7 +246,7 @@ namespace LauncherZLib.Launcher
                 "[Highlights] are ~supported~.\n" +
                 "They are [[[~_Stackable_~]]]. " +
                 "Creation Time: " + DateTime.Now.ToLongTimeString(),
-                "LauncherZ|IconBlank", 0.0, new LauncherExtendedProperties(false)
+                "LauncherZ|IconBlank", 0.0
                 )
         {
             DescriptionFont = "Seoge UI";

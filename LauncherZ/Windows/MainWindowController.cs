@@ -286,14 +286,14 @@ namespace LauncherZ.Windows
                 _tickTimerDivider = 0;
                 tickSlow = true;
             }
-            foreach (var cmd in _mwModel.Launchers.Where(cmd => cmd.ExtendedProperties.Tickable))
+            foreach (var launcherData in _mwModel.Launchers.Where(l => l.Tickable))
             {
-                bool shouldTick = cmd.ExtendedProperties.CurrentTickRate == TickRate.Fast;
-                shouldTick = shouldTick || (tickNormal && cmd.ExtendedProperties.CurrentTickRate == TickRate.Normal);
-                shouldTick = shouldTick || (tickSlow && cmd.ExtendedProperties.CurrentTickRate == TickRate.Slow);
+                bool shouldTick = launcherData.CurrentTickRate == TickRate.Fast;
+                shouldTick = shouldTick || (tickNormal && launcherData.CurrentTickRate == TickRate.Normal);
+                shouldTick = shouldTick || (tickSlow && launcherData.CurrentTickRate == TickRate.Slow);
                 if (shouldTick)
                 {
-                    _app.PluginManager.DistributeEventTo(cmd.PluginId, new LauncherTickEvent(cmd));
+                    _app.PluginManager.DistributeEventTo(launcherData.PluginId, new LauncherTickEvent(launcherData));
                 }
             }
         }

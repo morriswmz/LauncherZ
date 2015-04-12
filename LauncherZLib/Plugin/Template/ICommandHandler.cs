@@ -9,7 +9,7 @@ namespace LauncherZLib.Plugin.Template
 
         IEnumerable<LauncherData> HandleQuery(LauncherQuery query);
 
-        PostLaunchAction HandleLaunch(LauncherData launcherData);
+        PostLaunchAction HandleLaunch(LauncherData launcherData, ArgumentCollection arguments);
 
         bool SubscribeToEvents { get; }
     }

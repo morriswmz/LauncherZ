@@ -38,13 +38,13 @@ namespace LauncherZLib.Plugin.Template
 
         public override PostLaunchAction Launch(LauncherData launcherData)
         {
-            var extendedProps = launcherData.ExtendedProperties as CommandExtendedProperties;
-            if (extendedProps == null || extendedProps.CommandArgs.Count == 0)
+            var cmdData = launcherData as CommandLauncherData;
+            if (cmdData == null || cmdData.CommandArgs.Count == 0)
                 return PostLaunchAction.Default;
 
             ICommandHandler handler;
-            return Handlers.TryGetValue(extendedProps.CommandArgs[0], out handler)
-                ? handler.HandleLaunch(launcherData)
+            return Handlers.TryGetValue(cmdData.CommandArgs[0], out handler)
+                ? handler.HandleLaunch(launcherData, cmdData.CommandArgs)
                 : PostLaunchAction.Default;
         }
 

@@ -4,9 +4,9 @@ using LauncherZLib.Launcher;
 using LauncherZLib.Plugin.Service;
 using LauncherZLib.Plugin.Template;
 
-namespace CorePlugins.CoreCommands
+namespace CorePlugins.CoreCommands.Commands
 {
-    public class ExitCommandHandler : CoreCommandHandler
+    public sealed class ExitCommandHandler : CoreCommandHandler
     {
         public ExitCommandHandler(IPluginServiceProvider serviceProvider) : base(serviceProvider)
         {
@@ -26,15 +26,16 @@ namespace CorePlugins.CoreCommands
         {
             return new LauncherData[]
             {
-                new LauncherData(
-                    Localization["ExitCommandTitle"],
-                    Localization["ExitCommandDescription"],
-                    "LauncherZ://IconGear", 1.0,
-                    new CommandExtendedProperties(query.Arguments))
+                new CommandLauncherData(query.Arguments, 1.0)
+                {
+                    Title = Localization["ExitCommandTitle"],
+                    Description = Localization["ExitCommandDescription"],
+                    IconLocation = "LauncherZ://IconGear"
+                }
             };
         }
 
-        public override PostLaunchAction HandleLaunch(LauncherData launcherData)
+        public override PostLaunchAction HandleLaunch(LauncherData launcherData, ArgumentCollection arguments)
         {
             Application.Current.Shutdown();
             return PostLaunchAction.Default;

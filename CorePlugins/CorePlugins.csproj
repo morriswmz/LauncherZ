@@ -48,14 +48,15 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AppLauncher\AppLauncherExtendedProperties.cs" />
+    <Compile Include="AppLauncher\AppLauncherData.cs" />
     <Compile Include="AppLauncher\AppLauncherPlugin.cs" />
     <Compile Include="AppLauncher\AppManifest.cs" />
     <Compile Include="AppLauncher\AppManifestManager.cs" />
     <Compile Include="AppLauncher\AppQueryResult.cs" />
+    <Compile Include="CoreCommands\Commands\CpuCommandHandler.cs" />
+    <Compile Include="CoreCommands\Commands\ExitCommandHandler.cs" />
+    <Compile Include="CoreCommands\Commands\IpCommandHandler.cs" />
     <Compile Include="CoreCommands\CoreCommandsConfig.cs" />
-    <Compile Include="CoreCommands\CpuCommandHandler.cs" />
-    <Compile Include="CoreCommands\ExitCommandHandler.cs" />
     <Compile Include="CoreCommands\CoreCommandHandler.cs" />
     <Compile Include="CoreCommands\CoreCommandsPlugin.cs" />
     <Compile Include="TestPlugin.cs" />

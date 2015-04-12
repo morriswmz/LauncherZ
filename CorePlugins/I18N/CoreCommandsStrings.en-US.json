@@ -6,5 +6,6 @@
     "ExitCommandTitle": "Exit LauncherZ",
     "ExitCommandDescription": "Press [Enter] to exit.",
     "CpuCommandTitle": "Total CPU usage",
-    "CpuCommandDescription": "Press [Enter] to open task manager."
+    "CpuCommandDescription": "Press [Enter] to open task manager.",
+    "IpCommandLaunchHint":  "Press [Enter] to copy the data to clipboard."
 }

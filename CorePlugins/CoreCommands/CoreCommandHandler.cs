@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using LauncherZLib.Event.Launcher;
 using LauncherZLib.I18N;
 using LauncherZLib.Launcher;
 using LauncherZLib.Plugin.Service;
@@ -26,7 +25,7 @@ namespace CorePlugins.CoreCommands
 
         public abstract IEnumerable<LauncherData> HandleQuery(LauncherQuery query);
 
-        public abstract PostLaunchAction HandleLaunch(LauncherData launcherData);
+        public abstract PostLaunchAction HandleLaunch(LauncherData launcherData, ArgumentCollection arguments);
 
         public abstract bool SubscribeToEvents { get; }
 

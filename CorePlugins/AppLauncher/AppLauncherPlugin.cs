@@ -37,7 +37,7 @@ namespace CorePlugins.AppLauncher
                 : null;
             if (_timerService != null)
             {
-                _saveTimerId = _timerService.SetInterval(() => _manager.SaveManifestToFile(), new TimeSpan(0, 0, 30, 0));
+                _saveTimerId = _timerService.SetInterval(() => _manager.ScheduleUpdateManifest(), new TimeSpan(0, 0, 30, 0));
             }
             _manifestFilePath = Path.Combine(PluginInfo.SuggestedPluginDataDirectory, "apps.json");
             _manager = new AppManifestManager(_manifestFilePath, Logger);
@@ -87,17 +87,17 @@ namespace CorePlugins.AppLauncher
         [SubscribeEvent]
         public void LauncherExecutedHanlder(LauncherExecutedEvent e)
         {
-            var prop = e.LauncherData.ExtendedProperties as AppLauncherExtendedProperties;
-            if (prop != null)
+            var appLauncherData = e.LauncherData as AppLauncherData;
+            if (appLauncherData != null)
             {
                 try
                 {
-                    Process.Start(prop.LinkFileLocation);
-                    _manager.IncreaseFrequencyFor(prop.LinkFileLocation);
+                    Process.Start(appLauncherData.LinkFileLocation);
+                    _manager.IncreaseFrequencyFor(appLauncherData.LinkFileLocation);
                 }
                 catch (Exception)
                 {
-                    Logger.Warning(string.Format("Unable to start process from: {0}", prop.LinkFileLocation));
+                    Logger.Warning(string.Format("Unable to start process from: {0}", appLauncherData.LinkFileLocation));
                 }
             }
         }

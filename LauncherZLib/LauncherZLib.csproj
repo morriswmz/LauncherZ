@@ -104,7 +104,7 @@
     <Compile Include="Plugin\PluginContainer.cs" />
     <Compile Include="Plugin\PluginManager.cs" />
     <Compile Include="Plugin\PluginType.cs" />
-    <Compile Include="Plugin\Template\CommandExtendedProperties.cs" />
+    <Compile Include="Plugin\Template\CommandLauncherData.cs" />
     <Compile Include="Plugin\Template\CommandPlugin.cs" />
     <Compile Include="Plugin\Template\ConfigurablePlugin.cs" />
     <Compile Include="Plugin\Template\EmptyPlugin.cs" />
@@ -112,7 +112,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Launcher\LauncherData.cs" />
     <Compile Include="Launcher\LauncherList.cs" />
-    <Compile Include="Launcher\LauncherExtendedProperties.cs" />
     <Compile Include="Launcher\LauncherQuery.cs" />
     <Compile Include="QueryController.cs" />
     <Compile Include="Utils\FileSystemUtils.cs" />

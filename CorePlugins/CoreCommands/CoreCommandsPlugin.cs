@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using CorePlugins.CoreCommands.Commands;
 using LauncherZLib.Event;
 using LauncherZLib.Event.Launcher;
 using LauncherZLib.I18N;
@@ -34,6 +35,7 @@ namespace CorePlugins.CoreCommands
         {
             AddCommandHandler(new CpuCommandHandler(ServiceProvider));
             AddCommandHandler(new ExitCommandHandler(ServiceProvider));
+            AddCommandHandler(new IpCommandHandler(ServiceProvider));
         }
     
     }

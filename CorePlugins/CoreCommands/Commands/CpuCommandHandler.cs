@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using LauncherZLib.Event;
 using LauncherZLib.Event.Launcher;
+using LauncherZLib.Icon;
 using LauncherZLib.Launcher;
 using LauncherZLib.Plugin.Service;
 using LauncherZLib.Plugin.Template;
 using LauncherZLib.Utils;
 
-namespace CorePlugins.CoreCommands
+namespace CorePlugins.CoreCommands.Commands
 {
-    public class CpuCommandHandler : CoreCommandHandler, IDisposable
+    public sealed class CpuCommandHandler : CoreCommandHandler, IDisposable
     {
         private readonly PerformanceCounter _cpuCounter;
         private bool _disposed = false;
@@ -41,7 +42,7 @@ namespace CorePlugins.CoreCommands
             GC.SuppressFinalize(this);
         }
 
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (_disposed)
                 return;
@@ -58,19 +59,17 @@ namespace CorePlugins.CoreCommands
         {
             return new LauncherData[]
             {
-                new LauncherData(
-                    Localization["CpuCommandTitle"],
-                    Localization["CpuCommandDescription"],
-                    @"LauncherZ://IconGear", 1.0,
-                    new CommandExtendedProperties(query.Arguments, true, TickRate.Normal)
-                )
+                new CommandLauncherData(query.Arguments, 1.0)
                 {
-                    DescriptionFont = "Segoe UI Mono"
+                    Title = Localization["CpuCommandTitle"],
+                    Description = Localization["CpuCommandDescription"],
+                    DescriptionFont = "Segoe UI Mono",
+                    IconLocation = @"LauncherZ://IconGear"
                 }
             };
         }
 
-        public override PostLaunchAction HandleLaunch(LauncherData launcherData)
+        public override PostLaunchAction HandleLaunch(LauncherData launcherData, ArgumentCollection arguments)
         {
             Process.Start("taskmgr");
             return PostLaunchAction.Default;
