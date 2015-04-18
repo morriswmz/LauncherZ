@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using LauncherZLib.Event.Launcher;
 using LauncherZLib.I18N;
 using LauncherZLib.Launcher;
 using LauncherZLib.Plugin.Service;
 using LauncherZLib.Plugin.Template;
 
-namespace CorePlugins.CoreCommands
+namespace CorePlugins.CoreCommands.Commands
 {
     public abstract class CoreCommandHandler : ICommandHandler
     {
@@ -27,7 +28,20 @@ namespace CorePlugins.CoreCommands
 
         public abstract PostLaunchAction HandleLaunch(LauncherData launcherData, ArgumentCollection arguments);
 
-        public abstract bool SubscribeToEvents { get; }
+        public virtual void HandleTick(CommandLauncherData cmdData)
+        {
+            
+        }
+
+        public virtual void HandleSelection(CommandLauncherData cmdData)
+        {
+            
+        }
+
+        public virtual void HandleDeselection(CommandLauncherData cmdData)
+        {
+            
+        }
 
     }
 }

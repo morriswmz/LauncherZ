@@ -16,11 +16,6 @@ namespace CorePlugins.CoreCommands.Commands
         {
             get { return "EXIT"; }
         }
-
-        public override bool SubscribeToEvents
-        {
-            get { return false; }
-        }
         
         public override IEnumerable<LauncherData> HandleQuery(LauncherQuery query)
         {

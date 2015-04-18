@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
 using LauncherZLib.Launcher;
 using LauncherZLib.Plugin.Service;
 
 namespace LauncherZLib.Plugin.Template
 {
-
+    // todo: perhaps mixin instead of inheritance is better?
     public abstract class CommandPlugin<TC> : ConfigurablePlugin<TC> where TC : class
     {
 
@@ -30,21 +29,20 @@ namespace LauncherZLib.Plugin.Template
 
         public override IEnumerable<LauncherData> Query(LauncherQuery query)
         {
-            ICommandHandler handler;
-            return Handlers.TryGetValue(query.Arguments[0], out handler)
+            if (query.Arguments == null || query.Arguments.Count == 0)
+                return LauncherQuery.EmptyResult;
+
+            ICommandHandler handler = GetCommandHandler(query.Arguments[0]);
+            return handler != null
                 ? handler.HandleQuery(query)
-                : Enumerable.Empty<LauncherData>();
+                : LauncherQuery.EmptyResult;
         }
 
         public override PostLaunchAction Launch(LauncherData launcherData)
         {
-            var cmdData = launcherData as CommandLauncherData;
-            if (cmdData == null || cmdData.CommandArgs.Count == 0)
-                return PostLaunchAction.Default;
-
-            ICommandHandler handler;
-            return Handlers.TryGetValue(cmdData.CommandArgs[0], out handler)
-                ? handler.HandleLaunch(launcherData, cmdData.CommandArgs)
+            ICommandHandler handler = GetCommandHandler(launcherData);
+            return handler != null
+                ? handler.HandleLaunch(launcherData, ((CommandLauncherData) launcherData).CommandArgs)
                 : PostLaunchAction.Default;
         }
 
@@ -62,19 +60,25 @@ namespace LauncherZLib.Plugin.Template
                 Logger.Warning("");
             }
             Handlers[handler.CommandName] = handler;
-            if (handler.SubscribeToEvents)
-            {
-                EventBus.Register(handler);
-            }
         }
 
         protected virtual void RemoveCommandHandlers()
         {
-            foreach (var handler in Handlers.Values.Where(handler => handler.SubscribeToEvents))
-            {
-                EventBus.Unregister(handler);
-            }
             Handlers.Clear();
+        }
+
+        protected virtual ICommandHandler GetCommandHandler(LauncherData data)
+        {
+            var cmdData = data as CommandLauncherData;
+            if (cmdData == null || cmdData.CommandArgs == null || cmdData.CommandArgs.Count == 0)
+                return null;
+            return GetCommandHandler(cmdData.CommandArgs[0]);
+        }
+
+        protected virtual ICommandHandler GetCommandHandler(string cmd)
+        {
+            ICommandHandler handler;
+            return Handlers.TryGetValue(cmd, out handler) ? handler : null;
         }
     }
 }

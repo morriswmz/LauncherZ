@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Net.NetworkInformation;
 using System.Text;
 using System.Windows;
-using LauncherZLib.Event;
-using LauncherZLib.Event.Launcher;
 using LauncherZLib.Launcher;
 using LauncherZLib.Plugin.Service;
 using LauncherZLib.Plugin.Template;
@@ -21,11 +19,6 @@ namespace CorePlugins.CoreCommands.Commands
         public override string CommandName
         {
             get { return "IP"; }
-        }
-
-        public override bool SubscribeToEvents
-        {
-            get { return false; }
         }
 
         public override IEnumerable<LauncherData> HandleQuery(LauncherQuery query)
@@ -57,18 +50,15 @@ namespace CorePlugins.CoreCommands.Commands
             return PostLaunchAction.Default;
         }
 
-        [SubscribeEvent]
-        public void LauncherSelectedEventHandler(LauncherSelectedEvent e)
+        public override void HandleSelection(CommandLauncherData cmdData)
         {
-            e.LauncherData.Description = e.LauncherData.StringData + Localization["IpCommandLaunchHint"];
+            cmdData.Description = cmdData.StringData + Localization["IpCommandLaunchHint"];
         }
 
-        [SubscribeEvent]
-        public void LauncherDeselectedEventHandler(LauncherDeselectedEvent e)
+        public override void HandleDeselection(CommandLauncherData cmdData)
         {
-            e.LauncherData.Description = e.LauncherData.StringData;
+            cmdData.Description = cmdData.StringData;
         }
 
-        
     }
 }

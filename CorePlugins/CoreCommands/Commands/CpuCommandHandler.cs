@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using LauncherZLib.Event;
-using LauncherZLib.Event.Launcher;
-using LauncherZLib.Icon;
 using LauncherZLib.Launcher;
 using LauncherZLib.Plugin.Service;
 using LauncherZLib.Plugin.Template;
@@ -29,11 +26,6 @@ namespace CorePlugins.CoreCommands.Commands
         public override string CommandName
         {
             get { return "CPU"; }
-        }
-
-        public override bool SubscribeToEvents
-        {
-            get { return true; }
         }
 
         public void Dispose()
@@ -64,7 +56,9 @@ namespace CorePlugins.CoreCommands.Commands
                     Title = Localization["CpuCommandTitle"],
                     Description = Localization["CpuCommandDescription"],
                     DescriptionFont = "Segoe UI Mono",
-                    IconLocation = @"LauncherZ://IconGear"
+                    IconLocation = @"LauncherZ://IconGear",
+                    Tickable = true,
+                    CurrentTickRate = TickRate.Normal
                 }
             };
         }
@@ -75,12 +69,11 @@ namespace CorePlugins.CoreCommands.Commands
             return PostLaunchAction.Default;
         }
 
-        [SubscribeEvent]
-        public void LauncherTickEventHandler(LauncherTickEvent e)
+        public override void HandleTick(CommandLauncherData cmdData)
         {
             var cpu = (int)_cpuCounter.NextValue();
             var bar = StringUtils.CreateProgressBar("[= ]", 20, cpu / 100.0);
-            e.LauncherData.Description = string.Format("[{0}] {1}%\n{2}", bar, cpu, Localization["CpuCommandDescription"]);
+            cmdData.Description = string.Format("[{0}] {1}%\n{2}", bar, cpu, Localization["CpuCommandDescription"]);
         }
 
     }

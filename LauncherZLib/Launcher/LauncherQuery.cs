@@ -1,13 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
-using LauncherZLib.Utils;
 
 namespace LauncherZLib.Launcher
 {
     public sealed class LauncherQuery
     {
+
+        public static readonly IEnumerable<LauncherData> EmptyResult = Enumerable.Empty<LauncherData>(); 
+
         private static long _queryCounter = 0;
 
         private readonly long _queryId;
