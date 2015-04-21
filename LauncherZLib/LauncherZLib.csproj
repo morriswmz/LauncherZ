@@ -107,6 +107,7 @@
     <Compile Include="Plugin\Template\CommandLauncherData.cs" />
     <Compile Include="Plugin\Template\CommandPlugin.cs" />
     <Compile Include="Plugin\Template\ConfigurablePlugin.cs" />
+    <Compile Include="Plugin\Template\ConfigModule.cs" />
     <Compile Include="Plugin\Template\EmptyPlugin.cs" />
     <Compile Include="Plugin\Template\ICommandHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -76,6 +76,8 @@ namespace LauncherZLib.Plugin.Loader
             return result;
         }
 
+        
+
         private class AssemblyDiscoverer : MarshalByRefObject
         {
 
@@ -102,7 +104,8 @@ namespace LauncherZLib.Plugin.Loader
                 }
                 var result = new List<PluginDiscoveryInfo>();
                 Type pluginAttrType = Type.ReflectionOnlyGetType(typeof (PluginAttribute).AssemblyQualifiedName, true, false);
-                Type descriptionType = Type.ReflectionOnlyGetType(typeof(DescriptionAttribute).AssemblyQualifiedName, true, false);
+                Type descriptionType = Type.ReflectionOnlyGetType(typeof (DescriptionAttribute).AssemblyQualifiedName, true, false);
+                Type iPluginType = Type.ReflectionOnlyGetType(typeof (IPlugin).AssemblyQualifiedName, true, false);
                 foreach (Type t in asm.GetTypes())
                 {
                     IList<CustomAttributeData> attrs = CustomAttributeData.GetCustomAttributes(t);
@@ -199,7 +202,7 @@ namespace LauncherZLib.Plugin.Loader
                     {
                         errMessages.Add("Plugin class cannot be generic.");
                     }
-                    else if (!typeof (IPlugin).IsAssignableFrom(t))
+                    else if (!iPluginType.IsAssignableFrom(t))
                     {
                         errMessages.Add("Plugin class does not implement IPlugin interface.");
                     }
