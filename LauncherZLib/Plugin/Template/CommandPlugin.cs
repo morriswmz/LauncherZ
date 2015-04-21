@@ -7,7 +7,7 @@ using LauncherZLib.Plugin.Service;
 namespace LauncherZLib.Plugin.Template
 {
     // todo: perhaps mixin instead of inheritance is better?
-    public abstract class CommandPlugin<TC> : ConfigurablePlugin<TC> where TC : class
+    public abstract class CommandPlugin : EmptyPlugin
     {
 
         protected Regex CommandNameRegex = new Regex(@"^[\w+_]+$");
@@ -24,7 +24,6 @@ namespace LauncherZLib.Plugin.Template
         public override void Deactivate(IPluginServiceProvider serviceProvider)
         {
             RemoveCommandHandlers();
-            base.Deactivate(serviceProvider);
         }
 
         public override IEnumerable<LauncherData> Query(LauncherQuery query)

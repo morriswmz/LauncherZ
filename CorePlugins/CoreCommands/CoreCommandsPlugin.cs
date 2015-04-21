@@ -11,7 +11,7 @@ namespace CorePlugins.CoreCommands
 {
     [Plugin("LZCoreCommands", FriendlyName = "LauncherZ Core Commands", Authors = "morriswmz", Version = "0.1.0.0")]
     [Description("Provides basic commands.")]
-    public class CoreCommandsPlugin : CommandPlugin<CoreCommandsConfig>
+    public class CoreCommandsPlugin : CommandPlugin
     {
 
         public override void Activate(IPluginServiceProvider serviceProvider)
@@ -26,11 +26,6 @@ namespace CorePlugins.CoreCommands
         {
             EventBus.Unregister(this);
             base.Deactivate(serviceProvider);
-        }
-
-        protected override CoreCommandsConfig CreateDefaultConfiguration()
-        {
-            return new CoreCommandsConfig();
         }
 
         protected override void AddCommandHandlers()
