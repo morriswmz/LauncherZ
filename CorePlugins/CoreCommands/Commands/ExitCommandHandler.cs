@@ -17,9 +17,9 @@ namespace CorePlugins.CoreCommands.Commands
             get { return "EXIT"; }
         }
         
-        public override IEnumerable<LauncherData> HandleQuery(LauncherQuery query)
+        public override IEnumerable<CommandLauncherData> HandleQuery(LauncherQuery query)
         {
-            return new LauncherData[]
+            return new []
             {
                 new CommandLauncherData(query.Arguments, 1.0)
                 {
@@ -30,7 +30,7 @@ namespace CorePlugins.CoreCommands.Commands
             };
         }
 
-        public override PostLaunchAction HandleLaunch(LauncherData launcherData, ArgumentCollection arguments)
+        public override PostLaunchAction HandleLaunch(CommandLauncherData cmdData)
         {
             Application.Current.Shutdown();
             return PostLaunchAction.Default;

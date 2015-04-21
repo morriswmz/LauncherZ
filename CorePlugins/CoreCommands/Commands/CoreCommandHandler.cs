@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using LauncherZLib.Event.Launcher;
 using LauncherZLib.I18N;
 using LauncherZLib.Launcher;
 using LauncherZLib.Plugin.Service;
@@ -24,9 +23,9 @@ namespace CorePlugins.CoreCommands.Commands
 
         public abstract string CommandName { get; }
 
-        public abstract IEnumerable<LauncherData> HandleQuery(LauncherQuery query);
+        public abstract IEnumerable<CommandLauncherData> HandleQuery(LauncherQuery query);
 
-        public abstract PostLaunchAction HandleLaunch(LauncherData launcherData, ArgumentCollection arguments);
+        public abstract PostLaunchAction HandleLaunch(CommandLauncherData cmdData);
 
         public virtual void HandleTick(CommandLauncherData cmdData)
         {

@@ -21,9 +21,9 @@ namespace CorePlugins.CoreCommands.Commands
             get { return "IP"; }
         }
 
-        public override IEnumerable<LauncherData> HandleQuery(LauncherQuery query)
+        public override IEnumerable<CommandLauncherData> HandleQuery(LauncherQuery query)
         {
-            var results = new List<LauncherData>();
+            var results = new List<CommandLauncherData>();
             foreach (var ni in NetworkInterface.GetAllNetworkInterfaces())
             {
                 var sb = new StringBuilder();
@@ -43,10 +43,10 @@ namespace CorePlugins.CoreCommands.Commands
             return results;
         }
 
-        public override PostLaunchAction HandleLaunch(LauncherData launcherData, ArgumentCollection arguments)
+        public override PostLaunchAction HandleLaunch(CommandLauncherData cmdData)
         {
-            Clipboard.SetText(string.Format("{0}{1}{2}", launcherData.Title, Environment.NewLine,
-                launcherData.StringData));
+            Clipboard.SetText(string.Format("{0}{1}{2}", cmdData.Title, Environment.NewLine,
+                cmdData.StringData));
             return PostLaunchAction.Default;
         }
 

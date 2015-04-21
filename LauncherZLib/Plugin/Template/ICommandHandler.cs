@@ -11,9 +11,9 @@ namespace LauncherZLib.Plugin.Template
 
         string CommandName { get; }
 
-        IEnumerable<LauncherData> HandleQuery(LauncherQuery query);
+        IEnumerable<CommandLauncherData> HandleQuery(LauncherQuery query);
 
-        PostLaunchAction HandleLaunch(LauncherData launcherData, ArgumentCollection arguments);
+        PostLaunchAction HandleLaunch(CommandLauncherData cmdData);
 
     }
 }
