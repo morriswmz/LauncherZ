@@ -1,11 +1,11 @@
 ﻿{
-    /* the following items should match the manifest file */
-    "Name": "LauncherZ Core Commands",
-    "Description": "Provides basic commands.",
+    /* the following items should match the attributes */
+    "PluginFriendlyName": "LauncherZ Core Commands",
+    "PluginDescription": "Provides basic commands.",
     /* en-US */
     "ExitCommandTitle": "Exit LauncherZ",
     "ExitCommandDescription": "Press [Enter] to exit.",
     "CpuCommandTitle": "Total CPU usage",
     "CpuCommandDescription": "Press [Enter] to open task manager.",
-    "IpCommandLaunchHint":  "Press [Enter] to copy the data to clipboard."
+    "IpCommandLaunchHint": "Press [Enter] to copy the data to clipboard."
 }

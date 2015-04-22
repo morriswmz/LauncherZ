@@ -1,0 +1,7 @@
+﻿{
+    /* the following items should match the attributes */
+    "PluginFriendlyName": "LauncherZ Math Evaluator",
+    "PluginDescription": "Evaluates math expressions.",
+
+    "MathEvaluatorDescription": "Press [Enter] to copy the result to clipboard."
+}

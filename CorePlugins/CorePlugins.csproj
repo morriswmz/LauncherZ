@@ -60,6 +60,18 @@
     <Compile Include="CoreCommands\Commands\IpCommandHandler.cs" />
     <Compile Include="CoreCommands\CoreCommandsConfig.cs" />
     <Compile Include="CoreCommands\CoreCommandsPlugin.cs" />
+    <Compile Include="MathEvaluator\ExpressionParser.cs" />
+    <Compile Include="MathEvaluator\MathEvaluator.cs" />
+    <Compile Include="MathEvaluator\MathEvaluatorPlugin.cs" />
+    <Compile Include="MathEvaluator\Symbols\InfixOperator.cs" />
+    <Compile Include="MathEvaluator\Symbols\InfixROperator.cs" />
+    <Compile Include="MathEvaluator\Symbols\LBracketSymbol.cs" />
+    <Compile Include="MathEvaluator\Symbols\LiteralSymbol.cs" />
+    <Compile Include="MathEvaluator\Symbols\NameSymbol.cs" />
+    <Compile Include="MathEvaluator\Symbols\OperatorSymbol.cs" />
+    <Compile Include="MathEvaluator\Symbols\PreInfixOperator.cs" />
+    <Compile Include="MathEvaluator\Symbols\Symbol.cs" />
+    <Compile Include="MathEvaluator\Tokenizer.cs" />
     <Compile Include="TestPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -87,6 +99,9 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="I18N\MathEvaluatorStrings.en-US.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

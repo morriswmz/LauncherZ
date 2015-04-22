@@ -8,6 +8,10 @@
         /// </summary>
         public static readonly PostLaunchAction Default = new PostLaunchAction(true, false, false, "");
         /// <summary>
+        /// Does nothing.
+        /// </summary>
+        public static readonly PostLaunchAction DoNothing = new PostLaunchAction(false, false, false, "");
+        /// <summary>
         /// Resets input and enters exclusive mode. Window is kept shown.
         /// </summary>
         public static readonly PostLaunchAction ResetInputAndEnterExclusiveMode = new PostLaunchAction(false, true, true, "");
