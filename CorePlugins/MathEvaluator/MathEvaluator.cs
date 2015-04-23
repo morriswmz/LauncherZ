@@ -77,7 +77,7 @@ namespace CorePlugins.MathEvaluator
                 }
                 throw new Exception(string.Format("Undefined function name \"{0}\"", lbs.FunctionName));
             }
-            throw new Exception(string.Format("Unaable to evaluate symbol \"{0}\"", root.Id));
+            throw new Exception(string.Format("Unable to evaluate symbol \"{0}\"", root.Id));
         }
 
         private void InitEvaluators()

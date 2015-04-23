@@ -16,7 +16,7 @@ namespace CorePlugins.CoreCommands
     public class CoreCommandsPlugin : EmptyPlugin
     {
 
-        private readonly CommandModule<CoreCommandHandler> _commandModel = new CommandModule<CoreCommandHandler>(false); 
+        private readonly CommandModule<CoreCommandHandler> _commandModule = new CommandModule<CoreCommandHandler>(false); 
 
         public override void Activate(IPluginServiceProvider serviceProvider)
         {
@@ -30,31 +30,32 @@ namespace CorePlugins.CoreCommands
         public override void Deactivate(IPluginServiceProvider serviceProvider)
         {
             EventBus.Unregister(this);
-            _commandModel.RemoveAllCommandHandlers();
+            _commandModule.RemoveAllCommandHandlers();
         }
 
         protected void AddCommandHandlers()
         {
-            _commandModel.AddOrUpdateCommandHanlder(new CpuCommandHandler(ServiceProvider));
-            _commandModel.AddOrUpdateCommandHanlder(new ExitCommandHandler(ServiceProvider));
-            _commandModel.AddOrUpdateCommandHanlder(new IpCommandHandler(ServiceProvider));
+            _commandModule.AddOrUpdateCommandHanlder(new CpuCommandHandler(ServiceProvider));
+            _commandModule.AddOrUpdateCommandHanlder(new ExitCommandHandler(ServiceProvider));
+            _commandModule.AddOrUpdateCommandHanlder(new IpCommandHandler(ServiceProvider));
+            _commandModule.AddOrUpdateCommandHanlder(new RunCommandHandler(ServiceProvider));
         }
 
         public override IEnumerable<LauncherData> Query(LauncherQuery query)
         {
-            return _commandModel.HandleQuery(query);
+            return _commandModule.HandleQuery(query);
         }
 
         public override PostLaunchAction Launch(LauncherData launcherData)
         {
             // the casting should be aways successful.
-            return _commandModel.HandleLaunch((CommandLauncherData) launcherData);
+            return _commandModule.HandleLaunch((CommandLauncherData) launcherData);
         }
 
         [SubscribeEvent]
         public void LauncherTickEventHandler(LauncherTickEvent e)
         {
-            var handler = _commandModel.GetCommandHandler((CommandLauncherData) e.LauncherData);
+            var handler = _commandModule.GetCommandHandler((CommandLauncherData) e.LauncherData);
             if (handler != null)
                 handler.HandleTick((CommandLauncherData) e.LauncherData);
         }
@@ -62,7 +63,7 @@ namespace CorePlugins.CoreCommands
         [SubscribeEvent]
         public void LauncherSelectedEventHandler(LauncherSelectedEvent e)
         {
-            var handler = _commandModel.GetCommandHandler((CommandLauncherData) e.LauncherData);
+            var handler = _commandModule.GetCommandHandler((CommandLauncherData) e.LauncherData);
             if (handler != null)
                 handler.HandleSelection((CommandLauncherData) e.LauncherData);
         }
@@ -70,7 +71,7 @@ namespace CorePlugins.CoreCommands
         [SubscribeEvent]
         public void LauncherDeselectedEventHandler(LauncherDeselectedEvent e)
         {
-            var handler = _commandModel.GetCommandHandler((CommandLauncherData) e.LauncherData);
+            var handler = _commandModule.GetCommandHandler((CommandLauncherData) e.LauncherData);
             if (handler != null)
                 handler.HandleDeselection((CommandLauncherData) e.LauncherData);
         }
