@@ -14,18 +14,17 @@ namespace LauncherZ
             get { return "Win+OemQuestion"; }
         }
 
-
-
         public LauncherZConfig()
         {
             Priorities = new Dictionary<string, double>();
         }
 
-        [JsonProperty("activation_key_combo")]
         public string ActivationKeyCombo { get; set; }
 
-        [JsonProperty("priorities")]
         public Dictionary<string, double> Priorities { get; private set; }
+
+        public string LastLaunch { get; set; }
+
 
     }
 }

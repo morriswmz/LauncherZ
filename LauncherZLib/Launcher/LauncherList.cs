@@ -94,11 +94,12 @@ namespace LauncherZLib.Launcher
             }
         }
 
-        public virtual int IndexOf(object item)
+        public virtual int IndexOf(LauncherData data)
         {
-            var data = item as LauncherData;
-            if (data == null)
+            if (data == null || _launchers.Count == 0)
                 return -1;
+            if (_launchers.Count == 1)
+                return _launchers[0] == data ? 0 : -1;
             return _launchers.IndexOf(data);
         }
 

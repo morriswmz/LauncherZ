@@ -19,6 +19,21 @@ namespace LauncherZ.Windows
             CtlInputBox.Focus();
         }
 
+        public void SelectInputText()
+        {
+            CtlInputBox.SelectAll();
+        }
+
+        public void SelectInputText(int start, int length)
+        {
+            CtlInputBox.Select(start, length);
+        }
+
+        public void ClearInputSelection()
+        {
+            CtlInputBox.Select(CtlInputBox.Text.Length, 0);
+        }
+
         private void MainWindow_Activated(object sender, System.EventArgs e)
         {
             FocusInput();

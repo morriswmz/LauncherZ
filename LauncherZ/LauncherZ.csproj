@@ -100,13 +100,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Controls\LauncherSelectionChangedEventArgs.cs" />
-    <Compile Include="Controls\FormattedTextBehavior.cs" />
+    <Compile Include="Behaviors\FormattedTextBehavior.cs" />
     <Compile Include="Controls\LauncherDataItem.xaml.cs">
       <SubType>Code</SubType>
       <DependentUpon>LauncherDataItem.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\LauncherIconBehavior.cs" />
+    <Compile Include="Behaviors\LauncherIconBehavior.cs" />
     <Compile Include="Controls\LauncherListView.xaml.cs">
       <DependentUpon>LauncherListView.xaml</DependentUpon>
     </Compile>

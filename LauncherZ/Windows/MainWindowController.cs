@@ -36,6 +36,8 @@ namespace LauncherZ.Windows
         private bool _mwDeactivating;
         private bool _mwActivating;
 
+        private string _lastLaunch;
+
         public MainWindowController(MainWindow mw, LauncherZApp app)
         {
             if (mw == null)
@@ -96,6 +98,8 @@ namespace LauncherZ.Windows
             }
             _switchHotkey.Register(_mw, 0);
             _switchHotkey.HotkeyPressed += SwitchHotkey_HotkeyPressed;
+
+            _lastLaunch = config.LastLaunch ?? "";
 
             // hook window events
             _mw.PreviewKeyUp += MainWindow_PreviewKeyUp;
@@ -178,6 +182,7 @@ namespace LauncherZ.Windows
                         .GetPluginContainer(launcherData.PluginId)
                         .PluginInstance
                         .Launch(launcherData);
+                    _lastLaunch = _mwModel.InputText;
                     if (action.HideWindow)
                     {
                         ClearAndHideMainWindow();
@@ -207,7 +212,15 @@ namespace LauncherZ.Windows
                     e.Handled = true;
                     break;
                 case Key.Up:
-                    SelectPreviousLauncher();
+                    if (string.IsNullOrEmpty(_mwModel.InputText))
+                    {
+                        _mwModel.InputText = _lastLaunch;
+                        _mw.SelectInputText();
+                    }
+                    else
+                    {
+                        SelectPreviousLauncher();
+                    }
                     e.Handled = true;
                     break;
                 case Key.Escape:

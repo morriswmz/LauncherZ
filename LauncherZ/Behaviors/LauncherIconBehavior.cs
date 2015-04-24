@@ -5,7 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using LauncherZLib.Icon;
 
-namespace LauncherZ.Controls
+namespace LauncherZ.Behaviors
 {
     public static class LauncherIconBehavior
     {

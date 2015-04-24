@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using LauncherZLib.FormattedText;
 
-namespace LauncherZ.Controls
+namespace LauncherZ.Behaviors
 {
     public static class FormattedTextBehavior
     {

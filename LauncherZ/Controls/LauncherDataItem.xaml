@@ -3,14 +3,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:local="clr-namespace:LauncherZ.Controls"
-             xmlns:cmd="clr-namespace:LauncherZLib.Launcher;assembly=LauncherZLib"
+             xmlns:launcher="clr-namespace:LauncherZLib.Launcher;assembly=LauncherZLib"
              xmlns:valueConverters="clr-namespace:LauncherZ.Controls.ValueConverters"
+             xmlns:behaviors="clr-namespace:LauncherZ.Behaviors"
              x:Class="LauncherZ.Controls.LauncherDataItem"
              x:Name="TaskDataEntryControl"
              mc:Ignorable="d"
              d:DesignWidth="460"
-             d:DataContext="{d:DesignInstance {x:Type cmd:LauncherDataDesignTime}, IsDesignTimeCreatable = True}">
+             d:DataContext="{d:DesignInstance {x:Type launcher:LauncherDataDesignTime}, IsDesignTimeCreatable = True}">
     <UserControl.Resources>
         <valueConverters:VisibilityConverter x:Key="VisibilityConverter"/>
     </UserControl.Resources>
@@ -20,10 +20,10 @@
                 <ColumnDefinition Width="50"/>
                 <ColumnDefinition Width="100*"/>
             </Grid.ColumnDefinitions>
-            <Image x:Name="CtlIcon" local:LauncherIconBehavior.IconLocation="{Binding IconLocation, Mode=OneWay}" Height="32" Margin="8,8,8,8" Width="32" Grid.Column="0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+            <Image x:Name="CtlIcon" behaviors:LauncherIconBehavior.IconLocation="{Binding IconLocation, Mode=OneWay}" Height="32" Margin="8,8,8,8" Width="32" Grid.Column="0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
             <StackPanel Grid.Column="1" Margin="0,2,5,0" VerticalAlignment="Top">
-                <TextBlock x:Name="CtlTitleText" local:FormattedTextBehavior.FormattedText="{Binding Title, Mode=OneWay}" VerticalAlignment="Top" Style="{DynamicResource TaskTitleStyle}" TextTrimming="CharacterEllipsis" TextWrapping="Wrap" Padding="0,0,0,1" Margin="0,2,0,0" Visibility="{Binding IsTitleVisible, Mode=OneWay, Converter={StaticResource VisibilityConverter}}" FlowDirection="LeftToRight" FontFamily="{Binding TitleFont, Mode=OneWay}"/>
-                <TextBlock x:Name="CtlDescriptionText" local:FormattedTextBehavior.FormattedText="{Binding Description, Mode=OneWay}"  Style="{DynamicResource TaskDescriptionStyle}" Margin="0,0,0,5" Visibility="{Binding IsDescriptionVisible, Mode=OneWay, Converter={StaticResource VisibilityConverter}}" FlowDirection="LeftToRight" FontFamily="{Binding DescriptionFont, Mode=OneWay}" TextWrapping="Wrap" />
+                <TextBlock x:Name="CtlTitleText" behaviors:FormattedTextBehavior.FormattedText="{Binding Title, Mode=OneWay}" VerticalAlignment="Top" Style="{DynamicResource TaskTitleStyle}" TextTrimming="CharacterEllipsis" TextWrapping="Wrap" Padding="0,0,0,1" Margin="0,2,0,0" Visibility="{Binding IsTitleVisible, Mode=OneWay, Converter={StaticResource VisibilityConverter}}" FlowDirection="LeftToRight" FontFamily="{Binding TitleFont, Mode=OneWay}"/>
+                <TextBlock x:Name="CtlDescriptionText" behaviors:FormattedTextBehavior.FormattedText="{Binding Description, Mode=OneWay}"  Style="{DynamicResource TaskDescriptionStyle}" Margin="0,0,0,5" Visibility="{Binding IsDescriptionVisible, Mode=OneWay, Converter={StaticResource VisibilityConverter}}" FlowDirection="LeftToRight" FontFamily="{Binding DescriptionFont, Mode=OneWay}" TextWrapping="Wrap" />
             </StackPanel>
         </Grid> 
     </Border>
