@@ -17,7 +17,8 @@
         <Border MinHeight="120" Style="{DynamicResource WindowBorderStyle}">
             <StackPanel>
                 <TextBlock x:Name="CtlHintText" Margin="14,10,14,0" TextWrapping="Wrap" Text="LauncherZ" Foreground="{DynamicResource DefaultTextBrush}" FontSize="14"/>
-                <TextBox x:Name="CtlInputBox" Padding="2,4" Margin="10,4,10,10" Style="{DynamicResource InputTextBoxStyle}" Text="{Binding InputText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="32"/>
+                <!--<TextBox x:Name="CtlInputBox" Padding="2,4" Margin="10,4,10,10" Style="{DynamicResource InputTextBoxStyle}" Text="{Binding InputText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="32"/>-->
+                <controls:SelectionRangeAwareTextBox x:Name="CtlInputBox" Padding="2,4" Margin="10,4,10,10" Style="{DynamicResource InputTextBoxStyle}" Text="{Binding InputText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectionRange="{Binding InputSelectionRange, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="32"/>
                 <controls:LauncherListView x:Name="CtlLauncherList" Margin="10,0,10,10" MaxHeight="200" SelectedLauncher="{Binding DataContext.SelectedLauncher, ElementName=MainWindowInstance, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DataContext="{Binding Launchers}" Focusable="False"/>
             </StackPanel>
         </Border>

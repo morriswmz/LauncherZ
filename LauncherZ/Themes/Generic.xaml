@@ -1,0 +1,10 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:LauncherZ.Controls">
+
+
+    <Style TargetType="{x:Type controls:SelectionRangeAwareTextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
+    </Style>
+    
+</ResourceDictionary>

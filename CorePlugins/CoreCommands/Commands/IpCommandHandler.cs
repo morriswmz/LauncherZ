@@ -23,7 +23,6 @@ namespace CorePlugins.CoreCommands.Commands
 
         public override IEnumerable<CommandLauncherData> HandleQuery(LauncherQuery query)
         {
-            var results = new List<CommandLauncherData>();
             foreach (var ni in NetworkInterface.GetAllNetworkInterfaces())
             {
                 var sb = new StringBuilder();
@@ -32,15 +31,14 @@ namespace CorePlugins.CoreCommands.Commands
                     sb.AppendLine(uAddr.Address.ToString());
                 }
                 string description = sb.ToString();
-                results.Add(new CommandLauncherData(query.Arguments, 1.0)
+                yield return new CommandLauncherData(query.Arguments, 1.0)
                 {
                     Title = ni.Name,
                     Description = description,
                     IconLocation = "LauncherZ://IconNetwork",
                     StringData = description
-                });
+                };
             }
-            return results;
         }
 
         public override PostLaunchAction HandleLaunch(CommandLauncherData cmdData)

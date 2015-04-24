@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using LauncherZ.Controls;
 using LauncherZLib.Launcher;
 
 namespace LauncherZ.Windows
@@ -9,9 +10,9 @@ namespace LauncherZ.Windows
     {
 
         private string _inputText = "";
+        private SelectionRange _inputSelectionRange = new SelectionRange(0, 0);
         private LauncherList _launchers;
         private LauncherData _selectedLauncher;
-        private int _selectedIndex = -1;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -23,6 +24,19 @@ namespace LauncherZ.Windows
                 if (_inputText != value)
                 {
                     _inputText = value;
+                    RaisePropertyChangedEvent();
+                }
+            }
+        }
+
+        public SelectionRange InputSelectionRange
+        {
+            get { return _inputSelectionRange; }
+            set
+            {
+                if (_inputSelectionRange != value)
+                {
+                    _inputSelectionRange = value;
                     RaisePropertyChangedEvent();
                 }
             }
@@ -49,19 +63,6 @@ namespace LauncherZ.Windows
                 if (_selectedLauncher != value)
                 {
                     _selectedLauncher = value;
-                    RaisePropertyChangedEvent();
-                }
-            }
-        }
-
-        public int SelectedIndex
-        {
-            get { return _selectedIndex;  }
-            set
-            {
-                if (_selectedIndex != value)
-                {
-                    _selectedIndex = value;
                     RaisePropertyChangedEvent();
                 }
             }

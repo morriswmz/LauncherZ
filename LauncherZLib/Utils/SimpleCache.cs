@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,7 +15,7 @@ namespace LauncherZLib.Utils
     /// <remarks>
     /// This class is not thread-safe.
     /// </remarks>
-    public class SimpleCache<TKey, TValue>
+    public class SimpleCache<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
     {
 
         private readonly int _capacity;
@@ -170,6 +171,21 @@ namespace LauncherZLib.Utils
             _tail.Prev = _head;
         }
 
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
+        {
+            CacheEntry curNode = _head.Next;
+            while (curNode != _tail)
+            {
+                yield return new KeyValuePair<TKey, TValue>(curNode.Key, curNode.Value);
+                curNode = curNode.Next;
+            }
+        }
+
         /// <summary>
         /// Internal implementation of refresh function.
         /// </summary>
@@ -200,8 +216,6 @@ namespace LauncherZLib.Utils
             public CacheEntry Prev { get; set; }
             public CacheEntry Next { get; set; }
         }
-
-
         
     }
 

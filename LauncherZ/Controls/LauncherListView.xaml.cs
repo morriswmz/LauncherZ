@@ -105,7 +105,6 @@ namespace LauncherZ.Controls
             {
                 return baseValue;
             }
-
             return DependencyProperty.UnsetValue;
         }
 
