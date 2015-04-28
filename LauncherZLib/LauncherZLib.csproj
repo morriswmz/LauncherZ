@@ -76,6 +76,7 @@
     <Compile Include="Icon\StaticIconProvider.cs" />
     <Compile Include="Launcher\ArgumentCollection.cs" />
     <Compile Include="Launcher\LauncherDataComparer.cs" />
+    <Compile Include="Launcher\LaunchHistoryManager.cs" />
     <Compile Include="Launcher\PostLaunchAction.cs" />
     <Compile Include="Launcher\TickRate.cs" />
     <Compile Include="Event\EventBase.cs" />

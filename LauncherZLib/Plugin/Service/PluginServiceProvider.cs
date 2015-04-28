@@ -17,7 +17,7 @@ namespace LauncherZLib.Plugin.Service
 
         public PluginServiceProvider()
         {
-            
+
         }
 
         public PluginServiceProvider(IDictionary<Type, object> services)

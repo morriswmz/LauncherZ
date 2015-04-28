@@ -1,6 +1,7 @@
 ﻿
 
 using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
@@ -36,14 +37,16 @@ namespace LauncherZ.Windows
         private bool _mwDeactivating;
         private bool _mwActivating;
 
-        private string _lastLaunch;
+        // launch history
+        private LinkedList<string> _launchHistory;
+        private int _maxLaunchHistory;
 
         public MainWindowController(MainWindow mw, LauncherZApp app)
         {
             if (mw == null)
                 throw new ArgumentNullException("mw");
             if (mw.DataContext == null)
-                throw new Exception("View model of MainWindow is null.");
+                throw new ArgumentException("View model of MainWindow is null.");
             if (app == null)
                 throw new ArgumentNullException("app");
 
@@ -99,13 +102,18 @@ namespace LauncherZ.Windows
             _switchHotkey.Register(_mw, 0);
             _switchHotkey.HotkeyPressed += SwitchHotkey_HotkeyPressed;
 
-            _lastLaunch = config.LastLaunch ?? "";
-
+            // load launch history
+            _launchHistory = new LinkedList<string>(config.LaunchHistory);
+            _maxLaunchHistory = config.MaxLaunchHistory;
+            
             // hook window events
             _mw.PreviewKeyUp += MainWindow_PreviewKeyUp;
             _mw.PreviewKeyDown += MainWindow_PreviewKeyDown;
             _mw.Deactivated += MainWindow_Deactivated;
+            _mw.Closed += MainWindow_Closed;
         }
+
+        
 
         private void ClearAndHideMainWindow()
         {
@@ -160,6 +168,18 @@ namespace LauncherZ.Windows
             }
         }
 
+        private void PushLaunchHistory(string input)
+        {
+            if (_launchHistory.Count == 0 || _launchHistory.First.Value != input)
+            {
+                _launchHistory.AddFirst(input);
+            }
+            while (_launchHistory.Count > _maxLaunchHistory)
+            {
+                _launchHistory.RemoveLast();
+            }
+        }
+
         #region Event Handlers
 
         private void MainWindow_Deactivated(object sender, EventArgs eventArgs)
@@ -169,6 +189,12 @@ namespace LauncherZ.Windows
             ClearAndHideMainWindow();
 #endif
 
+        }
+
+        private void MainWindow_Closed(object sender, EventArgs eventArgs)
+        {
+            // save launch history when closed
+            _app.Configuration.LaunchHistory = _launchHistory.ToArray();
         }
 
         private void MainWindow_PreviewKeyUp(object sender, KeyEventArgs e)
@@ -182,7 +208,7 @@ namespace LauncherZ.Windows
                         .GetPluginContainer(launcherData.PluginId)
                         .PluginInstance
                         .Launch(launcherData);
-                    _lastLaunch = _mwModel.InputText;
+                    PushLaunchHistory(_mwModel.InputText);
                     if (action.HideWindow)
                     {
                         ClearAndHideMainWindow();
@@ -208,29 +234,44 @@ namespace LauncherZ.Windows
             switch (e.Key)
             {
                 case Key.Down:
-                    SelectNextLauncher();
-                    e.Handled = true;
+                    HandleDownKeyPressed(e);
                     break;
                 case Key.Up:
-                    if (string.IsNullOrEmpty(_mwModel.InputText))
-                    {
-                        _mwModel.InputText = _lastLaunch;
-                        _mw.SelectInputText();
-                    }
-                    else
-                    {
-                        SelectPreviousLauncher();
-                    }
-                    e.Handled = true;
+                    HandleUpKeyPressed(e);
                     break;
                 case Key.Escape:
-                    ClearAndHideMainWindow();
-                    e.Handled = true;
+                    HandleEscapeKeyPressed(e);
                     break;
                 default:
                     _mw.FocusInput();
                     break;
             }
+        }
+
+        private void HandleDownKeyPressed(KeyEventArgs e)
+        {
+            SelectNextLauncher();
+            e.Handled = true;
+        }
+
+        private void HandleUpKeyPressed(KeyEventArgs e)
+        {
+            if (string.IsNullOrEmpty(_mwModel.InputText) && _launchHistory.Count > 0)
+            {
+                _mwModel.InputText = _launchHistory.First.Value;
+                _mw.SelectInputText();
+            }
+            else
+            {
+                SelectPreviousLauncher();
+            }
+            e.Handled = true;
+        }
+
+        private void HandleEscapeKeyPressed(KeyEventArgs e)
+        {
+            ClearAndHideMainWindow();
+            e.Handled = true;
         }
 
         private void QueryController_ResultUpdate(object sender, ResultUpdatedEventArgs e)
