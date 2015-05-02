@@ -21,7 +21,7 @@ namespace LauncherZLib.Win32
         /// <see cref="http://msdn.microsoft.com/en-us/library/windows/desktop/ms724211%28v=vs.85%29.aspx"/>
         [DllImport("kernel32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool CloseHandle(IntPtr hObject);
+        internal static extern bool CloseHandle(IntPtr hObject);
 
         /// <summary>
         /// Sets the last-error code for the calling thread.
@@ -29,7 +29,7 @@ namespace LauncherZLib.Win32
         /// <param name="dwErrCode">The last-error code for the thread.</param>
         /// <see cref="http://msdn.microsoft.com/en-us/library/windows/desktop/ms680627(v=vs.85).aspx"/>
         [DllImport("kernel32.dll", SetLastError = true)]
-        static extern void SetLastError(uint dwErrCode);
+        internal static extern void SetLastError(uint dwErrCode);
 
         /// <summary>
         /// Adds a character string to the global atom table and returns a unique value (an atom)
@@ -46,7 +46,7 @@ namespace LauncherZLib.Win32
         /// </returns>
         /// <see cref="http://msdn.microsoft.com/en-us/library/windows/desktop/ms649060%28v=vs.85%29.aspx"/>
         [DllImport("kernel32", SetLastError = true)]
-        public static extern short GlobalAddAtom(string lpString);
+        internal static extern short GlobalAddAtom(string lpString);
 
         /// <summary>
         /// Decrements the reference count of a global string atom. If the atom's reference count
@@ -62,6 +62,6 @@ namespace LauncherZLib.Win32
         /// </returns>
         /// <see cref="http://msdn.microsoft.com/en-us/library/windows/desktop/ms649061(v=vs.85).aspx"/>
         [DllImport("kernel32", SetLastError = true)]
-        public static extern short GlobalDeleteAtom(short nAtom);
+        internal static extern short GlobalDeleteAtom(short nAtom);
     }
 }

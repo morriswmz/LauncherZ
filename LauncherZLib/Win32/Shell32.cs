@@ -9,7 +9,7 @@ namespace LauncherZLib.Win32
 {
     public class Shell32
     {
-        public const int MAX_PATH = 260;
+        internal const int MAX_PATH = 260;
 
         // read more: http://msdn.microsoft.com/en-us/library/windows/desktop/bb762179(v=vs.85).aspx
 
@@ -17,37 +17,37 @@ namespace LauncherZLib.Win32
         /// Version 5.0. Apply the appropriate overlays to the file's icon. The SHGFI_ICON flag
         /// must also be set.
         /// </summary>
-        public const uint SHGFI_ADDOVERLAYS = 0x000000020;
+        internal const uint SHGFI_ADDOVERLAYS = 0x000000020;
         /// <summary>
         /// Retrieve the handle to the icon that represents the file and the index of the icon
         /// within the system image list. The handle is copied to the hIcon member of the structure
         /// specified by psfi, and the index is copied to the iIcon member.
         /// </summary>
-        public const uint SHGFI_ICON = 0x000000100;
+        internal const uint SHGFI_ICON = 0x000000100;
         /// <summary>
         /// Modify SHGFI_ICON, causing the function to retrieve the file's large icon.
         /// The SHGFI_ICON flag must also be set.
         /// </summary>
-        public const uint SHGFI_LARGEICON = 0x000000000;
+        internal const uint SHGFI_LARGEICON = 0x000000000;
         /// <summary>
         /// Modify SHGFI_ICON, causing the function to retrieve the file's small icon. Also used
         /// to modify SHGFI_SYSICONINDEX, causing the function to return the handle to the system
         /// image list that contains small icon images. The SHGFI_ICON and/or SHGFI_SYSICONINDEX
         /// flag must also be set.
         /// </summary>
-        public const uint SHGFI_SMALLICON = 0x000000001;
+        internal const uint SHGFI_SMALLICON = 0x000000001;
         /// <summary>
         /// Modify SHGFI_ICON, causing the function to add the link overlay to the file's icon.
         /// The SHGFI_ICON flag must also be set.
         /// </summary>
-        public const uint SHGFI_LINKOVERLAY = 0x000008000;
+        internal const uint SHGFI_LINKOVERLAY = 0x000008000;
         /// <summary>
         /// Indicates that the function should not attempt to access the file specified by pszPath.
         /// Rather, it should act as if the file specified by pszPath exists with the file attributes
         /// passed in dwFileAttributes. This flag cannot be combined with the SHGFI_ATTRIBUTES,
         /// SHGFI_EXETYPE, or SHGFI_PIDL flags.
         /// </summary>
-        public const uint SHGFI_USEFILEATTRIBUTES = 0x000000010;
+        internal const uint SHGFI_USEFILEATTRIBUTES = 0x000000010;
 
 
 
@@ -79,7 +79,7 @@ namespace LauncherZLib.Win32
         /// <param name="uFlags">The flags that specify the file information to retrieve.</param>
         /// <returns>Returns a value whose meaning depends on the uFlags parameter.</returns>
         [DllImport("shell32.dll")]
-        public static extern IntPtr SHGetFileInfo(string pszPath, uint dwFileAttributes, ref SHFILEINFO psfi, uint cbSizeFileInfo, uint uFlags);
+        internal static extern IntPtr SHGetFileInfo(string pszPath, uint dwFileAttributes, ref SHFILEINFO psfi, uint cbSizeFileInfo, uint uFlags);
     }
     
 }

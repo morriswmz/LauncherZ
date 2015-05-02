@@ -223,17 +223,17 @@ namespace LauncherZLib.Plugin.Loader
                     return pluginAttr;
                 foreach (var namedArgument in attr.NamedArguments)
                 {
-                    if (namedArgument.MemberName == "FriendlyName")
+                    switch (namedArgument.MemberName)
                     {
-                        pluginAttr.FriendlyName = namedArgument.TypedValue.Value as string;
-                    }
-                    else if (namedArgument.MemberName == "Authors")
-                    {
-                        pluginAttr.Authors = namedArgument.TypedValue.Value as string;
-                    }
-                    else if (namedArgument.MemberName == "Version")
-                    {
-                        pluginAttr.Version = namedArgument.TypedValue.Value as string;
+                        case "FriendlyName":
+                            pluginAttr.FriendlyName = namedArgument.TypedValue.Value as string;
+                            break;
+                        case "Authors":
+                            pluginAttr.Authors = namedArgument.TypedValue.Value as string;
+                            break;
+                        case "Version":
+                            pluginAttr.Version = namedArgument.TypedValue.Value as string;
+                            break;
                     }
                 }
                 return pluginAttr;

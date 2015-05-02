@@ -20,31 +20,31 @@ namespace LauncherZLib.Win32
         /// </returns>
         /// <see cref="http://msdn.microsoft.com/en-us/library/windows/desktop/ms648063%28v=vs.85%29.aspx"/>
         [DllImport("user32.dll", SetLastError = true)]
-        public static extern bool DestroyIcon(IntPtr hIcon);
+        internal static extern bool DestroyIcon(IntPtr hIcon);
 
 
         /// <summary>
         /// Alt key modifier.
         /// </summary>
-        public const uint MOD_ALT = 0x0001;
+        internal const uint MOD_ALT = 0x0001;
         /// <summary>
         /// Control key modifier.
         /// </summary>
-        public const uint MOD_CONTROL = 0x0002;
+        internal const uint MOD_CONTROL = 0x0002;
         /// <summary>
         /// Shift key modifier.
         /// </summary>
-        public const uint MOD_SHIFT = 0x0004;
+        internal const uint MOD_SHIFT = 0x0004;
         /// <summary>
         /// Win key modifier.
         /// </summary>
-        public const uint MOD_WIN = 0x0008;
+        internal const uint MOD_WIN = 0x0008;
         /// <summary>
         /// Changes the hotkey behavior so that the keyboard auto-repeat does not yield multiple
         /// hotkey notifications.
         /// Windows Vista and Windows XP/2000:  This flag is not supported.
         /// </summary>
-        public const uint MOD_NOREPEAT = 0x4000;
+        internal const uint MOD_NOREPEAT = 0x4000;
 
         /// <summary>
         /// Posted when the user presses a hot key registered by the RegisterHotKey function.
@@ -52,7 +52,7 @@ namespace LauncherZLib.Win32
         /// registered the hot key.
         /// </summary>
         /// <see cref="http://msdn.microsoft.com/en-us/library/windows/desktop/ms646279%28v=vs.85%29.aspx"/>
-        public const int WM_HOTKEY = 0x312;
+        internal const int WM_HOTKEY = 0x312;
 
         /// <summary>
         /// Defines a system-wide hot key.
@@ -76,7 +76,7 @@ namespace LauncherZLib.Win32
         /// <see cref="http://msdn.microsoft.com/en-us/library/windows/desktop/ms646309(v=vs.85).aspx"/>
         [DllImport("user32", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool RegisterHotKey(IntPtr hwnd, int id, uint fsModifiers, uint vk);
+        internal static extern bool RegisterHotKey(IntPtr hwnd, int id, uint fsModifiers, uint vk);
 
         /// <summary>
         /// Frees a hot key previously registered by the calling thread.
@@ -92,6 +92,6 @@ namespace LauncherZLib.Win32
         /// <see cref="http://msdn.microsoft.com/en-us/library/windows/desktop/ms646327(v=vs.85).aspx"/>
         [DllImport("user32", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool UnregisterHotKey(IntPtr hwnd, int id);
+        internal static extern bool UnregisterHotKey(IntPtr hwnd, int id);
     }
 }

@@ -12,7 +12,7 @@ namespace LauncherZLib.Win32
     /// Read more: http://msdn.microsoft.com/en-us/library/windows/desktop/bb759792(v=vs.85).aspx
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
-    public struct SHFILEINFO
+    internal struct SHFILEINFO
     {
         /// <summary>
         /// A handle to the icon that represents the file. You are responsible for destroying this
