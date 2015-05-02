@@ -97,7 +97,7 @@
     <Compile Include="Plugin\Loader\PluginDiscoverer.cs" />
     <Compile Include="Plugin\PluginEventBus.cs" />
     <Compile Include="Plugin\Loader\PluginLoader.cs" />
-    <Compile Include="Plugin\Service\IPluginServiceProvider.cs" />
+    <Compile Include="Plugin\Service\IExtendedServiceProvider.cs" />
     <Compile Include="Plugin\Service\IPluginInfoProvider.cs" />
     <Compile Include="Plugin\Service\StaticPluginInfoProvider.cs" />
     <Compile Include="Plugin\Service\PluginServiceProvider.cs" />

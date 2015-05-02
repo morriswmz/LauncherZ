@@ -17,7 +17,7 @@ namespace LauncherZLib.Plugin.Service
             get { return _commonServices; }
         }
 
-        public IPluginServiceProvider Create(IDictionary<Type, object> additionalServices)
+        public IExtendedServiceProvider Create(IDictionary<Type, object> additionalServices)
         {
             var sp = new PluginServiceProvider(CommonServices);
             foreach (var pair in additionalServices)

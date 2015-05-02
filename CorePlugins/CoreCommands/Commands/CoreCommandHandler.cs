@@ -9,10 +9,10 @@ namespace CorePlugins.CoreCommands.Commands
 {
     public abstract class CoreCommandHandler : ICommandHandler
     {
-        protected IPluginServiceProvider ServiceProvider;
+        protected IExtendedServiceProvider ServiceProvider;
         protected ILocalizationDictionary Localization;
 
-        protected CoreCommandHandler(IPluginServiceProvider serviceProvider)
+        protected CoreCommandHandler(IExtendedServiceProvider serviceProvider)
         {
             if (serviceProvider == null)
                 throw new ArgumentNullException("serviceProvider");

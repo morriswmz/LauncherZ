@@ -14,13 +14,13 @@ namespace LauncherZLib.Plugin
         /// Activates the plugin.
         /// </summary>
         /// <param name="serviceProvider"></param>
-        void Activate(IPluginServiceProvider serviceProvider);
+        void Activate(IExtendedServiceProvider serviceProvider);
 
         /// <summary>
         /// Deactivates the plugin.
         /// </summary>
         /// <param name="serviceProvider"></param>
-        void Deactivate(IPluginServiceProvider serviceProvider);
+        void Deactivate(IExtendedServiceProvider serviceProvider);
 
         /// <summary>
         /// Queries available commands.

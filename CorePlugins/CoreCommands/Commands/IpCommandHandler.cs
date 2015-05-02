@@ -12,7 +12,7 @@ namespace CorePlugins.CoreCommands.Commands
     public sealed class IpCommandHandler : CoreCommandHandler
     {
 
-        public IpCommandHandler(IPluginServiceProvider serviceProvider) : base(serviceProvider)
+        public IpCommandHandler(IExtendedServiceProvider serviceProvider) : base(serviceProvider)
         {
         }
 

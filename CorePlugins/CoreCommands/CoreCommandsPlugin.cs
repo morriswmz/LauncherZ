@@ -18,7 +18,7 @@ namespace CorePlugins.CoreCommands
 
         private readonly CommandModule<CoreCommandHandler> _commandModule = new CommandModule<CoreCommandHandler>(false); 
 
-        public override void Activate(IPluginServiceProvider serviceProvider)
+        public override void Activate(IExtendedServiceProvider serviceProvider)
         {
             base.Activate(serviceProvider);
             Localization.LoadLanguageFile(
@@ -27,7 +27,7 @@ namespace CorePlugins.CoreCommands
             EventBus.Register(this);
         }
 
-        public override void Deactivate(IPluginServiceProvider serviceProvider)
+        public override void Deactivate(IExtendedServiceProvider serviceProvider)
         {
             EventBus.Unregister(this);
             _commandModule.RemoveAllCommandHandlers();

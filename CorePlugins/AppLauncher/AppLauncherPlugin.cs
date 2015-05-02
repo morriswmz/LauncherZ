@@ -28,7 +28,7 @@ namespace CorePlugins.AppLauncher
         private int _saveTimerId = -1;
         private string _manifestFilePath;
 
-        public override void Activate(IPluginServiceProvider serviceProvider)
+        public override void Activate(IExtendedServiceProvider serviceProvider)
         {
             base.Activate(serviceProvider);
 
@@ -48,7 +48,7 @@ namespace CorePlugins.AppLauncher
             EventBus.Register(this);
         }
 
-        public override void Deactivate(IPluginServiceProvider serviceProvider)
+        public override void Deactivate(IExtendedServiceProvider serviceProvider)
         {
             if (_saveTimerId >= 0)
             {

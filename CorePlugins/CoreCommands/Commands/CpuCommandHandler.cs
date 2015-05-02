@@ -13,7 +13,7 @@ namespace CorePlugins.CoreCommands.Commands
         private readonly PerformanceCounter _cpuCounter;
         private bool _disposed = false;
 
-        public CpuCommandHandler(IPluginServiceProvider serviceProvider) : base(serviceProvider)
+        public CpuCommandHandler(IExtendedServiceProvider serviceProvider) : base(serviceProvider)
         {
             _cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
         }

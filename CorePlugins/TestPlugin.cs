@@ -18,13 +18,13 @@ namespace CorePlugins
         private IEventBus _eventBus;
         private Random _random = new Random();
 
-        public void Activate(IPluginServiceProvider serviceProvider)
+        public void Activate(IExtendedServiceProvider serviceProvider)
         {
             _eventBus = serviceProvider.GetService<IEventBus>();
             _eventBus.Register(this);
         }
 
-        public void Deactivate(IPluginServiceProvider serviceProvider)
+        public void Deactivate(IExtendedServiceProvider serviceProvider)
         {
 
         }

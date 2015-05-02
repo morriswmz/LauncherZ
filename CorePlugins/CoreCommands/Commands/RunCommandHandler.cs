@@ -9,7 +9,7 @@ namespace CorePlugins.CoreCommands.Commands
 {
     public class RunCommandHandler : CoreCommandHandler
     {
-        public RunCommandHandler(IPluginServiceProvider serviceProvider) : base(serviceProvider)
+        public RunCommandHandler(IExtendedServiceProvider serviceProvider) : base(serviceProvider)
         {
         }
 

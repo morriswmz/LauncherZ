@@ -67,13 +67,13 @@ namespace LauncherZLib.Plugin
         /// <summary>
         /// Gets the associated plugin service provider.
         /// </summary>
-        public IPluginServiceProvider ServiceProvider { get; private set; }
+        public IExtendedServiceProvider ServiceProvider { get; private set; }
 
         public IEventBus PluginEventBus { get; private set; }
 
         public PluginStatus Status { get; set; }
 
-        public PluginContainer(IPlugin pluginInstance, PluginDiscoveryInfo discoveryInfo, IPluginServiceProvider serviceProvider)
+        public PluginContainer(IPlugin pluginInstance, PluginDiscoveryInfo discoveryInfo, IExtendedServiceProvider serviceProvider)
         {
             if (pluginInstance == null)
                 throw new ArgumentNullException("pluginInstance");

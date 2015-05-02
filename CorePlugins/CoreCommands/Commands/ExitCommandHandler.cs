@@ -8,7 +8,7 @@ namespace CorePlugins.CoreCommands.Commands
 {
     public sealed class ExitCommandHandler : CoreCommandHandler
     {
-        public ExitCommandHandler(IPluginServiceProvider serviceProvider) : base(serviceProvider)
+        public ExitCommandHandler(IExtendedServiceProvider serviceProvider) : base(serviceProvider)
         {
         }
 

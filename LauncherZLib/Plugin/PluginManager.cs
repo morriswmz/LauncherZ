@@ -273,7 +273,7 @@ namespace LauncherZLib.Plugin
                 }
                 if (pluginInstance != null)
                 {
-                    IPluginServiceProvider serviceProvider = _serviceProviderFactory.Create(
+                    IExtendedServiceProvider serviceProvider = _serviceProviderFactory.Create(
                         new Dictionary<Type, object>()
                         {
                             {typeof (IPluginInfoProvider), new StaticPluginInfoProvider(pdi, dataDirBase)},

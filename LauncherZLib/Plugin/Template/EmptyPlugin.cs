@@ -11,13 +11,13 @@ namespace LauncherZLib.Plugin.Template
 {
     public abstract class EmptyPlugin : IPlugin
     {
-        protected IPluginServiceProvider ServiceProvider;
+        protected IExtendedServiceProvider ServiceProvider;
         protected IPluginInfoProvider PluginInfo;
         protected ILogger Logger;
         protected ILocalizationDictionary Localization;
         protected IEventBus EventBus;
 
-        public virtual void Activate(IPluginServiceProvider serviceProvider)
+        public virtual void Activate(IExtendedServiceProvider serviceProvider)
         {
             // setup context
             ServiceProvider = serviceProvider;
@@ -42,7 +42,7 @@ namespace LauncherZLib.Plugin.Template
             }
         }
 
-        public abstract void Deactivate(IPluginServiceProvider serviceProvider);
+        public abstract void Deactivate(IExtendedServiceProvider serviceProvider);
 
         public abstract IEnumerable<LauncherData> Query(LauncherQuery query);
 
