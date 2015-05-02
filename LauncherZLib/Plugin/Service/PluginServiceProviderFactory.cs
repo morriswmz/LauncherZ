@@ -8,23 +8,32 @@ namespace LauncherZLib.Plugin.Service
     /// </summary>
     public class PluginServiceProviderFactory
     {
+        private static readonly Action<PluginServiceProvider> EmptyInitializer = init => { };
 
-        private readonly Dictionary<Type, object> _commonServices = new Dictionary<Type, object>();
-
-
-        public Dictionary<Type, object> CommonServices
+        private readonly Action<PluginServiceProvider> _commonServiceInitializer;
+        
+        public PluginServiceProviderFactory()
+            : this(EmptyInitializer)
         {
-            get { return _commonServices; }
         }
 
-        public IExtendedServiceProvider Create(IDictionary<Type, object> additionalServices)
+        public PluginServiceProviderFactory(Action<PluginServiceProvider> commonServiceInitializer)
         {
-            var sp = new PluginServiceProvider(CommonServices);
-            foreach (var pair in additionalServices)
-            {
-                sp.AddService(pair.Key, pair.Value);
-            }
+            _commonServiceInitializer = commonServiceInitializer;
+        }
+
+        public PluginServiceProvider Create(Action<PluginServiceProvider> serviceInitializer)
+        {
+            var sp = new PluginServiceProvider();
+            _commonServiceInitializer.Invoke(sp);
+            serviceInitializer.Invoke(sp);
             return sp;
         }
+
+        public PluginServiceProvider Create()
+        {
+            return Create(EmptyInitializer);
+        }
+
     }
 }

@@ -61,6 +61,7 @@ namespace LauncherZLib.Plugin.Service
             }
             serviceObj.ServiceInstance = serviceObj.Initializer();
             serviceObj.Initializer = null;
+            serviceObj.Initialized = true;
             return serviceObj.ServiceInstance;
         }
 

@@ -123,9 +123,9 @@ namespace LauncherZLib.Plugin
                 // remove from disabled
                 _deactivatedPluginIds.Remove(pluginId);
                 // rebuild active list
+                _pluginSorted = false;
                 _activePluginIds.Add(pluginId);
                 _sortedActiveContainers.Add(container);
-                _pluginSorted = false;
                 return true;
             }
             catch (Exception ex)
@@ -158,6 +158,7 @@ namespace LauncherZLib.Plugin
             try
             {
                 // deactivate
+                _logger.Info(string.Format("Sending deactivation signal to {0}.", container));
                 container.PluginInstance.Deactivate(container.ServiceProvider);
                 container.Status = PluginStatus.Deactivated;
             }
@@ -171,13 +172,11 @@ namespace LauncherZLib.Plugin
             }
             finally
             {
-                _logger.Info(string.Format("Deactivated {0} if possible.", container));
                 // remove from active anyway
                 _activePluginIds.Remove(pluginId);
                 _deactivatedPluginIds.Add(pluginId);
                 // just remove, no need to sort again
                 _sortedActiveContainers.Remove(container);
-                // dispatch event
             }
             return true;
         }
@@ -273,14 +272,17 @@ namespace LauncherZLib.Plugin
                 }
                 if (pluginInstance != null)
                 {
-                    IExtendedServiceProvider serviceProvider = _serviceProviderFactory.Create(
-                        new Dictionary<Type, object>()
-                        {
-                            {typeof (IPluginInfoProvider), new StaticPluginInfoProvider(pdi, dataDirBase)},
-                            {typeof (ILogger), _loggerProvider.CreateLogger(pdi.Id)},
-                            {typeof (IEventBus), new PluginEventBus(pdi.Id, _eventBus, _dispatcherService)},
-                            {typeof (ILocalizationDictionary), new LocalizationDictionary()}
-                        });
+                    var pluginInfoProvider = new StaticPluginInfoProvider(pdi, dataDirBase);
+                    var pluginLogger = _loggerProvider.CreateLogger(pdi.Id);
+                    var pluginEventBus = new PluginEventBus(pdi.Id, _eventBus, _dispatcherService);
+                    var pluginLocDict = new Lazy<ILocalizationDictionary>(() => new LocalizationDictionary());
+                    PluginServiceProvider serviceProvider = _serviceProviderFactory.Create(psp =>
+                    {
+                        psp.AddService(typeof(IPluginInfoProvider), pluginInfoProvider);
+                        psp.AddService(typeof(ILogger), pluginLogger);
+                        psp.AddService(typeof(IEventBus), pluginEventBus);
+                        psp.AddService(pluginLocDict);
+                    });
                     var pc = new PluginContainer(pluginInstance, pdi, serviceProvider);
                     _loadedPlugins.Add(pc.PluginId, pc);
                 }

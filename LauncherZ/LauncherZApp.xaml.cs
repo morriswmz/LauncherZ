@@ -184,9 +184,11 @@ namespace LauncherZ
             AppDispatcherService = new SimpleDispatcherService(Dispatcher);
             AppTimerService = new SimpleTimer(Dispatcher);
 
-            var pspFactory = new PluginServiceProviderFactory();
-            pspFactory.CommonServices.Add(typeof(IDispatcherService), AppDispatcherService);
-            pspFactory.CommonServices.Add(typeof(ITimerService), AppTimerService);
+            var pspFactory = new PluginServiceProviderFactory(psp =>
+            {
+                psp.AddService(typeof (IDispatcherService), AppDispatcherService);
+                psp.AddService(typeof(ITimerService), AppTimerService);
+            });
 
             PluginManager = new PluginManager(Logger, AppDispatcherService, pspFactory);
             PluginManager.LoadAllFrom(new String[]

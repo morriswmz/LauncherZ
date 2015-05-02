@@ -10,12 +10,11 @@ namespace CorePlugins.CoreCommands.Commands
 {
     public sealed class CpuCommandHandler : CoreCommandHandler, IDisposable
     {
-        private readonly PerformanceCounter _cpuCounter;
+        private PerformanceCounter _cpuCounter;
         private bool _disposed = false;
 
         public CpuCommandHandler(IExtendedServiceProvider serviceProvider) : base(serviceProvider)
         {
-            _cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
         }
 
         ~CpuCommandHandler()
@@ -71,6 +70,11 @@ namespace CorePlugins.CoreCommands.Commands
 
         public override void HandleTick(CommandLauncherData cmdData)
         {
+            // only initialize when needed
+            if (_cpuCounter == null)
+            {
+                _cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
+            }
             var cpu = (int)_cpuCounter.NextValue();
             var bar = StringUtils.CreateProgressBar("[= ]", 20, cpu / 100.0);
             cmdData.Description = string.Format("[{0}] {1}%\n{2}", bar, cpu, Localization["CpuCommandDescription"]);
