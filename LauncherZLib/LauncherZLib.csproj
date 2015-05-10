@@ -115,7 +115,7 @@
     <Compile Include="Launcher\LauncherData.cs" />
     <Compile Include="Launcher\LauncherList.cs" />
     <Compile Include="Launcher\LauncherQuery.cs" />
-    <Compile Include="QueryController.cs" />
+    <Compile Include="QueryDistributor.cs" />
     <Compile Include="Utils\FileSystemUtils.cs" />
     <Compile Include="Utils\GlobalHotkey.cs" />
     <Compile Include="Utils\IAutoCompletionProvider.cs" />

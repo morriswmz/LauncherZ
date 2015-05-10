@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
 
 namespace LauncherZLib.Launcher
 {
     /// <summary>
     /// Manages launch history.
     /// </summary>
+    /// todo: should also collect plugin usage for reweighting
     [Serializable]
-    public sealed class LaunchHistoryManager
+    public sealed class LaunchHistoryManager : ISerializable
     {
         private LinkedList<string> _history;
 
@@ -29,8 +29,8 @@ namespace LauncherZLib.Launcher
 
         private LaunchHistoryManager(SerializationInfo info, StreamingContext context)
         {
-            var saveHistory = (string[]) info.GetValue("History", typeof (string[]));
-            _history = new LinkedList<string>(saveHistory);
+            var savedHistory = info.GetValue("History", typeof (string[])) as string[];
+            _history = savedHistory == null ? new LinkedList<string>() : new LinkedList<string>(savedHistory);
             MaxHistoryCount = info.GetInt32("MaxHistoryCount");
         }
 
@@ -49,7 +49,7 @@ namespace LauncherZLib.Launcher
             get { return _history; }
         }
 
-        public void PushHistory(string input)
+        public void PushHistory(string input, string pluginId)
         {
             if (string.IsNullOrWhiteSpace(input))
                 return;

@@ -13,12 +13,18 @@ namespace LauncherZLib.Icon
     /// <remarks>
     /// This class is not thread-safe and should be used only in main UI thread .
     /// </remarks>
+    /// TODO: each provider should only handle one domain
     public sealed class IconLibrary
     {
 
         private readonly List<IIconProvider> _providers = new List<IIconProvider>();
-        private readonly Dictionary<IconLocation, List<Action<IconLocation, BitmapSource>>> _callbacks =
-            new Dictionary<IconLocation, List<Action<IconLocation, BitmapSource>>>();
+
+        private readonly Dictionary<string, List<IIconProvider>> _providerMap =
+            new Dictionary<string, List<IIconProvider>>();
+        private readonly Dictionary<IconLocation, List<IconLoadedCallback>> _callbacks =
+            new Dictionary<IconLocation, List<IconLoadedCallback>>();
+
+        public delegate void IconLoadedCallback(IconLocation il, BitmapSource icon);
 
         /// <summary>
         /// Gets or sets the default icon.
@@ -76,17 +82,17 @@ namespace LauncherZLib.Icon
         /// or <see cref="F:LauncheZLib.Icon.IconAvailability.AvailableLater"/>).
         /// </para>
         /// </remarks>
-        public async void GetIconAsync(IconLocation location, Action<IconLocation, BitmapSource> callback)
+        public async void GetIconAsync(IconLocation location, IconLoadedCallback callback)
         {
             // register callback
-            List<Action<IconLocation, BitmapSource>> callbackList;
+            List<IconLoadedCallback> callbackList;
             if (_callbacks.TryGetValue(location, out callbackList))
             {
                 callbackList.Add(callback);
             }
             else
             {
-                callbackList = new List<Action<IconLocation, BitmapSource>> {callback};
+                callbackList = new List<IconLoadedCallback> { callback };
                 _callbacks[location] = callbackList;
             }
             // get icon

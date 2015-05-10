@@ -188,6 +188,7 @@ namespace LauncherZ.Controls
                         _scrolling = true;
                     }
                 }
+                _targetVerticalOffset = Math.Round(_targetVerticalOffset);
             }
             // check if smooth scrolling is enabled
             if (_scrolling && !SmoothScrolling)

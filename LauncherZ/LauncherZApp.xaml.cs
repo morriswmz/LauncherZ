@@ -8,7 +8,9 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using LauncherZ.Windows;
+using LauncherZLib;
 using LauncherZLib.Icon;
+using LauncherZLib.Launcher;
 using LauncherZLib.Matching;
 using LauncherZLib.Plugin;
 using LauncherZLib.Plugin.Service;
@@ -63,6 +65,10 @@ namespace LauncherZ
         internal IconLibrary IconLibrary { get; private set; }
 
         internal SimpleLogger Logger { get; private set; }
+
+        internal LaunchHistoryManager LaunchHistoryManager { get; private set; }
+
+        internal QueryDistributor QueryDistributor { get; private set; }
 
         internal PluginManager PluginManager { get; private set; }
 

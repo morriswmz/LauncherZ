@@ -9,6 +9,7 @@ namespace LauncherZLib.Launcher
     /// Data model for a launcher.
     /// You may extend this class if you wish to store additional data.
     /// </summary>
+    /// todo: remove style properties, they should not be here
     public class LauncherData : INotifyPropertyChanged
     {
 

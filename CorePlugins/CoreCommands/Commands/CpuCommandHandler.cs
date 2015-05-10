@@ -41,6 +41,7 @@ namespace CorePlugins.CoreCommands.Commands
             if (disposing)
             {
                 _cpuCounter.Dispose();
+                _cpuCounter = null;
             }
 
             _disposed = true;

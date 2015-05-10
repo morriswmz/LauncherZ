@@ -8,7 +8,7 @@ using LauncherZLib.Plugin;
 
 namespace LauncherZLib
 {
-    public sealed class QueryController
+    public sealed class QueryDistributor
     {
 
         private readonly PluginManager _pluginManager;
@@ -16,7 +16,7 @@ namespace LauncherZLib
 
         private LauncherQuery _currentQuery;
 
-        public QueryController(PluginManager manager, int maxResults)
+        public QueryDistributor(PluginManager manager, int maxResults)
         {
             if (manager == null)
                 throw new ArgumentNullException("manager");
