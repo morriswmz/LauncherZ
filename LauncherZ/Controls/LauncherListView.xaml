@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              x:Name="CtlCommandListView" x:Class="LauncherZ.Controls.LauncherListView" 
              mc:Ignorable="d" 
-             d:DesignWidth="480" Padding="0,5">
+             d:DesignWidth="480" Padding="0">
     <Grid>
 
         <ScrollViewer x:Name="CtlScrollViewer" x:FieldModifier="private" VerticalScrollBarVisibility="Hidden" HorizontalContentAlignment="Stretch">

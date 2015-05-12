@@ -9,7 +9,7 @@
     <!-- Style for all window borders.  -->
     <Style x:Key="WindowBorderStyle" TargetType="Border">
         <Setter Property="Margin" Value="10"></Setter>
-        <Setter Property="Background" Value="#99000000"></Setter>
+        <Setter Property="Background" Value="#AA000000"></Setter>
         <Setter Property="BorderBrush" Value="#FFCCCCCC"></Setter>
         <Setter Property="BorderThickness" Value="1"></Setter>
         <Setter Property="Effect">
@@ -25,7 +25,7 @@
     
     <!-- Style for hint text. -->
     <Style x:Key="HintTextStyle" TargetType="TextBlock">
-        <Setter Property="Margin" Value="14,10,14,0"></Setter>
+        <Setter Property="Margin" Value="12,8,0,2"></Setter>
         <Setter Property="Foreground" Value="{StaticResource DefaultBorderBrush}"></Setter>
         <Setter Property="FontSize" Value="14"></Setter>
         <Setter Property="TextWrapping" Value="Wrap"></Setter>
@@ -33,11 +33,12 @@
     
     <!-- Style for input. -->
     <Style x:Key="InputTextBoxStyle" TargetType="TextBox">
-        <Setter Property="Padding" Value="2,4"></Setter>
-        <Setter Property="Margin" Value="10,4,10,10"></Setter>
+        <Setter Property="Padding" Value="8,4"></Setter>
+        <Setter Property="Margin" Value="0,4,0,0"></Setter>
         <Setter Property="Height" Value="32"></Setter>
-        <Setter Property="BorderBrush" Value="{StaticResource DefaultBorderBrush}"></Setter>
-        <Setter Property="Background" Value="#19FFFFFF"></Setter>
+        <Setter Property="BorderBrush" Value="#FFAAAAAA"></Setter>
+        <Setter Property="BorderThickness" Value="0,0,0,1"></Setter>
+        <Setter Property="Background" Value="Transparent"></Setter>
         <Setter Property="Foreground" Value="#FFEEEEEE"></Setter>
         <Setter Property="CaretBrush" Value="#FFEEEEEE"></Setter>
         <Setter Property="FontSize" Value="16"></Setter>
@@ -45,7 +46,8 @@
     
     <!-- Style for launcher list. -->
     <Style x:Key="LauncherListStyle" TargetType="controls:LauncherListView">
-        <Setter Property="Margin" Value="10, 0, 10, 10"></Setter>
+        <Setter Property="Margin" Value="0"></Setter>
+        <Setter Property="Padding" Value="0"></Setter>
         <Setter Property="MaxHeight" Value="200"></Setter>
     </Style>
     
@@ -64,7 +66,7 @@
     <!-- Style for highlight box -->
     <Style x:Key="HighlightBoxStyle" TargetType="Rectangle">
         <Setter Property="Fill" Value="#33E8E8E8"></Setter>
-        <Setter Property="Stroke" Value="White"></Setter>
+        <Setter Property="Stroke" Value="Transparent"></Setter>
         <Style.Triggers>
             <Trigger Property="Visibility" Value="Visible">
                 <Trigger.EnterActions>

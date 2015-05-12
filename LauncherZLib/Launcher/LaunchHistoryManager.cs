@@ -13,6 +13,7 @@ namespace LauncherZLib.Launcher
     public sealed class LaunchHistoryManager : ISerializable
     {
         private LinkedList<string> _history;
+        private Dictionary<string, int> _launchCounts;
 
         private int _maxHistoryCount;
 
@@ -25,10 +26,13 @@ namespace LauncherZLib.Launcher
         {
             _maxHistoryCount = maxHistoryCount;
             _history = new LinkedList<string>();
+            _launchCounts = new Dictionary<string, int>();
         }
 
         private LaunchHistoryManager(SerializationInfo info, StreamingContext context)
         {
+            var launchCounts = info.GetValue("LaunchCounts", typeof (Dictionary<string, int>));
+            _launchCounts = launchCounts == null ? new Dictionary<string, int>() : (Dictionary<string, int>) launchCounts;
             var savedHistory = info.GetValue("History", typeof (string[])) as string[];
             _history = savedHistory == null ? new LinkedList<string>() : new LinkedList<string>(savedHistory);
             MaxHistoryCount = info.GetInt32("MaxHistoryCount");
@@ -62,6 +66,17 @@ namespace LauncherZLib.Launcher
             {
                 _history.AddFirst(input);
             }
+            if (!string.IsNullOrWhiteSpace(pluginId))
+            {
+                if (_launchCounts.ContainsKey(pluginId))
+                {
+                    _launchCounts[pluginId]++;
+                }
+                else
+                {
+                    _launchCounts[pluginId] = 1;
+                }
+            }
         }
 
         private void TruncateHistory()
@@ -78,6 +93,7 @@ namespace LauncherZLib.Launcher
         {
             info.AddValue("MaxHistoryCount", _maxHistoryCount);
             info.AddValue("History", _history.ToArray(), typeof (string[]));
+            info.AddValue("LaunchCounts", _launchCounts, typeof(Dictionary<string, int>));
         }
     }
 }
