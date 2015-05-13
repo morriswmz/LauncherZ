@@ -8,6 +8,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
+using LauncherZ.Configuration;
 using LauncherZLib;
 using LauncherZLib.Event.Launcher;
 using LauncherZLib.Launcher;

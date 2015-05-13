@@ -1,48 +1,50 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace LauncherZ
+namespace LauncherZ.Configuration
 {
-    [Serializable]
+    [JsonObject(MemberSerialization.OptIn)]
     public class LauncherZConfig
     {
 
         #region Private Fields
 
-        private int _maxLaunchHistory;
+        private string _theme;
 
         #endregion
 
-        [JsonIgnore]
+        #region Defaults
+
         public static string DefaultActivationKeyCombo
         {
             get { return "Win+OemQuestion"; }
         }
 
+        public static string DefaultTheme
+        {
+            get { return "Default"; }
+        }
+
+        #endregion
+
         public LauncherZConfig()
         {
             Priorities = new Dictionary<string, double>();
             ActivationKeyCombo = DefaultActivationKeyCombo;
-            MaxLaunchHistory = 10;
-            LaunchHistory = new string[0];
+            Theme = DefaultTheme;
         }
 
+        [JsonProperty]
         public string ActivationKeyCombo { get; set; }
 
+        [JsonProperty]
         public Dictionary<string, double> Priorities { get; private set; }
 
-        public int MaxLaunchHistory
+        [JsonProperty]
+        public string Theme
         {
-            get { return _maxLaunchHistory; }
-            set
-            {
-                if (!double.IsNaN(value))
-                    _maxLaunchHistory = Math.Min(Math.Max(value, 1), 1000);
-            }
+            get { return _theme; }
+            set { _theme = value ?? DefaultTheme; }
         }
-
-        public string[] LaunchHistory { get; set; }
-
     }
 }

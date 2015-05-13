@@ -7,6 +7,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using LauncherZ.Configuration;
 using LauncherZ.Windows;
 using LauncherZLib;
 using LauncherZLib.Icon;
@@ -174,6 +175,39 @@ namespace LauncherZ
                 Configuration = new LauncherZConfig();
             }
            
+            // check theme
+            if (string.IsNullOrWhiteSpace(Configuration.Theme))
+            {
+                Configuration.Theme = LauncherZConfig.DefaultTheme;
+            }
+            if (!Configuration.Theme.Equals(LauncherZConfig.DefaultTheme, StringComparison.OrdinalIgnoreCase))
+            {
+                if (File.Exists(Configuration.Theme))
+                {
+                    try
+                    {
+                        var uri = new Uri(Path.GetFullPath(Configuration.Theme), UriKind.Absolute);
+                        var rd = new ResourceDictionary() { Source = uri };
+                        Resources.MergedDictionaries.Clear();
+                        Resources.MergedDictionaries.Add(rd);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error(string.Format("An exception occurred while loading the theme file \"{0}\".{1}{2}",
+                            Configuration.Theme, Environment.NewLine, ex));
+                        var uri = new Uri("pack://application:,,,/Themes/DefaultTheme.xaml", UriKind.Absolute);
+                        Resources.MergedDictionaries.Clear();
+                        Resources.MergedDictionaries.Add(new ResourceDictionary() { Source = uri });
+                        Configuration.Theme = LauncherZConfig.DefaultTheme;
+                    }
+                }
+                else
+                {
+                    Logger.Warning(string.Format("Theme file \"{0}\" does not exist.", Configuration.Theme));
+                    Configuration.Theme = LauncherZConfig.DefaultTheme;
+                }
+            }
+
             // init icon library
             _staticIconProvider = new StaticIconProvider();
             _fileIconProvider = new FileIconProvider(Logger.CreateLogger("FileIconProvider"));
@@ -185,7 +219,7 @@ namespace LauncherZ
             RegitserInternalIcons();
             IconLibrary.DefaultIcon = _staticIconProvider.ProvideIcon(new IconLocation("LauncherZ", "IconBlank"));
             _fileIconProvider.MissingFileIcon = IconLibrary.DefaultIcon;
-            
+
             // init and load plugins
             AppDispatcherService = new SimpleDispatcherService(Dispatcher);
             AppTimerService = new SimpleTimer(Dispatcher);
@@ -216,6 +250,8 @@ namespace LauncherZ
             // load global lexicons
             LoadLexiconsFrom(Path.GetFullPath(@".\Lexicons"));
             LoadLexiconsFrom(LexiconPath);
+
+            
 
             // start main window
             SetUpMainWindow();

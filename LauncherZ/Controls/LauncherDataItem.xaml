@@ -22,8 +22,8 @@
             </Grid.ColumnDefinitions>
             <Image x:Name="CtlIcon" behaviors:LauncherIconBehavior.IconLocation="{Binding IconLocation, Mode=OneWay}" Height="32" Margin="8,8,8,8" Width="32" Grid.Column="0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
             <StackPanel Grid.Column="1" Margin="0,2,5,0" VerticalAlignment="Top">
-                <TextBlock x:Name="CtlTitleText" behaviors:FormattedTextBehavior.FormattedText="{Binding Title, Mode=OneWay}" VerticalAlignment="Top" Style="{DynamicResource TaskTitleStyle}" TextTrimming="CharacterEllipsis" TextWrapping="Wrap" Padding="0,0,0,1" Margin="0,2,0,0" Visibility="{Binding IsTitleVisible, Mode=OneWay, Converter={StaticResource VisibilityConverter}}" FlowDirection="LeftToRight" FontFamily="{Binding TitleFont, Mode=OneWay}"/>
-                <TextBlock x:Name="CtlDescriptionText" behaviors:FormattedTextBehavior.FormattedText="{Binding Description, Mode=OneWay}"  Style="{DynamicResource TaskDescriptionStyle}" Margin="0,0,0,5" Visibility="{Binding IsDescriptionVisible, Mode=OneWay, Converter={StaticResource VisibilityConverter}}" FlowDirection="LeftToRight" FontFamily="{Binding DescriptionFont, Mode=OneWay}" TextWrapping="Wrap" />
+                <TextBlock x:Name="CtlTitleText" behaviors:FormattedTextBehavior.FormattedText="{Binding Title, Mode=OneWay}" VerticalAlignment="Top" Style="{DynamicResource TaskTitleStyle}" TextTrimming="CharacterEllipsis" TextWrapping="Wrap" Padding="0,0,0,1" Margin="0,2,0,0" Visibility="{Binding IsTitleVisible, Mode=OneWay, Converter={StaticResource VisibilityConverter}}" FlowDirection="LeftToRight"/>
+                <TextBlock x:Name="CtlDescriptionText" behaviors:FormattedTextBehavior.FormattedText="{Binding Description, Mode=OneWay}"  Style="{DynamicResource TaskDescriptionStyle}" Margin="0,0,0,5" Visibility="{Binding IsDescriptionVisible, Mode=OneWay, Converter={StaticResource VisibilityConverter}}" FlowDirection="LeftToRight" TextWrapping="Wrap" />
             </StackPanel>
         </Grid> 
     </Border>
