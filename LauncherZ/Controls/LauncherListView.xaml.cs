@@ -85,7 +85,6 @@ namespace LauncherZ.Controls
             DataContextChanged += LauncherListView_DataContextChanged;
             CtlHighlightBox.Visibility = Visibility.Collapsed;
             CompositionTarget.Rendering += CompositionTarget_Rendering;
-           
         }
 
         #region Static Methods
@@ -252,7 +251,7 @@ namespace LauncherZ.Controls
                 }
                 else if (sIdx >= index)
                 {
-                    sIdx++;
+                    SelectedIndex++;
                     ScheduleUpdateHighlightBox();
                 }
             }

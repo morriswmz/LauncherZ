@@ -1,5 +1,6 @@
 ﻿namespace LauncherZLib.Utils
 {
+    // TODO add sublogger support, should accept param[]
     public interface ILogger
     {
         bool IsRunning { get; }

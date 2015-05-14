@@ -1,0 +1,2 @@
+﻿DefaultTheme.xaml and Generic.xaml will be compiled into the assembly.
+Remaining custom themes will be copied to output folder.

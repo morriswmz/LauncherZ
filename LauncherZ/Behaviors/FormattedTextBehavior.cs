@@ -7,7 +7,7 @@ using LauncherZLib.FormattedText;
 
 namespace LauncherZ.Behaviors
 {
-    public static class FormattedTextBehavior
+    internal static class FormattedTextBehavior
     {
 
 

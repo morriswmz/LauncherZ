@@ -152,6 +152,7 @@ namespace LauncherZ
             // leave it unhandled
         }
 
+        // todo: tidy up
         private void InitializeApp()
         {
             AppDomain.CurrentDomain.UnhandledException += Application_UnhandledException;
@@ -160,74 +161,32 @@ namespace LauncherZ
             // initialize logger
             InitializeLogger();
             // load configurations
-            try
-            {
-                Configuration = JsonUtils.StreamDeserialize<LauncherZConfig>(
-                    Path.Combine(LauncherZDataBasePath, AppConfigFileName));
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(string.Format(
-                    "An exception occurred while loading application configuration. Details: {0}{1}",
-                    Environment.NewLine, ex));
-                // default config
-                Logger.Warning("Using default configuration.");
-                Configuration = new LauncherZConfig();
-            }
-           
+            LoadConfigurations();
             // check theme
-            if (string.IsNullOrWhiteSpace(Configuration.Theme))
-            {
-                Configuration.Theme = LauncherZConfig.DefaultTheme;
-            }
-            if (!Configuration.Theme.Equals(LauncherZConfig.DefaultTheme, StringComparison.OrdinalIgnoreCase))
-            {
-                if (File.Exists(Configuration.Theme))
-                {
-                    try
-                    {
-                        var uri = new Uri(Path.GetFullPath(Configuration.Theme), UriKind.Absolute);
-                        var rd = new ResourceDictionary() { Source = uri };
-                        Resources.MergedDictionaries.Clear();
-                        Resources.MergedDictionaries.Add(rd);
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Error(string.Format("An exception occurred while loading the theme file \"{0}\".{1}{2}",
-                            Configuration.Theme, Environment.NewLine, ex));
-                        var uri = new Uri("pack://application:,,,/Themes/DefaultTheme.xaml", UriKind.Absolute);
-                        Resources.MergedDictionaries.Clear();
-                        Resources.MergedDictionaries.Add(new ResourceDictionary() { Source = uri });
-                        Configuration.Theme = LauncherZConfig.DefaultTheme;
-                    }
-                }
-                else
-                {
-                    Logger.Warning(string.Format("Theme file \"{0}\" does not exist.", Configuration.Theme));
-                    Configuration.Theme = LauncherZConfig.DefaultTheme;
-                }
-            }
-
+            SetUpTheme();
             // init icon library
-            _staticIconProvider = new StaticIconProvider();
-            _fileIconProvider = new FileIconProvider(Logger.CreateLogger("FileIconProvider"));
-            var iconBorderBrush = FindResource("IconBorderBrush") as Brush;
-            _fileIconProvider.ThumbnailBorderBrush = iconBorderBrush ?? Brushes.White;
-            IconLibrary = new IconLibrary();
-            IconLibrary.RegisterProvider(_staticIconProvider);
-            IconLibrary.RegisterProvider(_fileIconProvider);
-            RegitserInternalIcons();
-            IconLibrary.DefaultIcon = _staticIconProvider.ProvideIcon(new IconLocation("LauncherZ", "IconBlank"));
-            _fileIconProvider.MissingFileIcon = IconLibrary.DefaultIcon;
-
-            // init and load plugins
+            SetUpIconLibrary();
+            // init basic services
             AppDispatcherService = new SimpleDispatcherService(Dispatcher);
             AppTimerService = new SimpleTimer(Dispatcher);
+            // load plugins
+            LoadPlugins();
+            // load global lexicons
+            LoadLexiconsFrom(Path.GetFullPath(@".\Lexicons"));
+            LoadLexiconsFrom(LexiconPath);
+            // start main window
+            SetUpMainWindow();
+            // finish
+            Logger.Fine("App started successfully.");
+            _appInitialized = true;
+        }
 
+        private void LoadPlugins()
+        {
             var pspFactory = new PluginServiceProviderFactory(psp =>
             {
                 psp.AddService(typeof (IDispatcherService), AppDispatcherService);
-                psp.AddService(typeof(ITimerService), AppTimerService);
+                psp.AddService(typeof (ITimerService), AppTimerService);
             });
 
             PluginManager = new PluginManager(Logger, AppDispatcherService, pspFactory);
@@ -247,21 +206,75 @@ namespace LauncherZ
             {
                 Configuration.Priorities.Add(pluginId, PluginManager.GetPluginPriority(pluginId));
             }
-            // load global lexicons
-            LoadLexiconsFrom(Path.GetFullPath(@".\Lexicons"));
-            LoadLexiconsFrom(LexiconPath);
-
-            
-
-            // start main window
-            SetUpMainWindow();
-
-            // finish
-            Logger.Fine("App started successfully.");
-            _appInitialized = true;
         }
 
-        
+        private void SetUpIconLibrary()
+        {
+            _staticIconProvider = new StaticIconProvider();
+            _fileIconProvider = new FileIconProvider(Logger.CreateLogger("FileIconProvider"));
+            var iconBorderBrush = FindResource("IconBorderBrush") as Brush;
+            _fileIconProvider.ThumbnailBorderBrush = iconBorderBrush ?? Brushes.White;
+            IconLibrary = new IconLibrary();
+            IconLibrary.RegisterProvider(_staticIconProvider);
+            IconLibrary.RegisterProvider(_fileIconProvider);
+            RegitserInternalIcons();
+            IconLibrary.DefaultIcon = _staticIconProvider.ProvideIcon(new IconLocation("LauncherZ", "IconBlank"));
+            _fileIconProvider.MissingFileIcon = IconLibrary.DefaultIcon;
+        }
+
+        private void LoadConfigurations()
+        {
+            try
+            {
+                Configuration = JsonUtils.StreamDeserialize<LauncherZConfig>(
+                    Path.Combine(LauncherZDataBasePath, AppConfigFileName));
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(string.Format(
+                    "An exception occurred while loading application configuration. Details: {0}{1}",
+                    Environment.NewLine, ex));
+                // default config
+                Logger.Warning("Using default configuration.");
+                Configuration = new LauncherZConfig();
+            }
+        }
+
+        private void SetUpTheme()
+        {
+            if (string.IsNullOrWhiteSpace(Configuration.Theme))
+            {
+                Configuration.Theme = LauncherZConfig.DefaultTheme;
+            }
+            if (!Configuration.Theme.Equals(LauncherZConfig.DefaultTheme, StringComparison.OrdinalIgnoreCase))
+            {
+                if (File.Exists(Configuration.Theme))
+                {
+                    try
+                    {
+                        var uri = new Uri(Path.GetFullPath(Configuration.Theme), UriKind.Absolute);
+                        var rd = new ResourceDictionary() {Source = uri};
+                        Resources.MergedDictionaries.Clear();
+                        Resources.MergedDictionaries.Add(rd);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error(string.Format("An exception occurred while loading the theme file \"{0}\".{1}{2}",
+                            Configuration.Theme, Environment.NewLine, ex));
+                        var uri = new Uri("pack://application:,,,/Themes/DefaultTheme.xaml", UriKind.Absolute);
+                        Resources.MergedDictionaries.Clear();
+                        Resources.MergedDictionaries.Add(new ResourceDictionary() {Source = uri});
+                        Configuration.Theme = LauncherZConfig.DefaultTheme;
+                    }
+                }
+                else
+                {
+                    Logger.Warning(string.Format("Theme file \"{0}\" does not exist.", Configuration.Theme));
+                    Configuration.Theme = LauncherZConfig.DefaultTheme;
+                }
+            }
+        }
+
 
         private void SetUpMainWindow()
         {

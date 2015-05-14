@@ -7,7 +7,7 @@ using LauncherZLib.Icon;
 
 namespace LauncherZ.Behaviors
 {
-    public static class LauncherIconBehavior
+    internal static class LauncherIconBehavior
     {
         public static readonly DependencyProperty IconLocationProperty =
             DependencyProperty.RegisterAttached("IconLocation", typeof(string), typeof(LauncherIconBehavior), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender, OnIconLocationChanged));
