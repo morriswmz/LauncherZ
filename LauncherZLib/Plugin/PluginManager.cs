@@ -11,6 +11,7 @@ using LauncherZLib.Utils;
 
 namespace LauncherZLib.Plugin
 {
+    // todo: plugin manager should support register/unregister plugin on the fly. load method should be removed
     public sealed class PluginManager : IAutoCompletionProvider
     {
         // note that id is case insensitive

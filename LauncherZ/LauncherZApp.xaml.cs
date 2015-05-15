@@ -7,6 +7,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using LauncherZ.App;
 using LauncherZ.Configuration;
 using LauncherZ.Windows;
 using LauncherZLib;
@@ -49,14 +50,11 @@ namespace LauncherZ
         /// </summary>
         public string AppGuid { get; private set; }
 
-        public string LauncherZDataBasePath { get; private set; }
-        public string PluginDataPath { get; private set; }
-        public string LogPath { get; private set; }
-        public string LexiconPath { get; private set; }
-
         #endregion
 
         #region Internal Properties
+
+        internal AppSpecialFolderManager SpecialFolderManager { get; private set; }
 
         internal LauncherZConfig Configuration { get; private set; }
 
@@ -123,7 +121,7 @@ namespace LauncherZ
                 try
                 {
                     JsonUtils.StreamSerialize(
-                        Path.Combine(LauncherZDataBasePath, AppConfigFileName), Configuration, Formatting.Indented);
+                        Path.Combine(SpecialFolderManager.UserDataFolder, AppConfigFileName), Configuration, Formatting.Indented);
                 }
                 catch (Exception ex)
                 {
@@ -157,7 +155,8 @@ namespace LauncherZ
         {
             AppDomain.CurrentDomain.UnhandledException += Application_UnhandledException;
             // create app data folders
-            CreateAppDataFolders();
+            SpecialFolderManager = new AppSpecialFolderManager(this);
+            SpecialFolderManager.PrepareFolders();
             // initialize logger
             InitializeLogger();
             // load configurations
@@ -172,8 +171,8 @@ namespace LauncherZ
             // load plugins
             LoadPlugins();
             // load global lexicons
-            LoadLexiconsFrom(Path.GetFullPath(@".\Lexicons"));
-            LoadLexiconsFrom(LexiconPath);
+            LoadLexiconsFrom(SpecialFolderManager.DefaultLexiconFolder);
+            LoadLexiconsFrom(SpecialFolderManager.UserDataFolder);
             // start main window
             SetUpMainWindow();
             // finish
@@ -192,9 +191,9 @@ namespace LauncherZ
             PluginManager = new PluginManager(Logger, AppDispatcherService, pspFactory);
             PluginManager.LoadAllFrom(new String[]
             {
-                Path.GetFullPath(@".\Plugins"),
-                string.Format("{0}{1}Plugins", LauncherZDataBasePath, Path.DirectorySeparatorChar)
-            }, PluginDataPath);
+                SpecialFolderManager.DefaultPluginFolder,
+                SpecialFolderManager.UserPluginFolder
+            }, SpecialFolderManager.PluginDataFolder);
             // set plugin priorities from configuration
             foreach (var pair in Configuration.Priorities)
             {
@@ -227,7 +226,7 @@ namespace LauncherZ
             try
             {
                 Configuration = JsonUtils.StreamDeserialize<LauncherZConfig>(
-                    Path.Combine(LauncherZDataBasePath, AppConfigFileName));
+                    Path.Combine(SpecialFolderManager.UserDataFolder, AppConfigFileName));
             }
             catch (Exception ex)
             {
@@ -288,36 +287,6 @@ namespace LauncherZ
             mw.Show();
         }
 
-        private void CreateAppDataFolders()
-        {
-            string userAppDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            
-#if DEBUG
-            string launcherZDataBasePath = Path.Combine(userAppDataPath, "LauncherZ.Debug." + AppGuid.Substring(0,8));
-#else
-            string appDataBasePath = Path.Combine(userAppDataPath, "LauncherZ." + AppGuid.Substring(0, 8));
-#endif
-            if (!Directory.Exists(launcherZDataBasePath))
-                Directory.CreateDirectory(launcherZDataBasePath);
-
-            string pluginDataPath = Path.Combine(launcherZDataBasePath, "PluginData");
-            if (!Directory.Exists(pluginDataPath))
-                Directory.CreateDirectory(pluginDataPath);
-            
-            string logPath = Path.Combine(launcherZDataBasePath, "Logs");
-            if (!Directory.Exists(logPath))
-                Directory.CreateDirectory(logPath);
-            
-            string lexiconPath = Path.Combine(launcherZDataBasePath, "Lexicons");
-            if (!Directory.Exists(lexiconPath))
-                Directory.CreateDirectory(lexiconPath);
-
-            LauncherZDataBasePath = launcherZDataBasePath;
-            PluginDataPath = pluginDataPath;
-            LogPath = logPath;
-            LexiconPath = lexiconPath;
-        }
-
         private void RegitserInternalIcons()
         {
             string[] internalIconName = { "IconProgram", "IconGear", "IconNetwork", "IconCalculator", "IconFolder", "IconBlank" };
@@ -364,14 +333,16 @@ namespace LauncherZ
         private void InitializeLogger()
         {
             // delete old logs
-            new DirectoryInfo(LogPath)
+            new DirectoryInfo(SpecialFolderManager.LogFolder)
                 .GetFiles("*.log")
                 .OrderByDescending(f => f.LastWriteTime)
                 .Skip(5)
                 .ToList()
                 .ForEach(f => f.Delete());
             // create new one
-            Logger = new SimpleLogger(string.Format("{0}\\{1}.log", LogPath, DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")));
+            string logFilePath = Path.Combine(SpecialFolderManager.LogFolder,
+                string.Format("{0}.log", DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")));
+            Logger = new SimpleLogger(logFilePath);
         }
         
         

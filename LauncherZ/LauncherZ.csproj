@@ -111,6 +111,7 @@
     </Compile>
     <Compile Include="Controls\SelectionRangeAwareTextBox.cs" />
     <Compile Include="Controls\ValueConverters\VisibilityConvertor.cs" />
+    <Compile Include="App\AppSpecialFolderManager.cs" />
     <Compile Include="RelayCommand.cs" />
     <Compile Include="DetailWindow.xaml.cs">
       <DependentUpon>DetailWindow.xaml</DependentUpon>
@@ -238,9 +239,7 @@
       <Name>LauncherZLib</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Init\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
