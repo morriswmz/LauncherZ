@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Media.Imaging;
+using LauncherZLib.Utils;
 
 namespace LauncherZLib.Icon
 {
@@ -13,17 +14,29 @@ namespace LauncherZLib.Icon
     /// </remarks>
     public class StaticIconProvider : IIconProvider, IIconRegisterer
     {
-        protected readonly Dictionary<IconLocation, BitmapSource> _icons = new Dictionary<IconLocation, BitmapSource>(); 
-        
-        public BitmapSource ProvideIcon(IconLocation location)
+        protected readonly string DomainField;
+        protected readonly Dictionary<IconLocation, BitmapSource> _icons = new Dictionary<IconLocation, BitmapSource>();
+
+        public StaticIconProvider(string domain)
         {
-            BitmapSource icon;
-            return _icons.TryGetValue(location, out icon) ? icon : null;
+            if (domain == null)
+                throw new ArgumentNullException("domain");
+            if (!domain.IsProperDomainName())
+                throw new ArgumentException("Domain name contains illegal characters.");
+            DomainField = domain;
         }
 
-        public virtual IconAvailability GetIconAvailability(IconLocation location)
+        public string Domain { get { return DomainField; } }
+
+        public BitmapSource ProvideIcon(string path)
         {
-            return _icons.ContainsKey(location) ? IconAvailability.Available : IconAvailability.NotAvailable;
+            BitmapSource icon;
+            return _icons.TryGetValue(path, out icon) ? icon : null;
+        }
+
+        public virtual IconAvailability GetIconAvailability(string path)
+        {
+            return _icons.ContainsKey(path) ? IconAvailability.Available : IconAvailability.NotAvailable;
         }
 
         public virtual void RegisterIcon(IconLocation location, BitmapSource icon)

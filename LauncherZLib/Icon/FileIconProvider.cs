@@ -41,11 +41,11 @@ namespace LauncherZLib.Icon
         /// </summary>
         public Brush ThumbnailBorderBrush { get; set; }
 
-        public BitmapSource ProvideIcon(IconLocation location)
+        public BitmapSource ProvideIcon(string path1)
         {
-            if (location == null)
-                throw new ArgumentNullException("location");
-            string path = location.Path.Replace('/', '\\');
+            if (path1 == null)
+                throw new ArgumentNullException("path1");
+            string path = path1.Path.Replace('/', '\\');
 
             BitmapSource icon;
             // check cache
@@ -133,12 +133,12 @@ namespace LauncherZLib.Icon
             return MissingFileIcon;
         }
 
-        public IconAvailability GetIconAvailability(IconLocation location)
+        public IconAvailability GetIconAvailability(string path1)
         {
-            if (location == null)
-                throw new ArgumentNullException("location");
-            string path = location.Path.Replace('/', '\\');
-            if (!location.Domain.Equals("file", StringComparison.OrdinalIgnoreCase))
+            if (path1 == null)
+                throw new ArgumentNullException("path1");
+            string path = path1.Path.Replace('/', '\\');
+            if (!path1.Domain.Equals("file", StringComparison.OrdinalIgnoreCase))
                 return IconAvailability.NotAvailable;
             // check cache first
             lock (_cacheLock)

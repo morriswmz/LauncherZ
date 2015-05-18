@@ -10,12 +10,12 @@ namespace LauncherZLib.Icon
         /// <summary>
         /// Registers an icon.
         /// </summary>
-        /// <param name="location"></param>
-        /// <param name="icon"></param>
+        /// <param name="icon">Icon to be registered.</param>
+        /// <returns>Assigned icon location for this icon.</returns>
         /// <exception cref="T:System.ArgumentNullException">
-        /// Thrown when any argument is null.
+        /// Thrown when icon is null.
         /// </exception>
-        void RegisterIcon(IconLocation location, BitmapSource icon);
+        IconLocation RegisterIcon(BitmapSource icon);
 
     }
 }

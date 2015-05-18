@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace LauncherZLib.Utils
 {
@@ -11,10 +9,16 @@ namespace LauncherZLib.Utils
     {
         public static readonly Regex ProperIdPattern = new Regex(@"^[_a-z][_a-z0-9]*(\.[_a-z][_a-z0-9]*)*$",
             RegexOptions.IgnoreCase);
+        public static readonly Regex ProperDomainNamePattern = new Regex(@"^[a-z][a-z0-9]*$");
 
         public static bool IsProperId(this string str)
         {
             return ProperIdPattern.IsMatch(str);
+        }
+
+        public static bool IsProperDomainName(this string str)
+        {
+            return ProperDomainNamePattern.IsMatch(str);
         }
 
         public static string GetSlashEscapedChar(char charAfterSlash)

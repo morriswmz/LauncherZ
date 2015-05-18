@@ -8,6 +8,12 @@ namespace LauncherZLib.Icon
     public interface IIconProvider
     {
         /// <summary>
+        /// Gets the supported domains of this icon provider. Multiple domains are separated by comma.
+        /// The domain name must begin with a letter, and contains only letters and digits.
+        /// </summary>
+        string Domain { get; }
+        
+        /// <summary>
         /// <para>
         /// Provides specified icon.
         /// </para>
