@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using LauncherZ.Icon;
 using LauncherZLib.Launcher;
 using LauncherZLib.Plugin.Service;
 using LauncherZLib.Plugin.Template;
@@ -28,7 +29,7 @@ namespace CorePlugins.CoreCommands.Commands
                 {
                     Title = string.Format(Localization["RunCommandTitle"], string.Join(" ", query.Arguments.Skip(1))),
                     Description = Localization["RunCommandNormalDescription"],
-                    IconLocation = "LauncherZ://IconProgram"
+                    IconLocation = LauncherZIconSet.Program.ToString()
                 }
             };
         }

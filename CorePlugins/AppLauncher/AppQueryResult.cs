@@ -23,11 +23,13 @@ namespace CorePlugins.AppLauncher
 
         public LauncherData CreateLauncherData()
         {
-            return new AppLauncherData(LinkFileLocation, Relevance)
+            // use string data to store link file location
+            return new LauncherData(Relevance)
             {
                 Title = Title, 
                 Description = Description, 
-                IconLocation = "file://" + LinkFileLocation
+                IconLocation = "file://" + LinkFileLocation,
+                StringData = LinkFileLocation
             };
         }
     }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.NetworkInformation;
 using System.Text;
 using System.Windows;
+using LauncherZ.Icon;
 using LauncherZLib.Launcher;
 using LauncherZLib.Plugin.Service;
 using LauncherZLib.Plugin.Template;
@@ -35,7 +36,7 @@ namespace CorePlugins.CoreCommands.Commands
                 {
                     Title = ni.Name,
                     Description = description,
-                    IconLocation = "LauncherZ://IconNetwork",
+                    IconLocation = LauncherZIconSet.Network.ToString(),
                     StringData = description
                 };
             }

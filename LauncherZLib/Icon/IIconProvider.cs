@@ -8,12 +8,6 @@ namespace LauncherZLib.Icon
     public interface IIconProvider
     {
         /// <summary>
-        /// Gets the supported domains of this icon provider. Multiple domains are separated by comma.
-        /// The domain name must begin with a letter, and contains only letters and digits.
-        /// </summary>
-        string Domain { get; }
-        
-        /// <summary>
         /// <para>
         /// Provides specified icon.
         /// </para>
@@ -24,7 +18,9 @@ namespace LauncherZLib.Icon
         /// </para>
         /// </summary>
         /// <param name="location"></param>
-        /// <returns></returns>
+        /// <returns>
+        /// Corresponding bitmap source. Null is permitted.
+        /// </returns>
         /// <exception cref="T:System.ArgumentNullException">
         /// Thrown when <paramref name="location"/> is null.
         /// </exception>
@@ -34,7 +30,9 @@ namespace LauncherZLib.Icon
         /// Gets the availability for specified icon.
         /// </summary>
         /// <param name="location"></param>
-        /// <returns></returns>
+        /// <returns>
+        /// See <see cref="T:LauncherZLib.Icon.IconAvailability"/> for details.
+        /// </returns>
         /// <exception cref="T:System.ArgumentNullException">
         /// Thrown when <paramref name="location"/> is null.
         /// </exception>

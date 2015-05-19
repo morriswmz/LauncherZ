@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Windows.Media.Imaging;
 using LauncherZLib.Utils;
 
@@ -14,8 +15,9 @@ namespace LauncherZLib.Icon
     /// </remarks>
     public class StaticIconProvider : IIconProvider, IIconRegisterer
     {
+        protected int IdCounter = 0;
         protected readonly string DomainField;
-        protected readonly Dictionary<IconLocation, BitmapSource> _icons = new Dictionary<IconLocation, BitmapSource>();
+        protected readonly Dictionary<int, BitmapSource> Icons = new Dictionary<int, BitmapSource>();
 
         public StaticIconProvider(string domain)
         {
@@ -28,24 +30,39 @@ namespace LauncherZLib.Icon
 
         public string Domain { get { return DomainField; } }
 
-        public BitmapSource ProvideIcon(string path)
+        public virtual BitmapSource ProvideIcon(IconLocation location)
         {
+            int id = GetIconId(location);
             BitmapSource icon;
-            return _icons.TryGetValue(path, out icon) ? icon : null;
+            return Icons.TryGetValue(id, out icon) ? icon : null;
         }
 
-        public virtual IconAvailability GetIconAvailability(string path)
+        public virtual IconAvailability GetIconAvailability(IconLocation location)
         {
-            return _icons.ContainsKey(path) ? IconAvailability.Available : IconAvailability.NotAvailable;
+            int id = GetIconId(location);
+            return id >= 0 && Icons.ContainsKey(id) ? IconAvailability.Available : IconAvailability.NotAvailable;
         }
 
-        public virtual void RegisterIcon(IconLocation location, BitmapSource icon)
+        public virtual IconLocation RegisterIcon(BitmapSource icon)
         {
-            if (location == null)
-                throw new ArgumentNullException("location");
             if (icon == null)
+            {
                 throw new ArgumentNullException("icon");
-            _icons[location] = icon;
+            }
+            Icons[IdCounter] = icon;
+            IdCounter++;
+            return new IconLocation(DomainField, (IdCounter-1).ToString(CultureInfo.InvariantCulture));
         }
+
+        protected virtual int GetIconId(IconLocation location)
+        {
+            if (!location.Domain.Equals(DomainField, StringComparison.OrdinalIgnoreCase))
+            {
+                return -1;
+            }
+            int id;
+            return int.TryParse(location.Path, out id) ? id : -1;
+        }
+
     }
 }

@@ -9,6 +9,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using LauncherZ.App;
 using LauncherZ.Configuration;
+using LauncherZ.Icon;
 using LauncherZ.Windows;
 using LauncherZLib;
 using LauncherZLib.Icon;
@@ -209,15 +210,15 @@ namespace LauncherZ
 
         private void SetUpIconLibrary()
         {
-            _staticIconProvider = new StaticIconProvider();
+            _staticIconProvider = new StaticIconProvider("static");
             _fileIconProvider = new FileIconProvider(Logger.CreateLogger("FileIconProvider"));
             var iconBorderBrush = FindResource("IconBorderBrush") as Brush;
             _fileIconProvider.ThumbnailBorderBrush = iconBorderBrush ?? Brushes.White;
             IconLibrary = new IconLibrary();
-            IconLibrary.RegisterProvider(_staticIconProvider);
-            IconLibrary.RegisterProvider(_fileIconProvider);
-            RegitserInternalIcons();
-            IconLibrary.DefaultIcon = _staticIconProvider.ProvideIcon(new IconLocation("LauncherZ", "IconBlank"));
+            IconLibrary.RegisterIconProvider(_staticIconProvider.Domain, _staticIconProvider);
+            IconLibrary.RegisterIconProvider("file", _fileIconProvider);
+            LauncherZIconSet.RegisterIconSet(this, _staticIconProvider);
+            IconLibrary.DefaultIcon = _staticIconProvider.ProvideIcon(LauncherZIconSet.Blank);
             _fileIconProvider.MissingFileIcon = IconLibrary.DefaultIcon;
         }
 
@@ -285,16 +286,6 @@ namespace LauncherZ
                 PluginManager, Logger);
             mainWindowController.Attach(mw);
             mw.Show();
-        }
-
-        private void RegitserInternalIcons()
-        {
-            string[] internalIconName = { "IconProgram", "IconGear", "IconNetwork", "IconCalculator", "IconFolder", "IconBlank" };
-            foreach (var s in internalIconName)
-            {
-                var bitmapImage = FindResource(s) as BitmapImage;
-                _staticIconProvider.RegisterIcon(new IconLocation("LauncherZ", s), bitmapImage);
-            }
         }
 
         private void LoadLexiconsFrom(string path)

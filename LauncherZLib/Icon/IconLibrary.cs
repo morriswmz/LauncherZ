@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
+using LauncherZLib.Utils;
 
 namespace LauncherZLib.Icon
 {
@@ -14,13 +15,12 @@ namespace LauncherZLib.Icon
     /// This class is not thread-safe and should be used only in main UI thread .
     /// </remarks>
     /// TODO: each provider should only handle one domain
-    public sealed class IconLibrary
+    public sealed class IconLibrary : IIconProviderRegistry
     {
 
-        private readonly List<IIconProvider> _providers = new List<IIconProvider>();
-
         private readonly Dictionary<string, List<IIconProvider>> _providerMap =
-            new Dictionary<string, List<IIconProvider>>();
+            new Dictionary<string, List<IIconProvider>>(StringComparer.OrdinalIgnoreCase);
+        private readonly HashSet<IIconProvider> _registeredProviders = new HashSet<IIconProvider>(); 
         private readonly Dictionary<IconLocation, List<IconLoadedCallback>> _callbacks =
             new Dictionary<IconLocation, List<IconLoadedCallback>>();
 
@@ -39,7 +39,9 @@ namespace LauncherZLib.Icon
         /// <returns></returns>
         public IconAvailability GetIconAvailability(IconLocation location)
         {
-            return _providers.Select(iconProvider => iconProvider.GetIconAvailability(location))
+            if (!_providerMap.ContainsKey(location.Domain))
+                return IconAvailability.NotAvailable;
+            return _providerMap[location.Domain].Select(iconProvider => iconProvider.GetIconAvailability(location))
                 .FirstOrDefault(availability => availability != IconAvailability.NotAvailable);
         }
 
@@ -60,7 +62,11 @@ namespace LauncherZLib.Icon
         /// </remarks>
         public BitmapSource GetIcon(IconLocation location)
         {
-            foreach (var iconProvider in _providers)
+            if (!_providerMap.ContainsKey(location.Domain))
+            {
+                return DefaultIcon;
+            }
+            foreach (var iconProvider in _providerMap[location.Domain])
             {
                 if (iconProvider.GetIconAvailability(location) != IconAvailability.NotAvailable)
                     return iconProvider.ProvideIcon(location);
@@ -98,7 +104,7 @@ namespace LauncherZLib.Icon
             // get icon
             IIconProvider provider = null;
             var availability = IconAvailability.NotAvailable;
-            foreach (var p in _providers)
+            foreach (var p in _providerMap[location.Domain])
             {
                 availability = p.GetIconAvailability(location);
                 if (availability != IconAvailability.NotAvailable)
@@ -132,31 +138,50 @@ namespace LauncherZLib.Icon
             }
         }
 
-        /// <summary>
-        /// <para>Registers an icon provider.</para>
-        /// <para>Does nothing if given icon provider is already registered.</para>
-        /// </summary>
-        /// <param name="provider"></param>
-        public void RegisterProvider(IIconProvider provider)
+        public bool IsDomainRegistered(string domain)
         {
-            if (provider == null)
-                throw new ArgumentNullException("provider");
-            if (!_providers.Contains(provider))
+            return _providerMap.ContainsKey(domain);
+        }
+
+        public void RegisterIconProvider(string domains, IIconProvider iconProvider)
+        {
+            if (domains == null)
+                throw new ArgumentNullException("domains");
+            if (iconProvider == null)
+                throw new ArgumentNullException("iconProvider");
+            // retrieve and check domain names
+            string[] domainArr = domains.Split(',');
+            foreach (var d in domainArr)
             {
-                _providers.Add(provider);
+                if (!d.IsProperDomainName())
+                {
+                    throw new ArgumentException(string.Format("{0} is not a valid domain name.", d));
+                }
+            }
+            // remove existing registeration if possible
+            if (_registeredProviders.Contains(iconProvider))
+            {
+                UnregisterIconProvider(iconProvider);
+            }
+            // assign new
+            foreach (var d in domainArr)
+            {
+                if (!_providerMap.ContainsKey(d))
+                {
+                    _providerMap[d] = new List<IIconProvider>(4);
+                }
+                _providerMap[d].Add(iconProvider);
             }
         }
 
-        /// <summary>
-        /// <para>Removes an icon provider.</para>
-        /// <para>Does nothing if given icon provider is not registered.</para>
-        /// </summary>
-        /// <param name="provider"></param>
-        public void RemoveProvider(IIconProvider provider)
+        public void UnregisterIconProvider(IIconProvider iconProvider)
         {
-            if (provider == null)
-                throw new ArgumentNullException("provider");
-            _providers.Remove(provider);
+            if (iconProvider == null)
+                throw new ArgumentNullException("iconProvider");
+            foreach (var l in _providerMap.Values)
+            {
+                l.Remove(iconProvider);
+            }
         }
 
     }

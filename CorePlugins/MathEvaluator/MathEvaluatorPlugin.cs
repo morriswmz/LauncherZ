@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Windows;
+using LauncherZ.Icon;
 using LauncherZLib.Launcher;
 using LauncherZLib.Plugin;
 using LauncherZLib.Plugin.Service;
@@ -39,7 +40,7 @@ namespace CorePlugins.MathEvaluator
                     {
                         Title = val.ToString(CultureInfo.InvariantCulture),
                         Description = Localization["MathEvaluatorDescription"],
-                        IconLocation = "LauncherZ://IconCalculator"
+                        IconLocation = LauncherZIconSet.Calculator.ToString()
                     }
                 };
             }

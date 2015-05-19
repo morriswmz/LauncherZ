@@ -71,7 +71,7 @@
     <Compile Include="Icon\IconLoader.cs" />
     <Compile Include="Icon\IconLocation.cs" />
     <Compile Include="Icon\IconLibrary.cs" />
-    <Compile Include="Icon\IIconProviderRegisterer.cs" />
+    <Compile Include="Icon\IIconProviderRegistry.cs" />
     <Compile Include="Icon\IIconProvider.cs" />
     <Compile Include="Icon\IIconRegisterer.cs" />
     <Compile Include="Icon\StaticIconProvider.cs" />

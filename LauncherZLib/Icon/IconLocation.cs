@@ -1,18 +1,22 @@
 ﻿using System;
+using LauncherZLib.Utils;
 
 namespace LauncherZLib.Icon
 {
-
+    /// <summary>
+    /// Describes the location of an icon.
+    /// </summary>
     public sealed class IconLocation : IEquatable<IconLocation>
     {
-
+        public static readonly IconLocation NotFound = new IconLocation();
         public static readonly string Separator = "://";
 
         private readonly string _domainInvariant;
+        private string _fullString;
 
         /// <summary>
         /// <para>Domain of the icon resource. This property is case insensitive. </para>
-        ////<para>By default, two domains "launcherz" and "file" are defined.</para>
+        ////<para>By default, two domains "static" and "file" are defined.</para>
         /// </summary>
         /// <remarks>
         /// When comparing, domain value will be converted to uppercase using
@@ -44,16 +48,20 @@ namespace LauncherZLib.Icon
             if (string.IsNullOrEmpty(location))
                 throw new ArgumentNullException("location");
             int idx = location.IndexOf(Separator, StringComparison.Ordinal);
-            if (idx >= 0)
+            if (idx > 0)
             {
                 Domain = location.Substring(0, idx);
+                if (!Domain.IsProperDomainName())
+                {
+                    throw new ArgumentException(string.Format("{0} is not a valid domain name.", Domain));
+                }
                 Path = location.Substring(idx + Separator.Length);
             }
             else
             {
-                Domain = "";
-                Path = location;
+                throw new ArgumentException("Domain cannot be empty.");
             }
+            
             Path = Path.Replace('\\', '/');
             _domainInvariant = Domain.ToUpperInvariant();
         }
@@ -69,10 +77,21 @@ namespace LauncherZLib.Icon
                 throw new ArgumentNullException("domain");
             if (path == null)
                 throw new ArgumentNullException("path");
+            if (!domain.IsProperDomainName())
+                throw new ArgumentException(string.Format("{0} is not a valid domain name.", Domain));
 
-            Domain = domain.ToUpperInvariant();
+            Domain = domain;
             Path = path;
             _domainInvariant = Domain.ToUpperInvariant();
+        }
+
+        /// <summary>
+        /// Special constructor for NotFound value. 
+        /// </summary>
+        private IconLocation()
+        {
+            Domain = "";
+            Path = "";
         }
 
         public bool Equals(IconLocation other)
@@ -100,7 +119,7 @@ namespace LauncherZLib.Icon
 
         public override string ToString()
         {
-            return string.IsNullOrEmpty(Domain) ? Path : string.Format("{0}{1}{2}", Domain, Separator, Path);
+            return _fullString ?? (_fullString = string.Format("{0}{1}{2}", Domain, Separator, Path));
         }
     }
 }

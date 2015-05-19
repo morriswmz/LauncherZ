@@ -87,18 +87,14 @@ namespace CorePlugins.AppLauncher
         [SubscribeEvent]
         public void LauncherExecutedHanlder(LauncherExecutedEvent e)
         {
-            var appLauncherData = e.LauncherData as AppLauncherData;
-            if (appLauncherData != null)
+            try
             {
-                try
-                {
-                    Process.Start(appLauncherData.LinkFileLocation);
-                    _manager.IncreaseFrequencyFor(appLauncherData.LinkFileLocation);
-                }
-                catch (Exception)
-                {
-                    Logger.Warning(string.Format("Unable to start process from: {0}", appLauncherData.LinkFileLocation));
-                }
+                Process.Start(e.LauncherData.StringData);
+                _manager.IncreaseFrequencyFor(e.LauncherData.StringData);
+            }
+            catch (Exception)
+            {
+                Logger.Warning(string.Format("Unable to start process from: {0}", e.LauncherData.StringData));
             }
         }
     }

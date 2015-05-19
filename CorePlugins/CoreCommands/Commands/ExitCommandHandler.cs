@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Windows;
+using LauncherZ.Icon;
 using LauncherZLib.Launcher;
 using LauncherZLib.Plugin.Service;
 using LauncherZLib.Plugin.Template;
@@ -25,7 +26,7 @@ namespace CorePlugins.CoreCommands.Commands
                 {
                     Title = Localization["ExitCommandTitle"],
                     Description = Localization["ExitCommandDescription"],
-                    IconLocation = "LauncherZ://IconGear"
+                    IconLocation = LauncherZIconSet.Gear.ToString()
                 }
             };
         }

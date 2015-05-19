@@ -14,8 +14,16 @@ namespace LauncherZ.Icon
         internal static void RegisterIconSet(LauncherZApp app, IIconRegisterer iconRegisterer)
         {
             // "IconProgram", "IconGear", "IconNetwork", "IconCalculator", "IconFolder", "IconBlank"
-            Blank = iconRegisterer.RegisterIcon(app.FindResource("IconBlank") as BitmapSource);
-            Program = iconRegisterer.RegisterIcon(app.FindResource("IconProgram") as BitmapSource);
+            Blank = RegisterIcon(iconRegisterer, app.FindResource("IconBlank") as BitmapSource);
+            Program = RegisterIcon(iconRegisterer, app.FindResource("IconProgram") as BitmapSource);
+            Gear = RegisterIcon(iconRegisterer, app.FindResource("IconGear") as BitmapSource);
+            Network = RegisterIcon(iconRegisterer, app.FindResource("IconNetwork") as BitmapSource);
+            Calculator = RegisterIcon(iconRegisterer, app.FindResource("IconCalculator") as BitmapSource);
+        }
+
+        internal static IconLocation RegisterIcon(IIconRegisterer iconRegisterer, BitmapSource icon)
+        {
+            return icon == null ? IconLocation.NotFound : iconRegisterer.RegisterIcon(icon);
         }
 
     }
