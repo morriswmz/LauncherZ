@@ -192,27 +192,27 @@ namespace LauncherZLib.Utils
 
             public void Info(string msg)
             {
-                Log("[INFO]" + msg);
+                _logger.Log(string.Format("{0}[{1}]{2}", "[INFO]", _category, msg));
             }
 
             public void Fine(string msg)
             {
-                Log("[FINE]" + msg);
+                _logger.Log(string.Format("{0}[{1}]{2}", "[FINE]", _category, msg));
             }
 
             public void Warning(string msg)
             {
-                Log("[WARNING]" + msg);
+                _logger.Log(string.Format("{0}[{1}]{2}", "[WARNING]", _category, msg));
             }
 
             public void Error(string msg)
             {
-                Log("[ERROR]" + msg);
+                _logger.Log(string.Format("{0}[{1}]{2}", "[ERROR]", _category, msg));
             }
 
             public void Severe(string msg)
             {
-                Log("[SEVERE]" + msg);
+                _logger.Log(string.Format("{0}[{1}]{2}", "[SEVERE]", _category, msg));
             }
         }
 

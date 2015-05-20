@@ -151,7 +151,6 @@ namespace LauncherZ
             // leave it unhandled
         }
 
-        // todo: tidy up
         private void InitializeApp()
         {
             AppDomain.CurrentDomain.UnhandledException += Application_UnhandledException;

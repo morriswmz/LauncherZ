@@ -15,7 +15,7 @@ namespace CorePlugins.BookmarkLauncher
         private Dictionary<string, CachedBookmark> _cachedBookmarkMap = new Dictionary<string, CachedBookmark>();
         private CachedBookmark[] _cachedBookmarks;
         private ILogger _logger;
-        private DateTime _lastUpdateTime;
+        private DateTime _lastUpdateTime = DateTime.MinValue;
         private string _cachePath;
 
         private readonly object _taskLock = new object();
@@ -100,6 +100,7 @@ namespace CorePlugins.BookmarkLauncher
                         _lastUpdateTime = DateTime.MinValue;
                     }
                 }
+                _logger.Fine(string.Format("Loaded {0} cached bookmarks.", _cachedBookmarkMap.Count));
             }
             catch (Exception ex)
             {
@@ -128,6 +129,7 @@ namespace CorePlugins.BookmarkLauncher
             try
             {
                 JsonUtils.StreamSerialize(_cachePath, list, Formatting.Indented);
+                _logger.Fine(string.Format("Saved {0} bookmarks.", list.Bookmarks.Length));
             }
             catch (Exception ex)
             {
@@ -186,6 +188,7 @@ namespace CorePlugins.BookmarkLauncher
                     _cachedBookmarks = null;
                     _lastUpdateTime = DateTime.Now;
                 }
+                _logger.Fine(string.Format("Updated {0} bookmarks.", _cachedBookmarkMap.Count));
                 Monitor.Exit(_taskLock);
             }
         }

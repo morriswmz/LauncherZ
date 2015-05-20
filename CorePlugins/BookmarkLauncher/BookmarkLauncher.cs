@@ -76,7 +76,7 @@ namespace CorePlugins.BookmarkLauncher
         {
             string chromePath = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                @"Google\Chrome\User Data\Default");
+                @"Google\Chrome\User Data\Default\Bookmarks");
             return new BookmarkSource[]
             {
                 new BookmarkSource("chrome", chromePath), 
