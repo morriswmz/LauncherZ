@@ -42,9 +42,20 @@ namespace LauncherZLib.Plugin.Template
             }
         }
 
-        public abstract void Deactivate(IExtendedServiceProvider serviceProvider);
+        public virtual void Deactivate(IExtendedServiceProvider serviceProvider)
+        {
+            // clear all references
+            EventBus = null;
+            Localization = null;
+            Logger = null;
+            PluginInfo = null;
+            ServiceProvider = null;
+        }
 
-        public abstract IEnumerable<LauncherData> Query(LauncherQuery query);
+        public virtual IEnumerable<LauncherData> Query(LauncherQuery query)
+        {
+            return LauncherQuery.EmptyResult;
+        }
 
         public virtual PostLaunchAction Launch(LauncherData launcherData)
         {

@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace CorePlugins.AppLauncher
 {
-    [Serializable]
+    [JsonObject(MemberSerialization.OptIn)]
     public class AppManifest
     {
         [JsonProperty(PropertyName = "apps", Required = Required.Always)]
@@ -18,7 +17,7 @@ namespace CorePlugins.AppLauncher
         }
     }
 
-    [Serializable]
+    [JsonObject(MemberSerialization.OptIn)]
     public class AppDescription
     {
         [JsonProperty(PropertyName = "name", Required = Required.Always)]

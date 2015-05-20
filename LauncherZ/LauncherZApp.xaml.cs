@@ -187,6 +187,8 @@ namespace LauncherZ
             {
                 psp.AddService(typeof (IDispatcherService), AppDispatcherService);
                 psp.AddService(typeof (ITimerService), AppTimerService);
+                psp.AddService(typeof (IIconProviderRegistry), IconLibrary);
+                psp.AddService(typeof (IIconRegisterer), _staticIconProvider);
             });
 
             PluginManager = new PluginManager(Logger, AppDispatcherService, pspFactory);

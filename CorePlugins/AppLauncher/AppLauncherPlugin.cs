@@ -57,6 +57,7 @@ namespace CorePlugins.AppLauncher
             }
             _manager.AbortUpdate();
             _manager.SaveManifestToFile();
+            base.Deactivate(serviceProvider);
         }
 
         public override IEnumerable<LauncherData> Query(LauncherQuery query)

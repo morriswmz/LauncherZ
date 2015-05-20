@@ -88,7 +88,7 @@ namespace LauncherZLib.Plugin.Template
         /// IO exceptions and deserialization errors are logged instead of thrown.
         /// Other unrecoverable exceptions will be thrown.
         /// </remarks>
-        protected virtual void LoadConfiguration()
+        public virtual void LoadConfiguration()
         {
             if (!File.Exists(ConfigFilePath))
             {
@@ -128,7 +128,7 @@ namespace LauncherZLib.Plugin.Template
         /// IO exceptions and deserialization errors are logged instead of thrown.
         /// Other unrecoverable exceptions will be thrown.
         /// </remarks>
-        protected virtual void SaveConfiguration()
+        public virtual void SaveConfiguration()
         {
             // check directory
             var dirPath = Path.GetDirectoryName(ConfigFilePath);

@@ -31,6 +31,7 @@ namespace CorePlugins.CoreCommands
         {
             EventBus.Unregister(this);
             _commandModule.RemoveAllCommandHandlers();
+            base.Deactivate(serviceProvider);
         }
 
         protected void AddCommandHandlers()
