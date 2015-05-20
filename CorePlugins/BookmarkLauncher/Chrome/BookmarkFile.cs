@@ -3,7 +3,7 @@
 namespace CorePlugins.BookmarkLauncher.Chrome
 {
     [JsonObject]
-    public class BookmarkFile
+    sealed public class BookmarkFile
     {
         [JsonProperty("checksum")]
         public string Checksum { get; set; }

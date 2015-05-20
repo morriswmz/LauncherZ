@@ -3,7 +3,7 @@
 namespace CorePlugins.BookmarkLauncher.Chrome
 {
     [JsonObject]
-    public class BookmarkItem : IBookmarkItem
+    sealed public class BookmarkItem : IBookmarkItem
     {
         [JsonProperty("children")]
         public BookmarkItem[] Children { get; set; }

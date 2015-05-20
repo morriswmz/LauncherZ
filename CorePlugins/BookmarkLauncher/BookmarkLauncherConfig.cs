@@ -3,19 +3,30 @@
 namespace CorePlugins.BookmarkLauncher
 {
     [JsonObject]
-    class BookmarkLauncherConfig
+    sealed class BookmarkLauncherConfig
     {
         [JsonProperty]
         public BookmarkSource[] BookmarkSources { get; set; }
     }
 
     [JsonObject(MemberSerialization.OptIn)]
-    class BookmarkSource
+    sealed class BookmarkSource
     {
         [JsonProperty]
         public string BrowserType { get; set; }
 
         [JsonProperty]
         public string Path { get; set; }
+
+        public BookmarkSource()
+        {
+            
+        }
+
+        public BookmarkSource(string browserType, string path)
+        {
+            BrowserType = browserType;
+            Path = path;
+        }
     }
 }
