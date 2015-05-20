@@ -104,8 +104,8 @@ namespace LauncherZ.Windows
             catch (Exception)
             {
                 _logger.Warning(
-                    string.Format("{0} is not a vali key combination. Restoring activation hot key to default: {1}.",
-                        _config.ActivationKeyCombo, LauncherZConfig.DefaultActivationKeyCombo));
+                    "{0} is not a vali key combination. Restoring activation hot key to default: {1}.",
+                    _config.ActivationKeyCombo, LauncherZConfig.DefaultActivationKeyCombo);
                 _config.ActivationKeyCombo = LauncherZConfig.DefaultActivationKeyCombo;
                 _switchHotkey = new GlobalHotkey(_config.ActivationKeyCombo);
             }

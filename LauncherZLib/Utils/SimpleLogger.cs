@@ -66,37 +66,40 @@ namespace LauncherZLib.Utils
             }
         }
 
-        public void Log(string msg)
+        public void Log(string msg, params object[] objects)
         {
             if (_logFileValid && _isRunning)
             {
-                _messages.Add(string.Format("[{0}]{1}", DateTime.Now.ToString("s"), msg));
+                _messages.Add(string.Format(
+                    "[{0}]{1}",
+                    DateTime.Now.ToString("s"),
+                    objects.Length == 0 ? msg : string.Format(msg, objects)));
             }
         }
 
-        public void Fine(string msg)
+        public void Fine(string msg, params object[] objects)
         {
-            Log("[FINE]" + msg);
+            Log("[FINE]" + (objects.Length == 0 ? msg : string.Format(msg, objects)));
         }
 
-        public void Info(string msg)
+        public void Info(string msg, params object[] objects)
         {
-            Log("[INFO]" + msg);
+            Log("[INFO]" + (objects.Length == 0 ? msg : string.Format(msg, objects)));
         }
 
-        public void Warning(string msg)
+        public void Warning(string msg, params object[] objects)
         {
-            Log("[WARNING]" + msg);
+            Log("[WARNING]" + (objects.Length == 0 ? msg : string.Format(msg, objects)));
         }
 
-        public void Error(string msg)
+        public void Error(string msg, params object[] objects)
         {
-            Log("[ERROR]" + msg);
+            Log("[ERROR]" + (objects.Length == 0 ? msg : string.Format(msg, objects)));
         }
 
-        public void Severe(string msg)
+        public void Severe(string msg, params object[] objects)
         {
-            Log("[SEVERE]" + msg);
+            Log("[SEVERE]" + (objects.Length == 0 ? msg : string.Format(msg, objects)));
         }
 
         public void Close()
@@ -180,39 +183,39 @@ namespace LauncherZLib.Utils
             public WrappedSimpleLogger(ILogger logger, string category)
             {
                 _logger = logger;
-                _category = category;
+                _category = "[" + category + "]";
             }
 
             public bool IsRunning { get { return _logger.IsRunning; } }
 
-            public void Log(string msg)
+            public void Log(string msg, params object[] objects)
             {
-                _logger.Log(string.Format("[{0}]{1}", _category, msg));
+                _logger.Log(_category + (objects.Length == 0 ? msg : string.Format(msg, objects)));
             }
 
-            public void Info(string msg)
+            public void Info(string msg, params object[] objects)
             {
-                _logger.Log(string.Format("{0}[{1}]{2}", "[INFO]", _category, msg));
+                _logger.Info(_category + (objects.Length == 0 ? msg : string.Format(msg, objects)));
             }
 
-            public void Fine(string msg)
+            public void Fine(string msg, params object[] objects)
             {
-                _logger.Log(string.Format("{0}[{1}]{2}", "[FINE]", _category, msg));
+                _logger.Fine(_category + (objects.Length == 0 ? msg : string.Format(msg, objects)));
             }
 
-            public void Warning(string msg)
+            public void Warning(string msg, params object[] objects)
             {
-                _logger.Log(string.Format("{0}[{1}]{2}", "[WARNING]", _category, msg));
+                _logger.Warning(_category + (objects.Length == 0 ? msg : string.Format(msg, objects)));
             }
 
-            public void Error(string msg)
+            public void Error(string msg, params object[] objects)
             {
-                _logger.Log(string.Format("{0}[{1}]{2}", "[ERROR]", _category, msg));
+                _logger.Error(_category + (objects.Length == 0 ? msg : string.Format(msg, objects)));
             }
 
-            public void Severe(string msg)
+            public void Severe(string msg, params object[] objects)
             {
-                _logger.Log(string.Format("{0}[{1}]{2}", "[SEVERE]", _category, msg));
+                _logger.Severe(_category + (objects.Length == 0 ? msg : string.Format(msg, objects)));
             }
         }
 

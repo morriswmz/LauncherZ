@@ -35,9 +35,9 @@ namespace LauncherZLib.Plugin.Template
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error(string.Format(
+                    Logger.Error(
                         "An exception occurred while creating data directory:{0}{1}",
-                        Environment.NewLine, ex));
+                        Environment.NewLine, ex);
                 }
             }
         }

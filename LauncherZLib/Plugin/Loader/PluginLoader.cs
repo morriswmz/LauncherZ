@@ -36,7 +36,7 @@ namespace LauncherZLib.Plugin.Loader
             // normalize
             if (!File.Exists(pdi.AssemblyPath))
             {
-                _logger.Warning(string.Format("Assembly file \"{0}\" does not exist. Skipped.", pdi.AssemblyPath));
+                _logger.Warning("Assembly file \"{0}\" does not exist. Skipped.", pdi.AssemblyPath);
                 return null;
             }
             var pluginInstance = Activator.CreateInstanceFrom(pdi.AssemblyPath, pdi.PluginClass).Unwrap() as IPlugin;

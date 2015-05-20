@@ -126,9 +126,9 @@ namespace LauncherZ
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error(string.Format(
+                    Logger.Error(
                         "An exception occurred while saving application configuration. Details:{0}{1}",
-                        Environment.NewLine, ex));
+                        Environment.NewLine, ex);
                 }
                 // clean up
                 Logger.Info("Deactivating plugins...");
@@ -140,9 +140,9 @@ namespace LauncherZ
 
         private void Application_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            Logger.Severe(string.Format(
+            Logger.Severe(
                 "An unhandled exception occurred. Application is unstable and terminating. Details: {0}{1}",
-                Environment.NewLine, e.ExceptionObject));
+                Environment.NewLine, e.ExceptionObject);
             // emergency clean up
             if (_appInitialized)
             {
@@ -232,9 +232,8 @@ namespace LauncherZ
             }
             catch (Exception ex)
             {
-                Logger.Error(string.Format(
-                    "An exception occurred while loading application configuration. Details: {0}{1}",
-                    Environment.NewLine, ex));
+                Logger.Error("An exception occurred while loading application configuration. Details: {0}{1}",
+                    Environment.NewLine, ex);
                 // default config
                 Logger.Warning("Using default configuration.");
                 Configuration = new LauncherZConfig();
@@ -260,8 +259,8 @@ namespace LauncherZ
                     }
                     catch (Exception ex)
                     {
-                        Logger.Error(string.Format("An exception occurred while loading the theme file \"{0}\".{1}{2}",
-                            Configuration.Theme, Environment.NewLine, ex));
+                        Logger.Error("An exception occurred while loading the theme file \"{0}\".{1}{2}",
+                            Configuration.Theme, Environment.NewLine, ex);
                         var uri = new Uri("pack://application:,,,/Themes/DefaultTheme.xaml", UriKind.Absolute);
                         Resources.MergedDictionaries.Clear();
                         Resources.MergedDictionaries.Add(new ResourceDictionary() {Source = uri});
@@ -270,7 +269,7 @@ namespace LauncherZ
                 }
                 else
                 {
-                    Logger.Warning(string.Format("Theme file \"{0}\" does not exist.", Configuration.Theme));
+                    Logger.Warning("Theme file \"{0}\" does not exist.", Configuration.Theme);
                     Configuration.Theme = LauncherZConfig.DefaultTheme;
                 }
             }
@@ -302,8 +301,8 @@ namespace LauncherZ
             }
             catch (Exception ex)
             {
-                Logger.Error(string.Format("Faild to get lexicon files from directory \"{0}\". Details:{1}{2}",
-                    path, Environment.NewLine, ex));
+                Logger.Error("Faild to get lexicon files from directory \"{0}\". Details:{1}{2}",
+                    path, Environment.NewLine, ex);
                 return;
             }
             foreach (var l in lexicons)
@@ -311,13 +310,12 @@ namespace LauncherZ
                 try
                 {
                     FlexLexicon.GlobalLexicon.AddFromFile(l);
-                    Logger.Fine(string.Format("Loaded lexicon file \"{0}\".", l));
+                    Logger.Fine("Loaded lexicon file \"{0}\".", l);
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error(string.Format(
-                        "An exception occurred while loading lexicon from \"{0}\". Details:{1}{2}",
-                        l, Environment.NewLine, ex));
+                    Logger.Error("An exception occurred while loading lexicon from \"{0}\". Details:{1}{2}",
+                        l, Environment.NewLine, ex);
                 }
             }
         }

@@ -100,11 +100,11 @@ namespace CorePlugins.BookmarkLauncher
                         _lastUpdateTime = DateTime.MinValue;
                     }
                 }
-                _logger.Fine(string.Format("Loaded {0} cached bookmarks.", _cachedBookmarkMap.Count));
+                _logger.Fine("Loaded {0} cached bookmarks.", _cachedBookmarkMap.Count);
             }
             catch (Exception ex)
             {
-                _logger.Error(string.Format("Failed to load cached bookmarks from \"{0}\". Details: {1}{2}", _cachePath, Environment.NewLine, ex));
+                _logger.Error("Failed to load cached bookmarks from \"{0}\". Details: {1}{2}", _cachePath, Environment.NewLine, ex);
                 lock (_dataLock)
                 {
                     _cachedBookmarkMap.Clear();
@@ -129,11 +129,11 @@ namespace CorePlugins.BookmarkLauncher
             try
             {
                 JsonUtils.StreamSerialize(_cachePath, list, Formatting.Indented);
-                _logger.Fine(string.Format("Saved {0} bookmarks.", list.Bookmarks.Length));
+                _logger.Fine("Saved {0} bookmarks.", list.Bookmarks.Length);
             }
             catch (Exception ex)
             {
-                _logger.Error(string.Format("Failed to save cached bookmarks to \"{0}\". Details: {1}{2}", _cachePath, Environment.NewLine, ex));
+                _logger.Error("Failed to save cached bookmarks to \"{0}\". Details: {1}{2}", _cachePath, Environment.NewLine, ex);
             }
         }
 
@@ -188,7 +188,7 @@ namespace CorePlugins.BookmarkLauncher
                     _cachedBookmarks = null;
                     _lastUpdateTime = DateTime.Now;
                 }
-                _logger.Fine(string.Format("Updated {0} bookmarks.", _cachedBookmarkMap.Count));
+                _logger.Fine("Updated {0} bookmarks.", _cachedBookmarkMap.Count);
                 Monitor.Exit(_taskLock);
             }
         }
@@ -226,14 +226,14 @@ namespace CorePlugins.BookmarkLauncher
                         }
                         catch (Exception ex)
                         {
-                            _logger.Error(string.Format("An exception occurred while reading bookmark. Details:{0}{1}",
-                                Environment.NewLine, ex));
+                            _logger.Error("An exception occurred while reading bookmark. Details:{0}{1}",
+                                Environment.NewLine, ex);
                         }   
                     }
                 }
                 if (!success)
                 {
-                    _logger.Warning(string.Format("Browser type \"{0}\" is not supported.", source.BrowserType));
+                    _logger.Warning("Browser type \"{0}\" is not supported.", source.BrowserType);
                 }
             }
             return bookmarkMap;

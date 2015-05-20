@@ -100,15 +100,14 @@ namespace LauncherZLib.Plugin.Template
                 try
                 {
                     Config = JsonUtils.StreamDeserialize<TC>(ConfigFilePath);
-                    Logger.Fine(string.Format(
-                        "Successfully loaded configuration from: {0}.", ConfigFilePath));
+                    Logger.Fine("Successfully loaded configuration from: {0}.", ConfigFilePath);
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error(string.Format(
+                    Logger.Error(
                         "An exception occurred while loading configuration." +
                         "File might be unaccessible or corrupted. Detailts:{0}{1}",
-                        Environment.NewLine, ex));
+                        Environment.NewLine, ex);
                     Logger.Warning("Loading default configuration as fallback.");
                     Config = DefaultConfigConstructor();
                     // possible corrupted file, replace with default
@@ -134,7 +133,7 @@ namespace LauncherZLib.Plugin.Template
             var dirPath = Path.GetDirectoryName(ConfigFilePath);
             if (dirPath == null)
             {
-                Logger.Error(string.Format("Invalid configuration file path: {0}.", ConfigFilePath));
+                Logger.Error("Invalid configuration file path: {0}.", ConfigFilePath);
                 return;
             }
             if (!Directory.Exists(dirPath))
@@ -145,8 +144,7 @@ namespace LauncherZLib.Plugin.Template
                 }
                 catch (Exception)
                 {
-                    Logger.Error(string.Format(
-                        "Failed to create directory for configuration file: {0}.", ConfigFilePath));
+                    Logger.Error("Failed to create directory for configuration file: {0}.", ConfigFilePath);
                     return;
                 }
             }
@@ -154,13 +152,12 @@ namespace LauncherZLib.Plugin.Template
             try
             {
                 JsonUtils.StreamSerialize(ConfigFilePath, Config, Formatting.Indented);
-                Logger.Fine(string.Format("Successfully saved configuration file: {0}.", ConfigFilePath));
+                Logger.Fine("Successfully saved configuration file: {0}.", ConfigFilePath);
             }
             catch (Exception ex)
             {
-                Logger.Error(string.Format(
-                    "An exception occurred while saving configuration file. Details: {0}{1}",
-                    Environment.NewLine, ex));
+                Logger.Error("An exception occurred while saving configuration file. Details: {0}{1}",
+                    Environment.NewLine, ex);
             }
         }
 

@@ -45,7 +45,7 @@ namespace LauncherZLib.Plugin.Loader
                 string directory = Path.GetFullPath(dir);
                 if (!Directory.Exists(directory))
                 {
-                    _logger.Warning(string.Format("Specified path \"{0}\" does not exist", directory));
+                    _logger.Warning("Specified path \"{0}\" does not exist", directory);
                     continue;
                 }
                 var walker = new SafeDirectoryWalker
@@ -54,7 +54,7 @@ namespace LauncherZLib.Plugin.Loader
                     MaxDepth = 2,
                     SearchPattern = new Regex(@".dll$", RegexOptions.IgnoreCase)
                 };
-                _logger.Info(string.Format("Searching \"{0}\" recursively for plugins.", directory));
+                _logger.Info("Searching \"{0}\" recursively for plugins.", directory);
                 walker.Walk(directory, fi =>
                 {
                     try
@@ -64,9 +64,8 @@ namespace LauncherZLib.Plugin.Loader
                     catch (Exception ex)
                     {
                         _logger.Warning(
-                            string.Format(
-                                "An exception occurred while searching for plugins in \"{0}\". Details:{1}{2}",
-                                fi.FullName, Environment.NewLine, ex));
+                            "An exception occurred while searching for plugins in \"{0}\". Details:{1}{2}",
+                            fi.FullName, Environment.NewLine, ex);
                     }
                     return true;
                 });

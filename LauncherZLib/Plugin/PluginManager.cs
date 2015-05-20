@@ -120,7 +120,7 @@ namespace LauncherZLib.Plugin
                 // activate
                 container.PluginInstance.Activate(container.ServiceProvider);
                 container.Status = PluginStatus.Activated;
-                _logger.Info(string.Format("Successfully activated {0}.", container));
+                _logger.Info("Successfully activated {0}.", container);
                 // remove from disabled
                 _deactivatedPluginIds.Remove(pluginId);
                 // rebuild active list
@@ -131,9 +131,9 @@ namespace LauncherZLib.Plugin
             }
             catch (Exception ex)
             {
-                _logger.Error(string.Format(
+                _logger.Error(
                     "An exception occured while activitng the plugin {0}. Details: {1}{2}",
-                    container, Environment.NewLine, ex));
+                    container, Environment.NewLine, ex);
                 container.Status = PluginStatus.Crashed;
                 return false;
             }
@@ -159,15 +159,15 @@ namespace LauncherZLib.Plugin
             try
             {
                 // deactivate
-                _logger.Info(string.Format("Sending deactivation signal to {0}.", container));
+                _logger.Info("Sending deactivation signal to {0}.", container);
                 container.PluginInstance.Deactivate(container.ServiceProvider);
                 container.Status = PluginStatus.Deactivated;
             }
             catch (Exception ex)
             {
-                _logger.Error(string.Format(
+                _logger.Error(
                     "An exception occured while deactivating the plugin {0}. Details: {1}{2}",
-                    container, Environment.NewLine, ex));
+                    container, Environment.NewLine, ex);
                 container.Status = PluginStatus.Crashed;
                 return false;
             }
@@ -266,10 +266,10 @@ namespace LauncherZLib.Plugin
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error(string.Format(
+                    _logger.Error(
                         "An exception occured while loading plugin with id \"{0}\". Details:{1}{2}",
                         pdi.Id, Environment.NewLine, ex
-                        ));
+                        );
                 }
                 if (pluginInstance != null)
                 {
@@ -352,22 +352,22 @@ namespace LauncherZLib.Plugin
             PluginContainer container;
             if (!_loadedPlugins.TryGetValue(pluginId, out container))
             {
-                _logger.Severe(string.Format(
+                _logger.Severe(
                     "Plugin with id \"{0}\" reported a crash but was never loaded. This is impossible!.",
-                    pluginId));
+                    pluginId);
                 return;
             }
 
             // make sure event is raised on main UI thread.
             _dispatcherService.InvokeAsync(() =>
             {
-                _logger.Error(string.Format(
-                    "Plugin {0} crashed with message: {1}", container, friendlyMsg));
+                _logger.Error(
+                    "Plugin {0} crashed with message: {1}", container, friendlyMsg);
                 // update collection
                 _activePluginIds.Remove(pluginId);
                 _sortedActiveContainers.Remove(container);
                 _deactivatedPluginIds.Add(pluginId);
-                _logger.Info(string.Format("Deactivated {0} if possible.", container));
+                _logger.Info("Deactivated {0} if possible.", container);
             });
         }
 

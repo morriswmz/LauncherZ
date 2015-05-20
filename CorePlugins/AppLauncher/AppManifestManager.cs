@@ -88,7 +88,7 @@ namespace CorePlugins.AppLauncher
         public void SaveManifestToFile()
         {
             if (!JsonUtils.TryStreamSerialize(_manifestPath, _manifest, Formatting.Indented))
-                _logger.Error(string.Format("Failed to save application manifest to {0}", _manifestPath));
+                _logger.Error("Failed to save application manifest to {0}.", _manifestPath);
         }
 
         public bool LoadManifestFromFile()
@@ -96,7 +96,7 @@ namespace CorePlugins.AppLauncher
             AppManifest loadedManifest;
             if (!JsonUtils.TryStreamDeserialize(_manifestPath, out loadedManifest))
             {
-                _logger.Error(string.Format("Failed to load application manifest from {0}", _manifestPath));
+                _logger.Error("Failed to load application manifest from {0}.", _manifestPath);
                 return false;
             }
             _manifest = loadedManifest;

@@ -180,8 +180,7 @@ namespace LauncherZLib.Icon
             }
             catch (Exception ex)
             {
-                _logger.Warning(string.Format(
-                    "Failed to generate thumbnail for: {0}. Details:{1}{2}", path, Environment.NewLine, ex));
+                _logger.Warning("Failed to generate thumbnail for: {0}. Details:{1}{2}", path, Environment.NewLine, ex);
                 return MissingFileIcon;
             }
         }
@@ -194,8 +193,7 @@ namespace LauncherZLib.Icon
             }
             catch (Exception ex)
             {
-                _logger.Warning(string.Format(
-                    "Failed to retrieve icon for: {0}. Details:{1}{2}", path, Environment.NewLine, ex));
+                _logger.Warning("Failed to retrieve icon for: {0}. Details:{1}{2}", path, Environment.NewLine, ex);
                 return MissingFileIcon;
             }
         }
@@ -208,8 +206,7 @@ namespace LauncherZLib.Icon
             }
             catch (Exception ex)
             {
-                _logger.Warning(string.Format(
-                    "Failed to generate directory icon. Details:{0}{1}", Environment.NewLine, ex));
+                _logger.Warning("Failed to generate directory icon. Details:{0}{1}", Environment.NewLine, ex);
                 return MissingFileIcon;
             }
         }
