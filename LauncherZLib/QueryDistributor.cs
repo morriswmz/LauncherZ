@@ -40,8 +40,8 @@ namespace LauncherZLib
 
         public void DistributeQuery(LauncherQuery query)
         {
-            var resultsSync = new List<LauncherData>();
             _currentQuery = query;
+            var resultsSync = new List<LauncherData>();
             foreach (var container in _pluginManager.SortedActivePlugins)
             {
                 if (resultsSync.Count > _maxResults)

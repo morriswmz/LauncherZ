@@ -21,7 +21,7 @@ namespace CorePlugins.AppLauncher
             Relevance = relevance;
         }
 
-        public LauncherData CreateLauncherData()
+        public LauncherData ToLauncherData()
         {
             // use string data to store link file location
             return new LauncherData(Relevance)

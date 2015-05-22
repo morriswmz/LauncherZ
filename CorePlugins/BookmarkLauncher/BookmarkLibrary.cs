@@ -46,7 +46,7 @@ namespace CorePlugins.BookmarkLauncher
         /// <summary>
         /// Gets the enumerator for bookmarks.
         /// </summary>
-        public IEnumerable<IBookmarkItem> Bookmarks
+        public IEnumerable<CachedBookmark> Bookmarks
         {
             get
             {

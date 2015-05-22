@@ -1,10 +1,16 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using CorePlugins.BookmarkLauncher.Chrome;
+using LauncherZLib.Event.Plugin;
+using LauncherZLib.FormattedText;
 using LauncherZLib.Launcher;
+using LauncherZLib.Matching;
 using LauncherZLib.Plugin;
 using LauncherZLib.Plugin.Service;
 using LauncherZLib.Plugin.Template;
@@ -13,7 +19,7 @@ namespace CorePlugins.BookmarkLauncher
 {
     [Plugin("LZBookmarkLauncher", Authors = "morriswmz", FriendlyName = "LauncherZ Bookmark Launcher", Version = "0.1.0.0")]
     [Description("Launches your browser favourites.")]
-    public sealed class BookmarkLauncher : EmptyPlugin
+    public sealed class BookmarkLauncherPlugin : EmptyPlugin
     {
         private ConfigModule<BookmarkLauncherConfig> _configModule;
         private BookmarkLibrary _library; 
@@ -54,9 +60,11 @@ namespace CorePlugins.BookmarkLauncher
 
         public override IEnumerable<LauncherData> Query(LauncherQuery query)
         {
-
+            QueryTask(query);
             return base.Query(query);
         }
+
+       
 
         public override PostLaunchAction Launch(LauncherData launcherData)
         {
@@ -70,6 +78,46 @@ namespace CorePlugins.BookmarkLauncher
                     launcherData.StringData, Environment.NewLine, ex));
             }
             return PostLaunchAction.Default;
+        }
+
+        private void QueryTask(LauncherQuery query)
+        {
+            var mathcer = new FlexMatcher();
+            var scorer = new FlexScorer();
+            var keywords = query.Arguments.ToArray();
+#if DEBUG
+            var sw = new System.Diagnostics.Stopwatch();
+            sw.Start();
+#endif
+            IEnumerable<LauncherData> results = _library.Bookmarks.Select(b =>
+            {
+                FlexMatchResult nameMatch = mathcer.Match(b.Name, keywords, FlexLexicon.GlobalLexicon);
+                FlexMatchResult urlMatch = mathcer.Match(b.Url, keywords, FlexLexicon.GlobalLexicon);
+                double nameScore = scorer.Score(b.Name, nameMatch);
+                double urlScore = scorer.Score(b.Url, urlMatch);
+                double freqScore = (1.0 - Math.Exp(-b.Frequency/5.0));
+                double finalScore = (nameMatch.Success || urlMatch.Success)
+                    ? 0.5*nameScore + 0.3*urlScore + 0.2*freqScore
+                    : 0.0;
+                return finalScore > 0
+                    ? new BookmarkQueryResult(
+                        FormattedTextEngine.ConvertFlexMatchResult(b.Name, nameMatch),
+                        FormattedTextEngine.ConvertFlexMatchResult(b.Url, urlMatch),
+                        b.Url, finalScore)
+                    : null;
+            }).Where(x => x != null)
+                .OrderByDescending(x => x.Relevance)
+                .Take(10)
+                .Select(x => x.ToLauncherData())
+                .ToArray();
+#if DEBUG
+            sw.Stop();
+            System.Diagnostics.Trace.WriteLine(string.Format("Bookmark Query Time: {0}ms", sw.ElapsedMilliseconds));
+#endif
+            if (EventBus != null)
+            {
+                EventBus.Post(new QueryResultUpdateEvent(query.QueryId, results));
+            }
         }
 
         private BookmarkSource[] GetDefaultSources()

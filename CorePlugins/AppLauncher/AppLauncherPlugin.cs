@@ -81,7 +81,7 @@ namespace CorePlugins.AppLauncher
             }
             return candidates.OrderByDescending(x => x.Relevance)
                 .Take(10)
-                .Select(x => x.CreateLauncherData())
+                .Select(x => x.ToLauncherData())
                 .ToArray();
         }
 

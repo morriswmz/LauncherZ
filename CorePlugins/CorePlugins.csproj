@@ -53,9 +53,10 @@
     <Compile Include="AppLauncher\AppManifest.cs" />
     <Compile Include="AppLauncher\AppManifestManager.cs" />
     <Compile Include="AppLauncher\AppQueryResult.cs" />
-    <Compile Include="BookmarkLauncher\BookmarkLauncher.cs" />
+    <Compile Include="BookmarkLauncher\BookmarkLauncherPlugin.cs" />
     <Compile Include="BookmarkLauncher\BookmarkLauncherConfig.cs" />
     <Compile Include="BookmarkLauncher\BookmarkLibrary.cs" />
+    <Compile Include="BookmarkLauncher\BookmarkQueryResult.cs" />
     <Compile Include="BookmarkLauncher\CachedBookmarkList.cs" />
     <Compile Include="BookmarkLauncher\Chrome\BookmarkFile.cs" />
     <Compile Include="BookmarkLauncher\Chrome\BookmarkItem.cs" />

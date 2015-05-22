@@ -294,6 +294,12 @@ namespace LauncherZLib.FormattedText
                 ? string.Format("{0}{1}\\{2}", left, str, right)
                 : string.Format("{0}{1}{2}", left, str, right);
         }
+
+        // todo escape formatters
+        public static string Escape(string str)
+        {
+            throw new NotImplementedException();
+        }
         
         private static TextFormat ModifyFormatByControlChar(TextFormat format, char c)
         {

@@ -5,6 +5,7 @@ namespace LauncherZLib.Matching
     /// <summary>
     /// Represents a match.
     /// </summary>
+    // todo FlexMatch depends on the context, overriding Equals may be inappropriate
     public class FlexMatch
     {
 
