@@ -279,10 +279,9 @@ namespace LauncherZ
         private void SetUpMainWindow()
         {
             var mw = new MainWindow(); // view model is initialized in MainWindow.xaml
-            QueryDistributor = new QueryDistributor(PluginManager, 100);
             LaunchHistoryManager = new LaunchHistoryManager();
             var mainWindowController = new MainWindowController(
-                Configuration, QueryDistributor, LaunchHistoryManager,
+                Configuration, LaunchHistoryManager,
                 PluginManager, Logger);
             mainWindowController.Attach(mw);
             mw.Show();

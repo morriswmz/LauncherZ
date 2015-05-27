@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using LauncherZLib.Event;
 using LauncherZLib.Event.PluginInternal;
-using LauncherZLib.Launcher;
 using LauncherZLib.Plugin;
+using LauncherZLib.Utils;
 
-namespace LauncherZLib
+namespace LauncherZLib.Launcher
 {
     public sealed class QueryDistributor
     {
@@ -29,6 +29,8 @@ namespace LauncherZLib
 
         public event EventHandler<ResultUpdatedEventArgs> ResultUpdate;
 
+        public event EventHandler QueryReset;
+
         public int MaxResults
         {
             get { return _maxResults; }
@@ -41,17 +43,13 @@ namespace LauncherZLib
         public void DistributeQuery(LauncherQuery query)
         {
             _currentQuery = query;
-            var resultsSync = new List<LauncherData>();
+            var resultsSync = new List<TaggedObject<LauncherData>>();
             foreach (var container in _pluginManager.SortedActivePlugins)
             {
                 if (resultsSync.Count > _maxResults)
                     break;
                 var immResults = container.PluginInstance.Query(query);
-                foreach (var launcherData in immResults)
-                {
-                    launcherData.PluginId = container.PluginId;
-                    resultsSync.Add(launcherData);
-                }
+                resultsSync.AddRange(immResults.Select(launcherData => new TaggedObject<LauncherData>(container.PluginId, launcherData)));
             }
             if (resultsSync.Count > 0)
             {
@@ -62,9 +60,12 @@ namespace LauncherZLib
         public void ClearCurrentQuery()
         {
             _currentQuery = null;
+            var handlers = QueryReset;
+            if (handlers != null)
+                handlers(this, EventArgs.Empty);
         }
 
-        private void RaiseResultUpdateEvent(IEnumerable<LauncherData> results)
+        private void RaiseResultUpdateEvent(IEnumerable<TaggedObject<LauncherData>> results)
         {
             EventHandler<ResultUpdatedEventArgs> handler = ResultUpdate;
             if (handler != null)
@@ -78,12 +79,8 @@ namespace LauncherZLib
         {
             if (_currentQuery == null || _currentQuery.QueryId != e.BaseEvent.QueryId || e.BaseEvent.Results == null)
                 return;
-            // assign plugin id;
-            foreach (var launcherData in e.BaseEvent.Results)
-            {
-                launcherData.PluginId = e.SourceId;
-            }
-            RaiseResultUpdateEvent(e.BaseEvent.Results);
+            // assign plugin id and raise update event
+            RaiseResultUpdateEvent(e.BaseEvent.Results.Select(l => new TaggedObject<LauncherData>(e.SourceId, l)));
         }
 
         #endregion
@@ -91,11 +88,11 @@ namespace LauncherZLib
 
     public class ResultUpdatedEventArgs : EventArgs
     {
-        public IEnumerable<LauncherData> Updates { get; private set; }
+        public IEnumerable<TaggedObject<LauncherData>> Updates { get; private set; }
 
-        public ResultUpdatedEventArgs(IEnumerable<LauncherData> updates)
+        public ResultUpdatedEventArgs(IEnumerable<TaggedObject<LauncherData>> updates)
         {
-            Updates = updates ?? Enumerable.Empty<LauncherData>();
+            Updates = updates ?? Enumerable.Empty<TaggedObject<LauncherData>>();
         }
     }
 

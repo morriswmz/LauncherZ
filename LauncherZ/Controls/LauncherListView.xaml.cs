@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -70,7 +71,7 @@ namespace LauncherZ.Controls
         #region Private Fields
 
         private readonly Queue<LauncherDataItem> _recycledItems = new Queue<LauncherDataItem>(); 
-        private LauncherList _launcherList;
+        private IList<LauncherData> _launcherList;
 
         private bool _updatingHighlightBox = false;
         private double _targetVerticalOffset = 0.0;
@@ -366,32 +367,39 @@ namespace LauncherZ.Controls
         {
             if (e.NewValue == null)
             {
-                LauncherListCollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-                if (_launcherList != null)
+                LauncherList_CollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+                if (_launcherList is INotifyCollectionChanged)
                 {
-                    _launcherList.CollectionChanged -= LauncherListCollectionChanged;
+                    ((INotifyCollectionChanged) _launcherList).CollectionChanged -= LauncherList_CollectionChanged;
                     _launcherList = null;
                 }
             }
             else
             {
-                var newList = e.NewValue as LauncherList;
+                var newList = e.NewValue as IList<LauncherData>;
                 // safely ignore non-compatible data context
                 if (newList != null)
                 {
-                    if (_launcherList != null)
-                        _launcherList.CollectionChanged -= LauncherListCollectionChanged;
+                    var oldObservableList = _launcherList as INotifyCollectionChanged;
+                    if (oldObservableList != null)
+                    {
+                        oldObservableList.CollectionChanged -= LauncherList_CollectionChanged;
+                    }
                     _launcherList = newList;
-                    _launcherList.CollectionChanged += LauncherListCollectionChanged;
+                    var newObservableList = newList as INotifyCollectionChanged;
+                    if (newObservableList != null)
+                    {
+                        newObservableList.CollectionChanged += LauncherList_CollectionChanged;
+                    }
                     // reset entries
-                    LauncherListCollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-                    LauncherListCollectionChanged(this, new NotifyCollectionChangedEventArgs(
+                    LauncherList_CollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+                    LauncherList_CollectionChanged(this, new NotifyCollectionChangedEventArgs(
                         NotifyCollectionChangedAction.Add, new List<LauncherData>(newList), 0));
                 }
             }
         }
 
-        private void LauncherListCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void LauncherList_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             switch (e.Action)
             {

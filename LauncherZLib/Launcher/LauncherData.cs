@@ -9,7 +9,6 @@ namespace LauncherZLib.Launcher
     /// Data model for a launcher.
     /// You may extend this class if you wish to store additional data.
     /// </summary>
-    /// todo: remove style properties, they should not be here
     public class LauncherData : INotifyPropertyChanged
     {
 
@@ -18,10 +17,8 @@ namespace LauncherZLib.Launcher
 
         private string _title = "";
         private string _description = "";
-        private bool _isDescriptionVisible = true;
-        private bool _isTitleVisible = true;
-        private string _titleFont = DefaultFontFamily;
-        private string _descriptionFont = DefaultFontFamily;
+        private bool _usesDescription = true;
+        private bool _usesTitle = true;
         private string _iconLocation = "";
         private readonly double _relevance;
         private readonly long _uniqueId;
@@ -95,14 +92,14 @@ namespace LauncherZLib.Launcher
         /// Gets or sets the title visibility.
         /// Triggers PropertyChanged event.
         /// </summary>
-        public bool IsTitleVisible
+        public bool UsesTitle
         {
-            get { return _isTitleVisible; }
+            get { return _usesTitle; }
             set
             {
-                if (_isTitleVisible != value)
+                if (_usesTitle != value)
                 {
-                    _isTitleVisible = value;
+                    _usesTitle = value;
                     RaisePropertyChangedEvent();
                 }
             }
@@ -112,50 +109,14 @@ namespace LauncherZLib.Launcher
         /// Gets or sets the description visibility.
         /// Triggers PropertyChanged event.
         /// </summary>
-        public bool IsDescriptionVisible
+        public bool UsesDescription
         {
-            get { return _isDescriptionVisible; }
+            get { return _usesDescription; }
             set
             {
-                if (_isDescriptionVisible != value)
+                if (_usesDescription != value)
                 {
-                    _isDescriptionVisible = value;
-                    RaisePropertyChangedEvent();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the font family of the title.
-        /// Triggers PropertyChanged event.
-        /// </summary>
-        public string TitleFont
-        {
-            get { return _titleFont; }
-            set
-            {
-                string newFont = value ?? DefaultFontFamily;
-                if (!_titleFont.Equals(newFont, StringComparison.OrdinalIgnoreCase))
-                {
-                    _titleFont = newFont;
-                    RaisePropertyChangedEvent();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the font family of the description.
-        /// Triggers PropertyChanged event.
-        /// </summary>
-        public string DescriptionFont
-        {
-            get { return _descriptionFont; }
-            set
-            {
-                string newFont = value ?? DefaultFontFamily;
-                if (!_descriptionFont.Equals(newFont, StringComparison.OrdinalIgnoreCase))
-                {
-                    _descriptionFont = newFont;
+                    _usesDescription = value;
                     RaisePropertyChangedEvent();
                 }
             }
@@ -188,14 +149,7 @@ namespace LauncherZLib.Launcher
         {
             get { return _relevance; }
         }
-
         
-        /// <summary>
-        /// Gets or sets the plugin id associated with this command.
-        /// Internal usage only.
-        /// </summary>
-        public string PluginId { get; internal set; }
-
         /// <summary>
         /// Gets or sets whether this launcher is tickable.
         /// </summary>
@@ -250,7 +204,7 @@ namespace LauncherZLib.Launcher
                 "LauncherZ|IconBlank", 0.0
                 )
         {
-            DescriptionFont = "Seoge UI";
+            
         }
 
         public LauncherDataDesignTime() : this(1) { }

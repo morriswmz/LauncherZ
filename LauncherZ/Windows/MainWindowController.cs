@@ -31,6 +31,7 @@ namespace LauncherZ.Windows
         private LaunchHistoryManager _historyManager;
         private PluginManager _pluginManager;
         private QueryDistributor _queryDistributor;
+        private ResultManager _resultManager;
         private ILogger _logger;
         private DispatcherTimer _inputDelayTimer;
         private DispatcherTimer _tickTimer;
@@ -42,13 +43,11 @@ namespace LauncherZ.Windows
         private bool _mwDeactivating;
         private bool _mwActivating;
 
-        public MainWindowController(LauncherZConfig config, QueryDistributor queryDistributor,
-            LaunchHistoryManager historyManager, PluginManager pluginManager, ILogger logger)
+        public MainWindowController(LauncherZConfig config, LaunchHistoryManager historyManager,
+            PluginManager pluginManager, ILogger logger)
         {
             if (config == null)
                 throw new ArgumentNullException("config");
-            if (queryDistributor == null)
-                throw new ArgumentNullException("queryDistributor");
             if (historyManager == null)
                 throw new ArgumentNullException("historyManager");
             if (pluginManager == null)
@@ -57,7 +56,6 @@ namespace LauncherZ.Windows
                 throw new ArgumentNullException("logger");
 
             _config = config;
-            _queryDistributor = queryDistributor;
             _historyManager = historyManager;
             _pluginManager = pluginManager;
             _logger = logger;
@@ -67,6 +65,10 @@ namespace LauncherZ.Windows
         {
             if (_attached)
                 Detach();
+
+            // prepare components
+            _queryDistributor = new QueryDistributor(_pluginManager, _config.MaxResultCount);
+            _resultManager = new ResultManager(_pluginManager, _queryDistributor);
 
             // set up data context
             _mw = mw;
@@ -78,13 +80,9 @@ namespace LauncherZ.Windows
 
             // link to model
             _lastSelectedLauncher = _mwModel.SelectedLauncher;
-            _mwModel.Launchers = new LauncherList(new LauncherDataComparer(_pluginManager));
-            _mwModel.Launchers.CollectionChanged += Launchers_CollectionChanged;
+            _mwModel.Launchers = _resultManager.Results;
+            ((INotifyCollectionChanged) _mwModel.Launchers).CollectionChanged += Launchers_CollectionChanged;
             _mwModel.PropertyChanged += Model_PropertyChanged;
-
-            // set up query controller
-            _queryDistributor = new QueryDistributor(_pluginManager, 100);
-            _queryDistributor.ResultUpdate += QueryDistributorResultUpdate;
 
             // setup timers
             _inputDelayTimer = new DispatcherTimer();
@@ -132,12 +130,15 @@ namespace LauncherZ.Windows
                 _switchHotkey.Dispose();
             }
 
-            _mwModel.Launchers.CollectionChanged -= Launchers_CollectionChanged;
+            ((INotifyCollectionChanged)_mwModel.Launchers).CollectionChanged -= Launchers_CollectionChanged;
             _mwModel.PropertyChanged -= Model_PropertyChanged;
-            _queryDistributor.ResultUpdate -= QueryDistributorResultUpdate;
+            _mwModel.Launchers = null;
+            _mwModel = null;
+
             _inputDelayTimer.Tick -= InputDelayTimer_Tick;
             _inputDelayTimer.Stop();
             _inputDelayTimer = null;
+
             _tickTimer.Tick -= TickTimer_Tick;
             _tickTimer.Stop();
             _tickTimer = null;
@@ -146,9 +147,7 @@ namespace LauncherZ.Windows
             _mw.PreviewKeyDown -= MainWindow_PreviewKeyDown;
             _mw.Deactivated -= MainWindow_Deactivated;
             _mw.Closed -= MainWindow_Closed;
-
             _mw = null;
-            _mwModel = null;
 
             _attached = false;
         }
@@ -166,8 +165,7 @@ namespace LauncherZ.Windows
                 _mwDeactivating = true;
                 _mwModel.InputText = "";
                 // force clear
-                _queryDistributor.ClearCurrentQuery();
-                _mwModel.Launchers.Clear();
+                ClearResults();
                 // ensure render updates
                 // otherwise we may see phantoms upon shown
                 _mw.Dispatcher.InvokeAsync(() =>
@@ -212,6 +210,11 @@ namespace LauncherZ.Windows
             }
         }
 
+        private void ClearResults()
+        {
+            _queryDistributor.ClearCurrentQuery();
+        }
+
         #region Event Handlers
 
         private void MainWindow_Deactivated(object sender, EventArgs eventArgs)
@@ -236,11 +239,12 @@ namespace LauncherZ.Windows
                 LauncherData launcherData = _mwModel.SelectedLauncher;
                 if (launcherData != null)
                 {
+                    var pluginId = _resultManager.GetPluginIdOf(launcherData);
                     PostLaunchAction action = _pluginManager
-                        .GetPluginContainer(launcherData.PluginId)
+                        .GetPluginContainer(pluginId)
                         .PluginInstance
                         .Launch(launcherData);
-                    _historyManager.PushHistory(_mwModel.InputText, launcherData.PluginId);
+                    _historyManager.PushHistory(_mwModel.InputText, pluginId);
                     if (action.HideWindow)
                     {
                         ClearAndHideMainWindow();
@@ -306,15 +310,6 @@ namespace LauncherZ.Windows
             e.Handled = true;
         }
 
-        private void QueryDistributorResultUpdate(object sender, ResultUpdatedEventArgs e)
-        {
-            _mwModel.Launchers.AddRange(e.Updates);
-            foreach (var launcherData in e.Updates)
-            {
-                _pluginManager.DistributeEventTo(launcherData.PluginId, new LauncherAddedEvent(launcherData));
-            }
-        }
-
         private void Model_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
@@ -333,13 +328,13 @@ namespace LauncherZ.Windows
                     // selection changed
                     if (_lastSelectedLauncher != null)
                     {
-                        _pluginManager.DistributeEventTo(_lastSelectedLauncher.PluginId,
+                        _pluginManager.DistributeEventTo(_resultManager.GetPluginIdOf(_lastSelectedLauncher),
                             new LauncherDeselectedEvent(_lastSelectedLauncher));
                     }
                     LauncherData newLauncher = _mwModel.SelectedLauncher;
                     if (newLauncher != null)
                     {
-                        _pluginManager.DistributeEventTo(newLauncher.PluginId,
+                        _pluginManager.DistributeEventTo(_resultManager.GetPluginIdOf(newLauncher),
                             new LauncherSelectedEvent(newLauncher));
                     }
                     _lastSelectedLauncher = newLauncher;
@@ -372,22 +367,24 @@ namespace LauncherZ.Windows
                 _tickTimerDivider = 0;
                 tickSlow = true;
             }
-            foreach (var launcherData in _mwModel.Launchers.Where(l => l.Tickable))
+            foreach (
+                var pair in
+                    _resultManager.Results.Where(l => l.Tickable)
+                        .Select(l => new KeyValuePair<string, LauncherData>(_resultManager.GetPluginIdOf(l), l)))
             {
-                bool shouldTick = launcherData.CurrentTickRate == TickRate.Fast;
-                shouldTick = shouldTick || (tickNormal && launcherData.CurrentTickRate == TickRate.Normal);
-                shouldTick = shouldTick || (tickSlow && launcherData.CurrentTickRate == TickRate.Slow);
+                bool shouldTick = pair.Value.CurrentTickRate == TickRate.Fast;
+                shouldTick = shouldTick || (tickNormal && pair.Value.CurrentTickRate == TickRate.Normal);
+                shouldTick = shouldTick || (tickSlow && pair.Value.CurrentTickRate == TickRate.Slow);
                 if (shouldTick)
                 {
-                    _pluginManager.DistributeEventTo(launcherData.PluginId, new LauncherTickEvent(launcherData));
+                    _pluginManager.DistributeEventTo(pair.Key, new LauncherTickEvent(pair.Value));
                 }
             }
         }
 
         private void InputDelayTimer_Tick(object sender, EventArgs eventArgs)
         {
-            _queryDistributor.ClearCurrentQuery();
-            _mwModel.Launchers.Clear();
+            ClearResults();
             if (!string.IsNullOrWhiteSpace(_mwModel.InputText))
             {
                 _queryDistributor.DistributeQuery(new LauncherQuery(_mwModel.InputText.Trim()));

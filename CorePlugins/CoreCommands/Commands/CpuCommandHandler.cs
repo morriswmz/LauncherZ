@@ -56,7 +56,6 @@ namespace CorePlugins.CoreCommands.Commands
                 {
                     Title = Localization["CpuCommandTitle"],
                     Description = Localization["CpuCommandDescription"],
-                    DescriptionFont = "Segoe UI Mono",
                     IconLocation = LauncherZIconSet.Gear.ToString(),
                     Tickable = true,
                     CurrentTickRate = TickRate.Normal

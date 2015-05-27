@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace LauncherZ.Configuration
@@ -10,6 +11,7 @@ namespace LauncherZ.Configuration
         #region Private Fields
 
         private string _theme;
+        private int _maxResultCount;
 
         #endregion
 
@@ -25,13 +27,26 @@ namespace LauncherZ.Configuration
             get { return "Default"; }
         }
 
+        public static int DefaultMaxResultCount
+        {
+            get { return 100; }
+        }
+
         #endregion
 
         public LauncherZConfig()
         {
+            MaxResultCount = DefaultMaxResultCount;
             Priorities = new Dictionary<string, double>();
             ActivationKeyCombo = DefaultActivationKeyCombo;
             Theme = DefaultTheme;
+        }
+
+        [JsonProperty]
+        public int MaxResultCount
+        {
+            get { return _maxResultCount; }
+            set { _maxResultCount = Math.Max(1, value); }
         }
 
         [JsonProperty]

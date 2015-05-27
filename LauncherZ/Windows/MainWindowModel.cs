@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using LauncherZ.Controls;
@@ -11,7 +11,7 @@ namespace LauncherZ.Windows
 
         private string _inputText = "";
         private SelectionRange _inputSelectionRange = new SelectionRange(0, 0);
-        private LauncherList _launchers;
+        private ReadOnlyObservableCollection<LauncherData> _launchers;
         private LauncherData _selectedLauncher;
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -42,7 +42,7 @@ namespace LauncherZ.Windows
             }
         }
 
-        public LauncherList Launchers
+        public ReadOnlyObservableCollection<LauncherData> Launchers
         {
             get { return _launchers; }
             set

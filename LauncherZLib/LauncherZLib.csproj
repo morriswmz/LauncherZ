@@ -76,9 +76,10 @@
     <Compile Include="Icon\IIconRegisterer.cs" />
     <Compile Include="Icon\StaticIconProvider.cs" />
     <Compile Include="Launcher\ArgumentCollection.cs" />
-    <Compile Include="Launcher\LauncherDataComparer.cs" />
     <Compile Include="Launcher\LaunchHistoryManager.cs" />
     <Compile Include="Launcher\PostLaunchAction.cs" />
+    <Compile Include="Launcher\QueryDistributor.cs" />
+    <Compile Include="Launcher\ResultManager.cs" />
     <Compile Include="Launcher\TickRate.cs" />
     <Compile Include="Event\EventBase.cs" />
     <Compile Include="Event\EventBus.cs" />
@@ -114,9 +115,7 @@
     <Compile Include="Plugin\Template\ICommandHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Launcher\LauncherData.cs" />
-    <Compile Include="Launcher\LauncherList.cs" />
     <Compile Include="Launcher\LauncherQuery.cs" />
-    <Compile Include="QueryDistributor.cs" />
     <Compile Include="Utils\FileSystemUtils.cs" />
     <Compile Include="Utils\GlobalHotkey.cs" />
     <Compile Include="Utils\IAutoCompletionProvider.cs" />
@@ -132,6 +131,7 @@
     <Compile Include="Utils\SimpleLogger.cs" />
     <Compile Include="Utils\SimpleTimer.cs" />
     <Compile Include="Utils\StringUtils.cs" />
+    <Compile Include="Utils\TaggedObject.cs" />
     <Compile Include="Win32\Kernel32.cs" />
     <Compile Include="Win32\Shell32.cs" />
     <Compile Include="Win32\SHFILEINFO.cs" />
