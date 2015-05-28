@@ -1,10 +1,12 @@
-﻿using LauncherZLib.Launcher;
+﻿using System;
+using LauncherZLib.Launcher;
 
 namespace LauncherZLib.Event.Launcher
 {
     /// <summary>
     /// Occurs when user pressed enter on an item of this plugin.
     /// </summary>
+    [Obsolete]
     public class LauncherExecutedEvent : LauncherEvent
     {
 

@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using LauncherZLib.Matching;
 
 namespace LauncherZLib.FormattedText
 {
     public static class FormattedTextEngine
     {
+        public static Regex SpecialCharPattern = new Regex(@"[\\_\[\]~]");
         /// <summary>
         /// <para>Converts input into formatted segments.</para>
         /// <para>Supports following formats (controlled by special characters):</para>
@@ -193,8 +195,9 @@ namespace LauncherZLib.FormattedText
         /// <returns></returns>
         public static string ConvertFlexMatchResult(string input, FlexMatchResult result)
         {
-            return ConvertFlexMatchResult(input, result, TextFormat.Normal, TextFormat.Bold);
-        } 
+            return ConvertFlexMatchResult(input, result, TextFormat.Normal, TextFormat.Bold, true);
+        }
+
 
         /// <summary>
         /// Converts <see cref="T:LauncherZLib.Matching.FlexMatchResult"/> to formatted string with
@@ -204,9 +207,10 @@ namespace LauncherZLib.FormattedText
         /// <param name="result"></param>
         /// <param name="normalFormat"></param>
         /// <param name="highlightFormat"></param>
+        /// <param name="escape"></param>
         /// <returns></returns>
         public static string ConvertFlexMatchResult(string input, FlexMatchResult result,
-            TextFormat normalFormat, TextFormat highlightFormat)
+            TextFormat normalFormat, TextFormat highlightFormat, bool escape)
         {
             if (input == null)
                 throw new ArgumentNullException("input");
@@ -214,7 +218,7 @@ namespace LauncherZLib.FormattedText
                 throw new ArgumentNullException("result");
 
             if (!result.Success)
-                return WrapWithFormat(input, normalFormat);
+                return WrapWithFormat(input, normalFormat, escape);
 
             FlexMatchCollection matches = null;
             if (result.IsExactMatchPerformed && result.ExactMatches.Count > 0)
@@ -234,9 +238,9 @@ namespace LauncherZLib.FormattedText
                         if (plainStart > hlStart)
                         {
                             // emit existing match
-                            sb.Append(WrapWithFormat(input.Substring(hlStart, plainStart - hlStart), highlightFormat));
+                            sb.Append(WrapWithFormat(input.Substring(hlStart, plainStart - hlStart), highlightFormat, escape));
                         }
-                        sb.Append(WrapWithFormat(input.Substring(plainStart, m.StartIndex - plainStart), normalFormat));
+                        sb.Append(WrapWithFormat(input.Substring(plainStart, m.StartIndex - plainStart), normalFormat, escape));
                         hlStart = m.StartIndex;
                         plainStart = m.StartIndex + m.Length;
                     }
@@ -248,14 +252,14 @@ namespace LauncherZLib.FormattedText
                 }
                 // last pieces
                 if (plainStart > hlStart)
-                    sb.Append(WrapWithFormat(input.Substring(hlStart, plainStart - hlStart), highlightFormat));
+                    sb.Append(WrapWithFormat(input.Substring(hlStart, plainStart - hlStart), highlightFormat, escape));
                 if (plainStart < input.Length)
-                    sb.Append(WrapWithFormat(input.Substring(plainStart), normalFormat));
+                    sb.Append(WrapWithFormat(input.Substring(plainStart), normalFormat, escape));
                 return sb.ToString();
             }
 
 
-            return WrapWithFormat(input, normalFormat);
+            return WrapWithFormat(input, normalFormat, escape);
         }
         
         /// <summary>
@@ -264,19 +268,24 @@ namespace LauncherZLib.FormattedText
         /// </summary>
         /// <param name="str"></param>
         /// <param name="format"></param>
+        /// <param name="escape"></param>
         /// <returns></returns>
         /// <remarks>
         /// This method will fix potential escaping problems. If the given string ends with a single backslash,
         /// a new backslash will be appended to prevent escaping controlling characters.
         /// </remarks>
-        public static string WrapWithFormat(string str, TextFormat format)
+        public static string WrapWithFormat(string str, TextFormat format, bool escape)
         {
             if (string.IsNullOrEmpty(str))
                 throw new ArgumentNullException("str");
-
-            bool fixEscape = str.Length >= 2 && str[str.Length - 1] == '\\' & str[str.Length - 2] != '\\';
-            if (format == TextFormat.Normal || format.HasFlag(TextFormat.Underline))
-                return fixEscape ? str + '\\' : str;
+            if (escape)
+            {
+                str = Escape(str);
+            }
+            if (format == TextFormat.Normal)
+            {
+                return str;
+            }
             
             var left = format.HasFlag(TextFormat.Bold) ? "[" : "";
             var right = format.HasFlag(TextFormat.Bold) ? "]" : "";
@@ -290,15 +299,12 @@ namespace LauncherZLib.FormattedText
                 left = left + '_';
                 right = '_' + right;
             }
-            return fixEscape
-                ? string.Format("{0}{1}\\{2}", left, str, right)
-                : string.Format("{0}{1}{2}", left, str, right);
+            return string.Format("{0}{1}{2}", left, str, right);
         }
 
-        // todo escape formatters
         public static string Escape(string str)
         {
-            throw new NotImplementedException();
+            return SpecialCharPattern.Replace(str, m => "\\" + m.Value);
         }
         
         private static TextFormat ModifyFormatByControlChar(TextFormat format, char c)

@@ -133,7 +133,7 @@ namespace LauncherZTests
                 "Number of exact matches mismatch.");
             for (var i = 0; i < expected.ExactMatches.Count; i++)
             {
-                Assert.AreEqual(expected.ExactMatches[i], actual.ExactMatches[i]);
+                Assert.IsTrue(AreFlexMatchTheSame(expected.ExactMatches[i], actual.ExactMatches[i]));
             }
             Assert.AreEqual(expected.IsFlexMatchPerformed, actual.IsFlexMatchPerformed,
                 "IsFlexMatchPerformed mismatch.");
@@ -141,8 +141,17 @@ namespace LauncherZTests
                 "Number of flex matches mismatch.");
             for (var i = 0; i < expected.FlexMatches.Count; i++)
             {
-                Assert.AreEqual(expected.FlexMatches[i], actual.FlexMatches[i]);
+                Assert.IsTrue(AreFlexMatchTheSame(expected.FlexMatches[i], actual.FlexMatches[i]));
             }
+        }
+
+        private bool AreFlexMatchTheSame(FlexMatch mx, FlexMatch my)
+        {
+            if (mx == null || my == null)
+            {
+                return mx == null && my == null;
+            }
+            return mx.StartIndex == my.StartIndex && mx.Length == my.Length && mx.Content == my.Content;
         }
 
         private IEnumerable<FlexLexiconTestData> LoadFlexLexiconTestData(string path)

@@ -85,18 +85,20 @@ namespace CorePlugins.AppLauncher
                 .ToArray();
         }
 
-        [SubscribeEvent]
-        public void LauncherExecutedHanlder(LauncherExecutedEvent e)
+        public override PostLaunchAction Launch(LauncherData launcherData)
         {
             try
             {
-                Process.Start(e.LauncherData.StringData);
-                _manager.IncreaseFrequencyFor(e.LauncherData.StringData);
+                Process.Start(launcherData.StringData);
+                _manager.IncreaseFrequencyFor(launcherData.StringData);
+                return PostLaunchAction.Default;
             }
             catch (Exception)
             {
-                Logger.Warning(string.Format("Unable to start process from: {0}", e.LauncherData.StringData));
+                Logger.Warning(string.Format("Unable to start process from: {0}", launcherData.StringData));
+                return PostLaunchAction.DoNothing;
             }
         }
+
     }
 }

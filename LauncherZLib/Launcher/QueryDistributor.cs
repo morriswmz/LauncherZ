@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using LauncherZLib.Event;
 using LauncherZLib.Event.PluginInternal;
@@ -44,6 +45,10 @@ namespace LauncherZLib.Launcher
         {
             _currentQuery = query;
             var resultsSync = new List<TaggedObject<LauncherData>>();
+#if DEBUG
+            var sw = new Stopwatch();
+            sw.Start();
+#endif
             foreach (var container in _pluginManager.SortedActivePlugins)
             {
                 if (resultsSync.Count > _maxResults)
@@ -51,6 +56,10 @@ namespace LauncherZLib.Launcher
                 var immResults = container.PluginInstance.Query(query);
                 resultsSync.AddRange(immResults.Select(launcherData => new TaggedObject<LauncherData>(container.PluginId, launcherData)));
             }
+#if DEBUG
+            sw.Stop();
+            Trace.WriteLine(string.Format("Total query time: {0}ms.", sw.ElapsedMilliseconds));
+#endif
             if (resultsSync.Count > 0)
             {
                 RaiseResultUpdateEvent(resultsSync);

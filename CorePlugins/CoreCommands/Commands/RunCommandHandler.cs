@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using LauncherZ.Icon;
+using LauncherZLib.FormattedText;
 using LauncherZLib.Launcher;
 using LauncherZLib.Plugin.Service;
 using LauncherZLib.Plugin.Template;
@@ -27,7 +28,7 @@ namespace CorePlugins.CoreCommands.Commands
             {
                 new CommandLauncherData(query.Arguments, 1.0)
                 {
-                    Title = string.Format(Localization["RunCommandTitle"], string.Join(" ", query.Arguments.Skip(1))),
+                    Title = string.Format(Localization["RunCommandTitle"], FormattedTextEngine.Escape(string.Join(" ", query.Arguments.Skip(1)))),
                     Description = Localization["RunCommandNormalDescription"],
                     IconLocation = LauncherZIconSet.Program.ToString()
                 }

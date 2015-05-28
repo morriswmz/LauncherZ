@@ -1,4 +1,5 @@
-﻿using LauncherZLib.Launcher;
+﻿using LauncherZLib.FormattedText;
+using LauncherZLib.Launcher;
 
 namespace CorePlugins.AppLauncher
 {
@@ -27,7 +28,7 @@ namespace CorePlugins.AppLauncher
             return new LauncherData(Relevance)
             {
                 Title = Title, 
-                Description = Description, 
+                Description = FormattedTextEngine.Escape(Description), 
                 IconLocation = "file://" + LinkFileLocation,
                 StringData = LinkFileLocation
             };

@@ -99,7 +99,7 @@ namespace LauncherZTests
             FormattedSegment[] actualOutputFlex1 = FormattedTextEngine.ParseFormattedText(converted1).ToArray();
             CollectionAssert.AreEqual(expectedOutputFlex1, actualOutputFlex1);
 
-            var inputFlex2 = "Renewable Energy";
+            var inputFlex2 = "Renewable Energy \\[]_~end";
             // keywords2 = {"rewag"};
             var result2 = new FlexMatchResult(true, FlexMatchCollection.Empty,
                 true, new FlexMatchCollection(new FlexMatch[]
@@ -108,19 +108,34 @@ namespace LauncherZTests
                     new FlexMatch(4, 2, "wa"),
                     new FlexMatch(14, 1, "g")
                 }));
-            var expectedOutputFlex2 = new FormattedSegment[]
+            var expectedOutputFlex2Escaped = new FormattedSegment[]
             {
                 new FormattedSegment("Re", TextFormat.Bold),
                 new FormattedSegment("ne", TextFormat.Normal),
                 new FormattedSegment("wa", TextFormat.Bold),
                 new FormattedSegment("ble Ener", TextFormat.Normal),
                 new FormattedSegment("g", TextFormat.Bold),
-                new FormattedSegment("y", TextFormat.Normal)
+                new FormattedSegment("y \\[]_~end", TextFormat.Normal)
             };
-            string converted2 = FormattedTextEngine.ConvertFlexMatchResult(inputFlex2, result2);
-            FormattedSegment[] actualOutputFlex2 = FormattedTextEngine.ParseFormattedText(converted2).ToArray();
-            CollectionAssert.AreEqual(expectedOutputFlex2, actualOutputFlex2);
-
+            var expectedOutputFlex2Unescaped = new FormattedSegment[]
+            {
+                new FormattedSegment("Re", TextFormat.Bold),
+                new FormattedSegment("ne", TextFormat.Normal),
+                new FormattedSegment("wa", TextFormat.Bold),
+                new FormattedSegment("ble Ener", TextFormat.Normal),
+                new FormattedSegment("g", TextFormat.Bold),
+                new FormattedSegment("y [", TextFormat.Normal),
+                new FormattedSegment("end", TextFormat.Underline | TextFormat.Italic) 
+            };
+            string converted2Escaped = FormattedTextEngine.ConvertFlexMatchResult(inputFlex2, result2);
+            string converted2Unescaped = FormattedTextEngine.ConvertFlexMatchResult(inputFlex2, result2,
+                TextFormat.Normal, TextFormat.Bold, false);
+            FormattedSegment[] actualOutputFlex2Escaped =
+                FormattedTextEngine.ParseFormattedText(converted2Escaped).ToArray();
+            FormattedSegment[] actualOutputFlex2Unescaped =
+                FormattedTextEngine.ParseFormattedText(converted2Unescaped).ToArray();
+            CollectionAssert.AreEqual(expectedOutputFlex2Escaped, actualOutputFlex2Escaped);
+            CollectionAssert.AreEqual(expectedOutputFlex2Unescaped, actualOutputFlex2Unescaped);
         }
     }
 }

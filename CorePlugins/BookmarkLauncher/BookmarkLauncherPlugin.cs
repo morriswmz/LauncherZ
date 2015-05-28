@@ -93,12 +93,12 @@ namespace CorePlugins.BookmarkLauncher
             {
                 FlexMatchResult nameMatch = mathcer.Match(b.Name, keywords, FlexLexicon.GlobalLexicon);
                 FlexMatchResult urlMatch = mathcer.Match(b.Url, keywords, FlexLexicon.GlobalLexicon);
+                if (!(nameMatch.Success || urlMatch.Success))
+                    return null;
                 double nameScore = scorer.Score(b.Name, nameMatch);
                 double urlScore = scorer.Score(b.Url, urlMatch);
                 double freqScore = (1.0 - Math.Exp(-b.Frequency/5.0));
-                double finalScore = (nameMatch.Success || urlMatch.Success)
-                    ? 0.5*nameScore + 0.3*urlScore + 0.2*freqScore
-                    : 0.0;
+                double finalScore = 0.5*nameScore + 0.3*urlScore + 0.2*freqScore;
                 return finalScore > 0
                     ? new BookmarkQueryResult(
                         FormattedTextEngine.ConvertFlexMatchResult(b.Name, nameMatch),

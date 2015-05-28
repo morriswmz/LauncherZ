@@ -14,7 +14,6 @@ namespace LauncherZLib.Icon
     /// <remarks>
     /// This class is not thread-safe and should be used only in main UI thread .
     /// </remarks>
-    /// TODO: each provider should only handle one domain
     public sealed class IconLibrary : IIconProviderRegistry
     {
 

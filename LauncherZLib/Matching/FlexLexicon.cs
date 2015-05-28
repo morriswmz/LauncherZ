@@ -20,7 +20,7 @@ namespace LauncherZLib.Matching
         /// </summary>
         public static readonly FlexLexicon GlobalLexicon = new FlexLexicon();
 
-        protected readonly Dictionary<string, string> _dict = new Dictionary<string, string>(2048);
+        protected readonly Dictionary<string, string> Dict = new Dictionary<string, string>(2048);
 
         /// <summary>
         /// <para>Checks if given character has short form match.</para>
@@ -35,7 +35,7 @@ namespace LauncherZLib.Matching
         {
             string abbrs;
             replacement = char.ToUpperInvariant(replacement);
-            if (!_dict.TryGetValue(character, out abbrs))
+            if (!Dict.TryGetValue(character, out abbrs))
                 return false;
             if (abbrs[0] == replacement)
                 return true;
@@ -112,21 +112,21 @@ namespace LauncherZLib.Matching
             while (te.MoveNext())
             {
                 string charStr = te.GetTextElement();
-                if (_dict.ContainsKey(charStr))
+                if (Dict.ContainsKey(charStr))
                 {
                     // combine existing
                     foreach (char c in replacement)
                     {
-                        if (!_dict[charStr].Contains(c))
+                        if (!Dict[charStr].Contains(c))
                         {
-                            _dict[charStr] += c;
+                            Dict[charStr] += c;
                         }
                     }
                 }
                 else
                 {
                     // add new
-                    _dict.Add(charStr, replacement);
+                    Dict.Add(charStr, replacement);
                 }
             }
         }
@@ -136,7 +136,7 @@ namespace LauncherZLib.Matching
         /// </summary>
         public virtual void Clear()
         {
-            _dict.Clear();
+            Dict.Clear();
         }
 
     }
