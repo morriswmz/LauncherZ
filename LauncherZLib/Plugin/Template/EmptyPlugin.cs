@@ -17,14 +17,14 @@ namespace LauncherZLib.Plugin.Template
         protected ILocalizationDictionary Localization;
         protected IEventBus EventBus;
 
-        public virtual void Activate(IExtendedServiceProvider serviceProvider)
+        public virtual void Activate(IPluginServiceProvider serviceProvider)
         {
             // setup context
             ServiceProvider = serviceProvider;
-            PluginInfo = serviceProvider.GetService<IPluginInfoProvider>();
-            Logger = serviceProvider.GetService<ILogger>();
-            Localization = serviceProvider.GetService<ILocalizationDictionary>();
-            EventBus = serviceProvider.GetService<IEventBus>();
+            PluginInfo = serviceProvider.Essentials.PluginInfo;
+            Logger = serviceProvider.Essentials.Logger;
+            Localization = serviceProvider.Essentials.Localization;
+            EventBus = serviceProvider.Essentials.EventBus;
             // prepare working directory
             string suggestedDataDir = PluginInfo.SuggestedPluginDataDirectory;
             if (!Directory.Exists(suggestedDataDir))
@@ -42,7 +42,7 @@ namespace LauncherZLib.Plugin.Template
             }
         }
 
-        public virtual void Deactivate(IExtendedServiceProvider serviceProvider)
+        public virtual void Deactivate(IPluginServiceProvider serviceProvider)
         {
             // clear all references
             EventBus = null;

@@ -15,39 +15,25 @@ namespace LauncherZLib.Plugin
     public sealed class PluginManager : IAutoCompletionProvider
     {
         // note that id is case insensitive
-        private readonly PluginServiceProviderFactory _serviceProviderFactory;
-        private readonly Dictionary<string, PluginContainer> _loadedPlugins = new Dictionary<string, PluginContainer>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, PluginEntry> _loadedPlugins = new Dictionary<string, PluginEntry>(StringComparer.OrdinalIgnoreCase);
         private readonly HashSet<string> _deactivatedPluginIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         private readonly HashSet<string> _activePluginIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         private readonly List<PluginContainer> _sortedActiveContainers = new List<PluginContainer>();
         private readonly ReadOnlyCollection<PluginContainer> _sortedActiveContainersReadonly;
-        private readonly IEventBus _eventBus = new EventBus();
-        private readonly ILoggerProvider _loggerProvider;
         private readonly ILogger _logger;
-        private readonly IDispatcherService _dispatcherService;
 
-        private bool _allPluginLoaded = false;
         private bool _pluginSorted = false;
 
         /// <summary>
         /// Creates a plugin manager.
         /// </summary>
-        /// <param name="loggerProvider">Logger provider.</param>
-        /// <param name="dispatcherService">
-        /// Dispatcher service of the main UI thread.
-        /// Asynchrous callbacks will be invoke via this dispatcher service.
-        /// </param>
-        public PluginManager(ILoggerProvider loggerProvider, IDispatcherService dispatcherService, PluginServiceProviderFactory pspFactory)
+        /// <param name="logger">Logger.</param>
+        public PluginManager(ILogger logger)
         {
-            if (loggerProvider == null)
-                throw new ArgumentNullException("loggerProvider");
-            if (dispatcherService == null)
-                throw new ArgumentNullException("dispatcherService");
+            if (logger == null)
+                throw new ArgumentNullException("logger");
 
-            _loggerProvider = loggerProvider;
-            _logger = _loggerProvider.CreateLogger("PluginManager");
-            _dispatcherService = dispatcherService;
-            _serviceProviderFactory = pspFactory;
+            _logger = logger;
             _sortedActiveContainersReadonly = _sortedActiveContainers.AsReadOnly(); 
         }
 
@@ -92,11 +78,48 @@ namespace LauncherZLib.Plugin
         /// <returns></returns>
         public PluginContainer GetPluginContainer(string pluginId)
         {
-            PluginContainer container;
-            if (_loadedPlugins.TryGetValue(pluginId, out container))
-                return container;
+            PluginEntry entry;
+            if (_loadedPlugins.TryGetValue(pluginId, out entry))
+                return entry.Container;
             throw new Exception(string.Format("Plugin with id \"{0}\" is not loaded", pluginId));
         }
+
+        public void Add(PluginContainer plugin)
+        {
+            var pluginId = plugin.PluginId;
+            if (_loadedPlugins.ContainsKey(pluginId))
+            {
+                throw new Exception(string.Format("A plugin with the same id \"{0}\" already exists.", pluginId));
+            }
+            _loadedPlugins.Add(pluginId, new PluginEntry(plugin, PluginStatus.Deactivated));
+            _deactivatedPluginIds.Add(pluginId);
+        }
+
+        public void AddAndActivate(PluginContainer plugin)
+        {
+            Add(plugin);
+            Activate(plugin.PluginId);
+        }
+
+        public void Remove(PluginContainer plugin)
+        {
+            Remove(plugin.PluginId);
+        }
+
+        public void Remove(string pluginId)
+        {
+            if (IsPluginActivated(pluginId))
+            {
+                Deactivate(pluginId);
+            }
+            if (!_loadedPlugins.ContainsKey(pluginId))
+            {
+                _loadedPlugins.Remove(pluginId);
+                _deactivatedPluginIds.Remove(pluginId);
+            }   
+        }
+
+        
 
         /// <summary>
         /// Activates specific plugin.
@@ -105,36 +128,36 @@ namespace LauncherZLib.Plugin
         /// <returns>True if successful.</returns>
         public bool Activate(string pluginId)
         {
-            PluginContainer container;
-            if (!_loadedPlugins.TryGetValue(pluginId, out container))
+            PluginEntry entry;
+            if (!_loadedPlugins.TryGetValue(pluginId, out entry))
                 throw new Exception(string.Format("Plugin with id \"{0}\" is not loaded.", pluginId));
 
-            if (container.Status == PluginStatus.Activated)
+            if (entry.Status == PluginStatus.Activated)
                 return true;
 
-            if (container.Status == PluginStatus.Crashed)
+            if (entry.Status == PluginStatus.Crashed)
                 return false;
 
             try
             {
                 // activate
-                container.PluginInstance.Activate(container.ServiceProvider);
-                container.Status = PluginStatus.Activated;
-                _logger.Info("Successfully activated {0}.", container);
+                entry.Container.PluginInstance.Activate(entry.Container.ServiceProvider);
+                entry.Status = PluginStatus.Activated;
+                _logger.Info("Successfully activated {0}.", entry);
                 // remove from disabled
                 _deactivatedPluginIds.Remove(pluginId);
                 // rebuild active list
                 _pluginSorted = false;
                 _activePluginIds.Add(pluginId);
-                _sortedActiveContainers.Add(container);
+                _sortedActiveContainers.Add(entry.Container);
                 return true;
             }
             catch (Exception ex)
             {
                 _logger.Error(
                     "An exception occured while activitng the plugin {0}. Details: {1}{2}",
-                    container, Environment.NewLine, ex);
-                container.Status = PluginStatus.Crashed;
+                    entry, Environment.NewLine, ex);
+                entry.Status = PluginStatus.Crashed;
                 return false;
             }
         }
@@ -146,29 +169,29 @@ namespace LauncherZLib.Plugin
         /// <returns>True if successful.</returns>
         public bool Deactivate(string pluginId)
         {
-            PluginContainer container;
-            if (!_loadedPlugins.TryGetValue(pluginId, out container))
+            PluginEntry entry;
+            if (!_loadedPlugins.TryGetValue(pluginId, out entry))
                 throw new Exception(string.Format("Plugin \"{0}\" is not loaded.", pluginId));
 
-            if (container.Status == PluginStatus.Deactivated)
+            if (entry.Status == PluginStatus.Deactivated)
                 return true;
 
-            if (container.Status == PluginStatus.Crashed)
+            if (entry.Status == PluginStatus.Crashed)
                 return false;
 
             try
             {
                 // deactivate
-                _logger.Info("Sending deactivation signal to {0}.", container);
-                container.PluginInstance.Deactivate(container.ServiceProvider);
-                container.Status = PluginStatus.Deactivated;
+                _logger.Info("Sending deactivation signal to {0}.", entry);
+                entry.Container.PluginInstance.Deactivate(entry.Container.ServiceProvider);
+                entry.Status = PluginStatus.Deactivated;
             }
             catch (Exception ex)
             {
                 _logger.Error(
                     "An exception occured while deactivating the plugin {0}. Details: {1}{2}",
-                    container, Environment.NewLine, ex);
-                container.Status = PluginStatus.Crashed;
+                    entry, Environment.NewLine, ex);
+                entry.Status = PluginStatus.Crashed;
                 return false;
             }
             finally
@@ -177,7 +200,7 @@ namespace LauncherZLib.Plugin
                 _activePluginIds.Remove(pluginId);
                 _deactivatedPluginIds.Add(pluginId);
                 // just remove, no need to sort again
-                _sortedActiveContainers.Remove(container);
+                _sortedActiveContainers.Remove(entry.Container);
             }
             return true;
         }
@@ -204,12 +227,8 @@ namespace LauncherZLib.Plugin
         /// </returns>
         public double GetPluginPriority(string pluginId)
         {
-            PluginContainer container;
-            if (_loadedPlugins.TryGetValue(pluginId, out container))
-            {
-                return container.PluginPriority;
-            }
-            return 0.0;
+            PluginEntry entry;
+            return _loadedPlugins.TryGetValue(pluginId, out entry) ? entry.Container.PluginPriority : 0.0;
         }
 
         /// <summary>
@@ -220,81 +239,11 @@ namespace LauncherZLib.Plugin
         /// <param name="priority"></param>
         public void SetPluginPriority(string pluginId, double priority)
         {
-            PluginContainer container;
-            if (_loadedPlugins.TryGetValue(pluginId, out container))
+            PluginEntry entry;
+            if (_loadedPlugins.TryGetValue(pluginId, out entry))
             {
-                container.PluginPriority = priority;
+                entry.Container.PluginPriority = priority;
             }
-        }
-
-        /// <summary>
-        /// Discovers and loads plugins from given folder.
-        /// </summary>
-        /// <param name="searchPath">Folder to load plugins from.</param>
-        /// <param name="dataDirBase">Base directory for plugin data storage.</param>
-        public void LoadAllFrom(IEnumerable<string> searchPath, string dataDirBase)
-        {
-            if (_allPluginLoaded)
-                return;
-
-            // discover
-            var discoverer = new PluginDiscoverer(_logger);
-            discoverer.SearchDirectories.AddRange(searchPath);
-            IEnumerable<PluginDiscoveryInfo> candidates = discoverer.DiscoverAll();
-            var conflicts = candidates.GroupBy(c => c.Id).Where(g => g.Count() > 1).ToList();
-            if (conflicts.Count > 0)
-            {
-                var sb = new StringBuilder("Conflicting plugin id detected.");
-                foreach (var conflict in conflicts)
-                {
-                    sb.AppendLine(string.Format("The following plugins have the same id \"{0}\"", conflict.Key));
-                    foreach (var p in conflict)
-                    {
-                        sb.AppendLine(string.Format("\"{0}\" in \"{1}\"", p.FriendlyName, p.SourceDirectory));
-                    }
-                }
-                return;
-            }
-            // load
-            var loader = new PluginLoader(_logger);
-            foreach (var pdi in candidates)
-            {
-                IPlugin pluginInstance = null;
-                try
-                {
-                    pluginInstance = loader.Load(pdi);
-                }
-                catch (Exception ex)
-                {
-                    _logger.Error(
-                        "An exception occured while loading plugin with id \"{0}\". Details:{1}{2}",
-                        pdi.Id, Environment.NewLine, ex
-                        );
-                }
-                if (pluginInstance != null)
-                {
-                    var pluginInfoProvider = new StaticPluginInfoProvider(pdi, dataDirBase);
-                    var pluginLogger = _loggerProvider.CreateLogger(pdi.Id);
-                    var pluginEventBus = new PluginEventBus(pdi.Id, _eventBus, _dispatcherService);
-                    var pluginLocDict = new Lazy<ILocalizationDictionary>(() => new LocalizationDictionary());
-                    PluginServiceProvider serviceProvider = _serviceProviderFactory.Create(psp =>
-                    {
-                        psp.AddService(typeof(IPluginInfoProvider), pluginInfoProvider);
-                        psp.AddService(typeof(ILogger), pluginLogger);
-                        psp.AddService(typeof(IEventBus), pluginEventBus);
-                        psp.AddService(pluginLocDict);
-                    });
-                    var pc = new PluginContainer(pluginInstance, pdi, serviceProvider);
-                    _loadedPlugins.Add(pc.PluginId, pc);
-                }
-            }
-            // activate
-            foreach (var k in _loadedPlugins.Keys.Except(_deactivatedPluginIds))
-            {
-                Activate(k);
-            }
-
-            _allPluginLoaded = true;
         }
         
         /// <summary>
@@ -305,7 +254,6 @@ namespace LauncherZLib.Plugin
         {
             foreach (var container in _sortedActiveContainers)
             {
-                if (container.Status == PluginStatus.Activated)
                 container.PluginEventBus.Post(e);
             }
         }
@@ -318,63 +266,28 @@ namespace LauncherZLib.Plugin
         /// <param name="pluginId"></param>
         public void DistributeEventTo(string pluginId, EventBase e)
         {
-            PluginContainer container;
-            if (!_loadedPlugins.TryGetValue(pluginId, out container))
+            PluginEntry entry;
+            if (!_loadedPlugins.TryGetValue(pluginId, out entry))
                 return;
-            if (container.Status == PluginStatus.Activated)
-                container.PluginEventBus.Post(e);
+            if (entry.Status == PluginStatus.Activated)
+                entry.Container.PluginEventBus.Post(e);
         }
-
-        /// <summary>
-        /// Registers an event handler for events raised by plugins.
-        /// No action will be taken if given handler is already registered.
-        /// </summary>
-        /// <param name="handler"></param>
-        /// <seealso cref="T:LauncherZLib.Event.EventBus"/>
-        public void RegisterPluginEventHandler(object handler)
-        {
-            _eventBus.Register(handler);
-        }
-
-        /// <summary>
-        /// Removes an event handler for events raised by plugins.
-        /// No action will be taken if given handler does not exist.
-        /// </summary>
-        /// <param name="handler"></param>
-        /// <seealso cref="T:LauncherZLib.Event.EventBus"/>
-        public void RemovePluginEventHandler(object handler)
-        {
-            _eventBus.Unregister(handler);
-        }
-
-        private void PluginCrashHandler(string pluginId, string friendlyMsg)
-        {
-            PluginContainer container;
-            if (!_loadedPlugins.TryGetValue(pluginId, out container))
-            {
-                _logger.Severe(
-                    "Plugin with id \"{0}\" reported a crash but was never loaded. This is impossible!.",
-                    pluginId);
-                return;
-            }
-
-            // make sure event is raised on main UI thread.
-            _dispatcherService.InvokeAsync(() =>
-            {
-                _logger.Error(
-                    "Plugin {0} crashed with message: {1}", container, friendlyMsg);
-                // update collection
-                _activePluginIds.Remove(pluginId);
-                _sortedActiveContainers.Remove(container);
-                _deactivatedPluginIds.Add(pluginId);
-                _logger.Info("Deactivated {0} if possible.", container);
-            });
-        }
-
-       
+        
         public IEnumerable<string> GetAutoCompletions(string context, int limit)
         {
             throw new NotImplementedException();
+        }
+
+        sealed class PluginEntry
+        {
+            public PluginEntry(PluginContainer container, PluginStatus status)
+            {
+                Container = container;
+                Status = status;
+            }
+
+            public PluginContainer Container { get; set; }
+            public PluginStatus Status { get; set; }
         }
 
     }

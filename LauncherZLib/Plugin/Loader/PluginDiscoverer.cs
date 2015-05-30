@@ -16,9 +16,7 @@ namespace LauncherZLib.Plugin.Loader
     {
 
         private readonly ILogger _logger;
-        private readonly List<string> _searchDirectories = new List<string>();
-
-
+        
         public PluginDiscoverer(ILogger logger)
         {
             if (logger == null)
@@ -26,12 +24,7 @@ namespace LauncherZLib.Plugin.Loader
             _logger = logger;
         }
 
-        public List<string> SearchDirectories
-        {
-            get { return _searchDirectories; }
-        }
-
-        public IEnumerable<PluginDiscoveryInfo> DiscoverAll()
+        public IEnumerable<PluginDiscoveryInfo> DiscoverAllIn(IEnumerable<string> searchDirectories)
         {
             var result = new List<PluginDiscoveryInfo>();
             // todo: properly setup a sandboxed domain
@@ -40,7 +33,7 @@ namespace LauncherZLib.Plugin.Loader
             var asmDiscoverer = (AssemblyDiscoverer)discoveryDomain.CreateInstanceAndUnwrap(executingAssemblyName, typeof(AssemblyDiscoverer).ToString());
             asmDiscoverer.ConfigureAppDomain(new string[] {Assembly.GetExecutingAssembly().Location});
 
-            foreach (var dir in SearchDirectories)
+            foreach (var dir in searchDirectories)
             {
                 string directory = Path.GetFullPath(dir);
                 if (!Directory.Exists(directory))

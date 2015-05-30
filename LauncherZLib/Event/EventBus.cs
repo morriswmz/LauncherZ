@@ -27,12 +27,6 @@ namespace LauncherZLib.Event
         protected bool RebuildFlag = false;
         private readonly object _lock = new object();
 
-        /// <summary>
-        /// Registers an event handler.
-        /// No action will be taken if given event handler is already registered.
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <seealso cref="T:LauncherZLib.Event.SubscribeEventAttribute"/>
         public virtual void Register(object obj)
         {
             lock (_lock)
@@ -41,11 +35,6 @@ namespace LauncherZLib.Event
             }
         }
 
-        /// <summary>
-        /// Unregisters a specific event handler.
-        /// No action will be taken if given event handler is not registered.
-        /// </summary>
-        /// <param name="obj"></param>
         public virtual void Unregister(object obj)
         {
             lock (_lock)
@@ -53,7 +42,7 @@ namespace LauncherZLib.Event
                 UnregisterImpl(obj);
             }
         }
-
+        
         /// <summary>
         /// Unregisters all event handlers.
         /// </summary>
@@ -69,15 +58,6 @@ namespace LauncherZLib.Event
             }
         }
 
-        /// <summary>
-        /// Posts an event.
-        /// </summary>
-        /// <param name="e"></param>
-        /// <remarks>
-        /// This method distributes given event to a cached event handler list. Adding/removing event handlers
-        /// while handling the event will not affect the cached event handler list.
-        /// Although this class is thread-safe, you should still think carefully in multi-threaded environment.
-        /// </remarks>
         public virtual void Post(EventBase e)
         {
             if (e == null)

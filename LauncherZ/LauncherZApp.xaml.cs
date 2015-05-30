@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 using System.Windows;
 using System.Windows.Media;
@@ -12,10 +14,13 @@ using LauncherZ.Configuration;
 using LauncherZ.Icon;
 using LauncherZ.Windows;
 using LauncherZLib;
+using LauncherZLib.Event;
+using LauncherZLib.I18N;
 using LauncherZLib.Icon;
 using LauncherZLib.Launcher;
 using LauncherZLib.Matching;
 using LauncherZLib.Plugin;
+using LauncherZLib.Plugin.Loader;
 using LauncherZLib.Plugin.Service;
 using LauncherZLib.Utils;
 using Newtonsoft.Json;
@@ -55,9 +60,11 @@ namespace LauncherZ
 
         #region Internal Properties
 
-        internal AppSpecialFolderManager SpecialFolderManager { get; private set; }
+        internal LauncherZSpecialFolderManager SpecialFolderManager { get; private set; }
 
         internal LauncherZConfig Configuration { get; private set; }
+
+        internal EventBus GlobalEventBus { get; private set; }
 
         /// <summary>
         /// IconLibrary of LauncherZ.
@@ -67,8 +74,6 @@ namespace LauncherZ
         internal SimpleLogger Logger { get; private set; }
 
         internal LaunchHistoryManager LaunchHistoryManager { get; private set; }
-
-        internal QueryDistributor QueryDistributor { get; private set; }
 
         internal PluginManager PluginManager { get; private set; }
 
@@ -122,7 +127,7 @@ namespace LauncherZ
                 try
                 {
                     JsonUtils.StreamSerialize(
-                        Path.Combine(SpecialFolderManager.UserDataFolder, AppConfigFileName), Configuration, Formatting.Indented);
+                        Path.Combine(this.SpecialFolderManager.UserDataFolder, AppConfigFileName), Configuration, Formatting.Indented);
                 }
                 catch (Exception ex)
                 {
@@ -155,8 +160,8 @@ namespace LauncherZ
         {
             AppDomain.CurrentDomain.UnhandledException += Application_UnhandledException;
             // create app data folders
-            SpecialFolderManager = new AppSpecialFolderManager(this);
-            SpecialFolderManager.PrepareFolders();
+            SpecialFolderManager = new LauncherZSpecialFolderManager();
+            SpecialFolderManager.PrepareFolders(this);
             // initialize logger
             InitializeLogger();
             // load configurations
@@ -166,13 +171,14 @@ namespace LauncherZ
             // init icon library
             SetUpIconLibrary();
             // init basic services
+            GlobalEventBus = new EventBus();
             AppDispatcherService = new SimpleDispatcherService(Dispatcher);
             AppTimerService = new SimpleTimer(Dispatcher);
             // load plugins
             LoadPlugins();
             // load global lexicons
-            LoadLexiconsFrom(SpecialFolderManager.DefaultLexiconFolder);
-            LoadLexiconsFrom(SpecialFolderManager.UserDataFolder);
+            LoadLexiconsFrom(this.SpecialFolderManager.DefaultLexiconFolder);
+            LoadLexiconsFrom(this.SpecialFolderManager.UserDataFolder);
             // start main window
             SetUpMainWindow();
             // finish
@@ -182,20 +188,35 @@ namespace LauncherZ
 
         private void LoadPlugins()
         {
-            var pspFactory = new PluginServiceProviderFactory(psp =>
+            var pluginLoader = new PluginLoader(
+                new PluginDiscoverer(Logger.CreateLogger("PluginDiscoverer")),
+                Logger.CreateLogger("PluginLoader"));
+            var pcs = pluginLoader.LoadPlugins(new string[]
             {
-                psp.AddService(typeof (IDispatcherService), AppDispatcherService);
-                psp.AddService(typeof (ITimerService), AppTimerService);
-                psp.AddService(typeof (IIconProviderRegistry), IconLibrary);
-                psp.AddService(typeof (IIconRegisterer), _staticIconProvider);
+                this.SpecialFolderManager.DefaultPluginFolder,
+                this.SpecialFolderManager.UserPluginFolder
+            }).Select(p =>
+            {
+                var essentialServices = new EssentialPluginServices(
+                    new StaticPluginInfoProvider(p.Info, this.SpecialFolderManager.PluginDataFolder),
+                    new LocalizationDictionary(), 
+                    Logger.CreateLogger(p.Info.Id),
+                    new PluginEventBus(p.Info.Id, GlobalEventBus, AppDispatcherService),
+                    AppDispatcherService
+                    );
+                var psp = new PluginServiceProvider(essentialServices, new Dictionary<Type, object>()
+                {
+                    {typeof(ITimerService), AppTimerService},
+                    {typeof(IIconRegisterer), _staticIconProvider},
+                    {typeof(IIconProviderRegistry), IconLibrary}
+                });
+                return new PluginContainer(p.Instance, p.Info, psp);
             });
-
-            PluginManager = new PluginManager(Logger, AppDispatcherService, pspFactory);
-            PluginManager.LoadAllFrom(new String[]
+            PluginManager = new PluginManager(Logger);
+            foreach (var pluginContainer in pcs)
             {
-                SpecialFolderManager.DefaultPluginFolder,
-                SpecialFolderManager.UserPluginFolder
-            }, SpecialFolderManager.PluginDataFolder);
+                PluginManager.AddAndActivate(pluginContainer);
+            }
             // set plugin priorities from configuration
             foreach (var pair in Configuration.Priorities)
             {
@@ -228,7 +249,7 @@ namespace LauncherZ
             try
             {
                 Configuration = JsonUtils.StreamDeserialize<LauncherZConfig>(
-                    Path.Combine(SpecialFolderManager.UserDataFolder, AppConfigFileName));
+                    Path.Combine(this.SpecialFolderManager.UserDataFolder, AppConfigFileName));
             }
             catch (Exception ex)
             {
@@ -280,9 +301,7 @@ namespace LauncherZ
         {
             var mw = new MainWindow(); // view model is initialized in MainWindow.xaml
             LaunchHistoryManager = new LaunchHistoryManager();
-            var mainWindowController = new MainWindowController(
-                Configuration, LaunchHistoryManager,
-                PluginManager, Logger);
+            var mainWindowController = new MainWindowController(this);
             mainWindowController.Attach(mw);
             mw.Show();
         }
@@ -322,14 +341,14 @@ namespace LauncherZ
         private void InitializeLogger()
         {
             // delete old logs
-            new DirectoryInfo(SpecialFolderManager.LogFolder)
+            new DirectoryInfo(this.SpecialFolderManager.LogFolder)
                 .GetFiles("*.log")
                 .OrderByDescending(f => f.LastWriteTime)
                 .Skip(5)
                 .ToList()
                 .ForEach(f => f.Delete());
             // create new one
-            string logFilePath = Path.Combine(SpecialFolderManager.LogFolder,
+            string logFilePath = Path.Combine(this.SpecialFolderManager.LogFolder,
                 string.Format("{0}.log", DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")));
             Logger = new SimpleLogger(logFilePath);
         }

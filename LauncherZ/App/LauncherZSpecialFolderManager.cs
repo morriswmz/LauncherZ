@@ -4,24 +4,15 @@ using System.Reflection;
 
 namespace LauncherZ.App
 {
-    sealed class AppSpecialFolderManager
+    sealed class LauncherZSpecialFolderManager
     {
         private bool _isPrepared = false;
-        private string _appGuid;
 
-        public AppSpecialFolderManager(LauncherZApp app)
-        {
-            if (app == null)
-                throw new ArgumentNullException("app");
-            
-            _appGuid = app.AppGuid;
-        }
-
-        public string PluginFolderName { get { return "Plugins"; } }
-        public string PluginDataFolderName { get { return "PluginData"; } }
-        public string LogFolderName { get { return "Logs"; } }
-        public string LexiconFolderName { get { return "Lexicons"; } }
-        public string ThemeFolderName { get { return "Themes"; } }
+        public static string PluginFolderName { get { return "Plugins"; } }
+        public static string PluginDataFolderName { get { return "PluginData"; } }
+        public static string LogFolderName { get { return "Logs"; } }
+        public static string LexiconFolderName { get { return "Lexicons"; } }
+        public static string ThemeFolderName { get { return "Themes"; } }
 
         /// <summary>
         /// Gets the full path of the folder containing the LauncherZ assembly.
@@ -76,7 +67,7 @@ namespace LauncherZ.App
         /// <summary>
         /// Set up all special folders.
         /// </summary>
-        public void PrepareFolders()
+        public void PrepareFolders(LauncherZApp app)
         {
             if (_isPrepared)
                 return;
@@ -91,7 +82,7 @@ namespace LauncherZ.App
 
             string systemAppDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 #if DEBUG
-            UserDataFolder = Path.Combine(systemAppDataPath, "LauncherZ.Debug." + _appGuid.Substring(0, 8));
+            UserDataFolder = Path.Combine(systemAppDataPath, "LauncherZ.Debug." + app.AppGuid.Substring(0, 8));
 #else
             UserDataFolder = Path.Combine(systemAppDataPath, "LauncherZ." + _appGuid.Substring(0, 8));
 #endif

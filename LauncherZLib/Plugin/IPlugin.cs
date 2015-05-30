@@ -14,13 +14,22 @@ namespace LauncherZLib.Plugin
         /// Activates the plugin.
         /// </summary>
         /// <param name="serviceProvider"></param>
-        void Activate(IExtendedServiceProvider serviceProvider);
+        /// <remarks>
+        /// <para>Only access LauncherZApp related resources after this method is invoked.</para>
+        /// <para>In case of bad things, you may throw exceptions to terminate the process and your plugin
+        /// will not be activated.</para>
+        /// </remarks>
+        void Activate(IPluginServiceProvider serviceProvider);
 
         /// <summary>
         /// Deactivates the plugin.
         /// </summary>
         /// <param name="serviceProvider"></param>
-        void Deactivate(IExtendedServiceProvider serviceProvider);
+        /// <remarks>
+        /// <para>Avoid accessing LauncherZApp related resources after this method is invoked.</para>
+        /// <para>Avoid throwing exceptions in this method.</para>
+        /// </remarks>
+        void Deactivate(IPluginServiceProvider serviceProvider);
 
         /// <summary>
         /// Queries available commands.

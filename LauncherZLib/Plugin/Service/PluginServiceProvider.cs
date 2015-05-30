@@ -1,32 +1,47 @@
 ﻿using System;
 using System.Collections.Generic;
+using LauncherZLib.Event;
+using LauncherZLib.I18N;
+using LauncherZLib.Utils;
 
 namespace LauncherZLib.Plugin.Service
 {
-    
-
     /// <summary>
     /// Provides services to plugins.
     /// </summary>
-    public sealed class PluginServiceProvider : IExtendedServiceProvider
+    public sealed class PluginServiceProvider : IPluginServiceProvider
     {
         private const string ErrMessageNotInterface = "Service type must be an interface.";
         private const string ErrMessageNotAvailable = "Service \"{0}\" is not available.";
 
         private readonly Dictionary<Type, ServiceEntry> _services = new Dictionary<Type, ServiceEntry>();
 
-        public PluginServiceProvider()
+        public PluginServiceProvider(EssentialPluginServices essentials)
         {
-
+            if (essentials == null)
+                throw new ArgumentNullException("essentials");
+            Essentials = essentials;
+            AddService(typeof (IPluginInfoProvider), essentials.PluginInfo);
+            AddService(typeof (ILocalizationDictionary), essentials.Localization);
+            AddService(typeof (ILogger), essentials.Localization);
+            AddService(typeof (IEventBus), essentials.EventBus);
+            AddService(typeof (IDispatcherService), essentials.Dispatcher);
         }
 
-        public PluginServiceProvider(IEnumerable<KeyValuePair<Type, object>> services)
+        public PluginServiceProvider(EssentialPluginServices essentials,
+            IEnumerable<KeyValuePair<Type, object>> extraServices)
+            : this(essentials)
         {
-            foreach (var pair in services)
+            if (extraServices == null)
+                throw new ArgumentNullException("extraServices");
+
+            foreach (var pair in extraServices)
             {
                 AddService(pair.Key, pair.Value);
             }
         }
+
+        public EssentialPluginServices Essentials { get; private set; }
 
         public bool CanProvideService<T>() where T : class
         {
@@ -73,6 +88,8 @@ namespace LauncherZLib.Plugin.Service
                 throw new Exception(ErrMessageNotInterface);
             if (service == null)
                 throw new ArgumentNullException("service");
+            if (_services.ContainsKey(serviceType))
+                throw new Exception("Service already exist.");
             _services[serviceType] = new ServiceEntry
             {
                 Initialized = true,

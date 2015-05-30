@@ -4,8 +4,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using LauncherZLib.Event;
-using LauncherZLib.Event.Launcher;
 using LauncherZLib.FormattedText;
 using LauncherZLib.Launcher;
 using LauncherZLib.Matching;
@@ -28,7 +26,7 @@ namespace CorePlugins.AppLauncher
         private int _saveTimerId = -1;
         private string _manifestFilePath;
 
-        public override void Activate(IExtendedServiceProvider serviceProvider)
+        public override void Activate(IPluginServiceProvider serviceProvider)
         {
             base.Activate(serviceProvider);
 
@@ -48,7 +46,7 @@ namespace CorePlugins.AppLauncher
             EventBus.Register(this);
         }
 
-        public override void Deactivate(IExtendedServiceProvider serviceProvider)
+        public override void Deactivate(IPluginServiceProvider serviceProvider)
         {
             if (_saveTimerId >= 0)
             {

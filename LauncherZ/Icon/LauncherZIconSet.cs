@@ -11,6 +11,15 @@ namespace LauncherZ.Icon
         public static IconLocation Network { get; private set; }
         public static IconLocation Calculator { get; private set; }
 
+        static LauncherZIconSet()
+        {
+            Blank = IconLocation.NotFound;
+            Program = IconLocation.NotFound;
+            Gear = IconLocation.NotFound;
+            Network = IconLocation.NotFound;
+            Calculator = IconLocation.NotFound;
+        }
+
         internal static void RegisterIconSet(LauncherZApp app, IIconRegisterer iconRegisterer)
         {
             // "IconProgram", "IconGear", "IconNetwork", "IconCalculator", "IconFolder", "IconBlank"

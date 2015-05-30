@@ -67,13 +67,11 @@ namespace LauncherZLib.Plugin
         /// <summary>
         /// Gets the associated plugin service provider.
         /// </summary>
-        public IExtendedServiceProvider ServiceProvider { get; private set; }
+        public IPluginServiceProvider ServiceProvider { get; private set; }
 
         public IEventBus PluginEventBus { get; private set; }
 
-        public PluginStatus Status { get; set; }
-
-        public PluginContainer(IPlugin pluginInstance, PluginDiscoveryInfo discoveryInfo, IExtendedServiceProvider serviceProvider)
+        public PluginContainer(IPlugin pluginInstance, PluginDiscoveryInfo discoveryInfo, IPluginServiceProvider serviceProvider)
         {
             if (pluginInstance == null)
                 throw new ArgumentNullException("pluginInstance");
@@ -83,32 +81,22 @@ namespace LauncherZLib.Plugin
                 throw new ArgumentNullException("serviceProvider");
 
             ServiceProvider = serviceProvider;
-            VerifyServices();
             
             PluginInstance = pluginInstance;
-            _pluginInfo = serviceProvider.GetService<IPluginInfoProvider>();
-            PluginEventBus = serviceProvider.GetService<IEventBus>();
-            Status = PluginStatus.Deactivated;
+            _pluginInfo = serviceProvider.Essentials.PluginInfo;
+            PluginEventBus = serviceProvider.Essentials.EventBus;
         }
 
         public int CompareTo(PluginContainer other)
         {
             return _priority.CompareTo(other._priority);
         }
-
-        private void VerifyServices()
-        {
-            if (!ServiceProvider.CanProvideService<IPluginInfoProvider>())
-                throw new Exception("Specified plugin service provider must provide IPluginInfoProvider service.");
-            if (!ServiceProvider.CanProvideService<IEventBus>())
-                throw new Exception("Specified plugin service provider must provide IEventBus service.");
-        }
-
+        
         private string TranslateWithFallback(string key, string fallback)
         {
-            if (ServiceProvider != null && ServiceProvider.CanProvideService<ILocalizationDictionary>())
-                return ServiceProvider.GetService<ILocalizationDictionary>().Translate(key);
-            return fallback;
+            return ServiceProvider.Essentials.Localization.CanTranslate(key)
+                ? ServiceProvider.Essentials.Localization[key]
+                : fallback;
         }
 
         public override string ToString()
@@ -117,5 +105,6 @@ namespace LauncherZLib.Plugin
                 "{{Name={0}, Version={1}, Authors=[{2}]}}",
                 PluginFriendlyName, PluginVersion, string.Join(", ", PluginAuthors));
         }
+
     }
 }

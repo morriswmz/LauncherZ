@@ -16,7 +16,7 @@ namespace CorePlugins.MathEvaluator
     public class MathEvaluatorPlugin : EmptyPlugin
     {
 
-        public override void Activate(IExtendedServiceProvider serviceProvider)
+        public override void Activate(IPluginServiceProvider serviceProvider)
         {
             base.Activate(serviceProvider);
             Localization.LoadLanguageFile(
@@ -24,7 +24,7 @@ namespace CorePlugins.MathEvaluator
             Logger.Fine("This is MathEvaluator. Life = 42");
         }
 
-        public override void Deactivate(IExtendedServiceProvider serviceProvider)
+        public override void Deactivate(IPluginServiceProvider serviceProvider)
         {
             // nothing to do here
         }

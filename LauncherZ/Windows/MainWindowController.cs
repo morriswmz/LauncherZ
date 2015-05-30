@@ -10,6 +10,7 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using LauncherZ.Configuration;
 using LauncherZLib;
+using LauncherZLib.Event;
 using LauncherZLib.Event.Launcher;
 using LauncherZLib.Launcher;
 using LauncherZLib.Plugin;
@@ -30,6 +31,7 @@ namespace LauncherZ.Windows
         private LauncherZConfig _config;
         private LaunchHistoryManager _historyManager;
         private PluginManager _pluginManager;
+        private IEventBus _globalEventBus;
         private QueryDistributor _queryDistributor;
         private ResultManager _resultManager;
         private ILogger _logger;
@@ -43,22 +45,16 @@ namespace LauncherZ.Windows
         private bool _mwDeactivating;
         private bool _mwActivating;
 
-        public MainWindowController(LauncherZConfig config, LaunchHistoryManager historyManager,
-            PluginManager pluginManager, ILogger logger)
+        public MainWindowController(LauncherZApp app)
         {
-            if (config == null)
-                throw new ArgumentNullException("config");
-            if (historyManager == null)
-                throw new ArgumentNullException("historyManager");
-            if (pluginManager == null)
-                throw new ArgumentNullException("pluginManager");
-            if (logger == null)
-                throw new ArgumentNullException("logger");
+            if (app == null)
+                throw new ArgumentNullException("app");
 
-            _config = config;
-            _historyManager = historyManager;
-            _pluginManager = pluginManager;
-            _logger = logger;
+            _config = app.Configuration;
+            _historyManager = app.LaunchHistoryManager;
+            _pluginManager = app.PluginManager;
+            _logger = app.Logger;
+            _globalEventBus = app.GlobalEventBus;
         }
 
         public void Attach(MainWindow mw)
@@ -69,6 +65,7 @@ namespace LauncherZ.Windows
             // prepare components
             _queryDistributor = new QueryDistributor(_pluginManager, _config.MaxResultCount);
             _resultManager = new ResultManager(_pluginManager, _queryDistributor);
+            _globalEventBus.Register(_queryDistributor);
 
             // set up data context
             _mw = mw;
@@ -129,6 +126,8 @@ namespace LauncherZ.Windows
                 _switchHotkey.Unregister();
                 _switchHotkey.Dispose();
             }
+
+            _globalEventBus.Unregister(_queryDistributor);
 
             ((INotifyCollectionChanged)_mwModel.Launchers).CollectionChanged -= Launchers_CollectionChanged;
             _mwModel.PropertyChanged -= Model_PropertyChanged;

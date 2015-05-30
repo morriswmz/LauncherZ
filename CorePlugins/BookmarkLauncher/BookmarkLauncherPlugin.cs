@@ -24,7 +24,7 @@ namespace CorePlugins.BookmarkLauncher
         private ConfigModule<BookmarkLauncherConfig> _configModule;
         private BookmarkLibrary _library; 
 
-        public override void Activate(IExtendedServiceProvider serviceProvider)
+        public override void Activate(IPluginServiceProvider serviceProvider)
         {
             base.Activate(serviceProvider);
             _configModule = new ConfigModule<BookmarkLauncherConfig>(Logger, new BookmarkLauncherConfig());
@@ -45,7 +45,7 @@ namespace CorePlugins.BookmarkLauncher
             }
         }
 
-        public override void Deactivate(IExtendedServiceProvider serviceProvider)
+        public override void Deactivate(IPluginServiceProvider serviceProvider)
         {
             // save cached bookmarks and clear references to readers/sources
             _library.SaveCachedBookmarks();

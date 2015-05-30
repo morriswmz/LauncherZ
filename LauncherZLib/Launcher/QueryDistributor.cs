@@ -24,8 +24,6 @@ namespace LauncherZLib.Launcher
 
             _pluginManager = manager;
             _maxResults = maxResults;
-            // handles events from plugins
-            _pluginManager.RegisterPluginEventHandler(this);
         }
 
         public event EventHandler<ResultUpdatedEventArgs> ResultUpdate;
