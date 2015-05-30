@@ -143,7 +143,7 @@ namespace LauncherZLib.Plugin
                 // activate
                 entry.Container.PluginInstance.Activate(entry.Container.ServiceProvider);
                 entry.Status = PluginStatus.Activated;
-                _logger.Info("Successfully activated {0}.", entry);
+                _logger.Info("Successfully activated {0}.", entry.Container);
                 // remove from disabled
                 _deactivatedPluginIds.Remove(pluginId);
                 // rebuild active list
@@ -156,7 +156,7 @@ namespace LauncherZLib.Plugin
             {
                 _logger.Error(
                     "An exception occured while activitng the plugin {0}. Details: {1}{2}",
-                    entry, Environment.NewLine, ex);
+                    entry.Container, Environment.NewLine, ex);
                 entry.Status = PluginStatus.Crashed;
                 return false;
             }
@@ -182,7 +182,7 @@ namespace LauncherZLib.Plugin
             try
             {
                 // deactivate
-                _logger.Info("Sending deactivation signal to {0}.", entry);
+                _logger.Info("Sending deactivation signal to {0}.", entry.Container);
                 entry.Container.PluginInstance.Deactivate(entry.Container.ServiceProvider);
                 entry.Status = PluginStatus.Deactivated;
             }
@@ -190,7 +190,7 @@ namespace LauncherZLib.Plugin
             {
                 _logger.Error(
                     "An exception occured while deactivating the plugin {0}. Details: {1}{2}",
-                    entry, Environment.NewLine, ex);
+                    entry.Container, Environment.NewLine, ex);
                 entry.Status = PluginStatus.Crashed;
                 return false;
             }

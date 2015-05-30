@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -34,6 +35,9 @@ namespace LauncherZLib.Plugin.Loader
         {
             if (searchPath == null)
                 throw new ArgumentNullException("searchPath");
+            
+            var sw = new Stopwatch();
+            sw.Start();
 
             PluginDiscoveryInfo[] candidates = _discoverer.DiscoverAllIn(searchPath).ToArray();
             var conflicts = candidates.GroupBy(c => c.Id).Where(g => g.Count() > 1).ToList();
@@ -52,7 +56,7 @@ namespace LauncherZLib.Plugin.Loader
                 return Enumerable.Empty<UncontainedPlugin>();
             }
             // load
-            return candidates.Select(pdi =>
+            UncontainedPlugin[] loadedPlugins = candidates.Select(pdi =>
             {
                 IPlugin pluginInstance = null;
                 try
@@ -67,17 +71,22 @@ namespace LauncherZLib.Plugin.Loader
                         );
                 }
                 return pluginInstance == null ? null : new UncontainedPlugin(pluginInstance, pdi);
-            }).Where(x => x != null);
+            }).Where(x => x != null)
+            .ToArray();
+
+            sw.Stop();
+            _logger.Info("Loaded {0} plugin(s) in {1}ms.", loadedPlugins.Length, sw.ElapsedMilliseconds);
+            return loadedPlugins;
         } 
         
         public IPlugin LoadInstance(PluginDiscoveryInfo pdi)
         {
-            switch (pdi.Type)
+            switch (pdi.PluginType)
             {
                 case PluginType.Assembly:
                     return LoadAssemblyPlugin(pdi);
                 default:
-                    throw new NotSupportedException(string.Format("Plugin type \"{0}\" is not supported.", pdi.Type));
+                    throw new NotSupportedException(string.Format("Plugin type \"{0}\" is not supported.", pdi.PluginType));
             }
         }
 

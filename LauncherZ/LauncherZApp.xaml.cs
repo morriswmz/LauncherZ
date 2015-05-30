@@ -193,12 +193,12 @@ namespace LauncherZ
                 Logger.CreateLogger("PluginLoader"));
             var pcs = pluginLoader.LoadPlugins(new string[]
             {
-                this.SpecialFolderManager.DefaultPluginFolder,
-                this.SpecialFolderManager.UserPluginFolder
+                SpecialFolderManager.DefaultPluginFolder,
+                SpecialFolderManager.UserPluginFolder
             }).Select(p =>
             {
                 var essentialServices = new EssentialPluginServices(
-                    new StaticPluginInfoProvider(p.Info, this.SpecialFolderManager.PluginDataFolder),
+                    new StaticPluginInfoProvider(p.Info, SpecialFolderManager.PluginDataFolder),
                     new LocalizationDictionary(), 
                     Logger.CreateLogger(p.Info.Id),
                     new PluginEventBus(p.Info.Id, GlobalEventBus, AppDispatcherService),
@@ -212,7 +212,7 @@ namespace LauncherZ
                 });
                 return new PluginContainer(p.Instance, p.Info, psp);
             });
-            PluginManager = new PluginManager(Logger);
+            PluginManager = new PluginManager(Logger.CreateLogger("PluginManager"));
             foreach (var pluginContainer in pcs)
             {
                 PluginManager.AddAndActivate(pluginContainer);
