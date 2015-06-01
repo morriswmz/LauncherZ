@@ -12,6 +12,7 @@ using System.Windows.Media.Imaging;
 using LauncherZ.App;
 using LauncherZ.Configuration;
 using LauncherZ.Icon;
+using LauncherZ.Plugin;
 using LauncherZ.Windows;
 using LauncherZLib;
 using LauncherZLib.Event;
@@ -191,11 +192,16 @@ namespace LauncherZ
             var pluginLoader = new PluginLoader(
                 new PluginDiscoverer(Logger.CreateLogger("PluginDiscoverer")),
                 Logger.CreateLogger("PluginLoader"));
-            var pcs = pluginLoader.LoadPlugins(new string[]
+            List<UncontainedPlugin> uncontainedPlugins = pluginLoader.LoadPlugins(new string[]
             {
                 SpecialFolderManager.DefaultPluginFolder,
                 SpecialFolderManager.UserPluginFolder
-            }).Select(p =>
+            }).ToList();
+            // add internal plugin here
+            uncontainedPlugins.Add(new UncontainedPlugin(new InternalsPlugin(),
+                PluginDiscoveryInfo.FromType(typeof (InternalsPlugin), false)));
+            // init services
+            var pcs = uncontainedPlugins.Select(p =>
             {
                 var essentialServices = new EssentialPluginServices(
                     new StaticPluginInfoProvider(p.Info, SpecialFolderManager.PluginDataFolder),

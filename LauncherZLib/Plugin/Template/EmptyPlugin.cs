@@ -11,7 +11,7 @@ namespace LauncherZLib.Plugin.Template
 {
     public abstract class EmptyPlugin : IPlugin
     {
-        protected IExtendedServiceProvider ServiceProvider;
+        protected IPluginServiceProvider ServiceProvider;
         protected IPluginInfoProvider PluginInfo;
         protected ILogger Logger;
         protected ILocalizationDictionary Localization;
@@ -40,10 +40,25 @@ namespace LauncherZLib.Plugin.Template
                         Environment.NewLine, ex);
                 }
             }
+            // load localization
+            string defaultI18NDir = Path.Combine(PluginInfo.PluginSourceDirectory, "I18N");
+            if (Directory.Exists(defaultI18NDir))
+            {
+                string defaultI18NFile = Path.Combine(defaultI18NDir, PluginInfo.PluginId + ".json");
+                try
+                {
+                    Localization.LoadLanguageFile(defaultI18NFile);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Warning("Unable to automatically load default language file \"{0}\". You may need to manually load language files.", defaultI18NFile);   
+                }
+            }
         }
 
         public virtual void Deactivate(IPluginServiceProvider serviceProvider)
         {
+            Localization.Clear();
             // clear all references
             EventBus = null;
             Localization = null;

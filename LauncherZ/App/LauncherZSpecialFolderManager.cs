@@ -13,6 +13,7 @@ namespace LauncherZ.App
         public static string LogFolderName { get { return "Logs"; } }
         public static string LexiconFolderName { get { return "Lexicons"; } }
         public static string ThemeFolderName { get { return "Themes"; } }
+        public static string I18NFolderName { get { return "I18N"; } }
 
         /// <summary>
         /// Gets the full path of the folder containing the LauncherZ assembly.
@@ -63,6 +64,11 @@ namespace LauncherZ.App
         /// Gets the full path of the user theme folder, located in the user data folder.
         /// </summary>
         public string UserThemeFolder { get; private set; }
+
+        /// <summary>
+        /// Gets the full path of the localization file folder, located in the assembly folder.
+        /// </summary>
+        public string I18NFolder { get; private set; }
         
         /// <summary>
         /// Set up all special folders.
@@ -79,6 +85,7 @@ namespace LauncherZ.App
             DefaultPluginFolder = Path.Combine(AssemblyFolder, PluginFolderName);
             DefaultLexiconFolder = Path.Combine(AssemblyFolder, LexiconFolderName);
             DefaultThemeFolder = Path.Combine(AssemblyFolder, ThemeFolderName);
+            I18NFolder = Path.Combine(AssemblyFolder, I18NFolderName);
 
             string systemAppDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 #if DEBUG

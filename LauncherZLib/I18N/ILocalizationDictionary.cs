@@ -48,5 +48,10 @@ namespace LauncherZLib.I18N
         /// Reloads all loaded language files.
         /// </summary>
         void ReloadAllLanguageFiles();
+
+        /// <summary>
+        /// Clears all entries and language files.
+        /// </summary>
+        void Clear();
     }
 }

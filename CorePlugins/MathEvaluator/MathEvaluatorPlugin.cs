@@ -19,8 +19,6 @@ namespace CorePlugins.MathEvaluator
         public override void Activate(IPluginServiceProvider serviceProvider)
         {
             base.Activate(serviceProvider);
-            Localization.LoadLanguageFile(
-                Path.Combine(PluginInfo.PluginSourceDirectory, @"I18N\MathEvaluatorStrings.json"));
             Logger.Fine("This is MathEvaluator. Life = 42");
         }
 

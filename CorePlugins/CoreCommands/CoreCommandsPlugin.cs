@@ -21,8 +21,6 @@ namespace CorePlugins.CoreCommands
         public override void Activate(IPluginServiceProvider serviceProvider)
         {
             base.Activate(serviceProvider);
-            Localization.LoadLanguageFile(
-                Path.Combine(PluginInfo.PluginSourceDirectory, @"I18N\CoreCommandsStrings.json"));
             AddCommandHandlers();
             EventBus.Register(this);
         }

@@ -116,6 +116,12 @@ namespace LauncherZLib.I18N
             _loadedLanguageFiles.ForEach(LoadLanguageFile);
         }
 
+        public void Clear()
+        {
+            _strings.Clear();
+            _loadedLanguageFiles.Clear();
+        }
+
         /// <summary>
         /// Removes culture name from given path.
         /// </summary>

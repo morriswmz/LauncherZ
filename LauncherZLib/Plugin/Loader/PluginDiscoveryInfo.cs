@@ -67,20 +67,9 @@ namespace LauncherZLib.Plugin.Loader
         {
             if (t == null)
                 throw new ArgumentNullException("t");
-            return reflectionOnly ? FromReflectionType(t) : FromRuntimeType(t);
-        }
 
-        private static PluginDiscoveryInfo FromRuntimeType(Type t)
-        {
             string path = GetTypeAssemblyPath(t);
 
-            throw new NotImplementedException();
-        }
-
-        private static PluginDiscoveryInfo FromReflectionType(Type t)
-        {
-            string path = GetTypeAssemblyPath(t);
-            
             IList<CustomAttributeData> attrs = CustomAttributeData.GetCustomAttributes(t);
             if (attrs.Count == 0)
                 return new PluginDiscoveryInfo();
@@ -89,13 +78,27 @@ namespace LauncherZLib.Plugin.Loader
             CustomAttributeData descriptionAttrData = null;
             foreach (var attr in attrs)
             {
-                if (attr.AttributeType == ReflOnlyPluginAttrType)
+                if (reflectionOnly)
                 {
-                    pluginAttrData = attr;
+                    if (attr.AttributeType == ReflOnlyPluginAttrType)
+                    {
+                        pluginAttrData = attr;
+                    }
+                    else if (attr.AttributeType == ReflOnlyDescriptionAttrType)
+                    {
+                        descriptionAttrData = attr;
+                    }
                 }
-                else if (attr.AttributeType == ReflOnlyDescriptionAttrType)
+                else
                 {
-                    descriptionAttrData = attr;
+                    if (attr.AttributeType == typeof(PluginAttribute))
+                    {
+                        pluginAttrData = attr;
+                    }
+                    else if (attr.AttributeType == typeof(DescriptionAttribute))
+                    {
+                        descriptionAttrData = attr;
+                    }
                 }
             }
             if (pluginAttrData == null)

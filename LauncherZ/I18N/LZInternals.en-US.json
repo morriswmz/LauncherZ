@@ -1,0 +1,8 @@
+﻿{
+    /* the following items should match the attributes */
+    "PluginFriendlyName": "LauncherZ Internals",
+    "PluginDescription": "Provides internal commands.",
+    /* en-US */
+    "AboutCommandTitle": "About [LauncherZ]",
+    "AboutCommandDescription":  "By [{0}]. Version [{1}]."
+}

@@ -110,6 +110,7 @@
     <Compile Include="Plugin\PluginContainer.cs" />
     <Compile Include="Plugin\PluginManager.cs" />
     <Compile Include="Plugin\PluginType.cs" />
+    <Compile Include="Plugin\Template\BasicCommandHandler.cs" />
     <Compile Include="Plugin\Template\CommandLauncherData.cs" />
     <Compile Include="Plugin\Template\CommandModule.cs" />
     <Compile Include="Plugin\Template\ConfigModule.cs" />

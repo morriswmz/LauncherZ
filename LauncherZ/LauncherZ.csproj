@@ -138,6 +138,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Content Include="I18N\LZInternals.en-US.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="Themes\AboutThemes.txt" />
     <Content Include="Themes\TerminalTheme.xaml">
       <SubType>Designer</SubType>
@@ -151,6 +154,8 @@
       <DependentUpon>LauncherZApp.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Plugin\AboutCommandHandler.cs" />
+    <Compile Include="Plugin\InternalsPlugin.cs" />
     <Compile Include="Windows\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

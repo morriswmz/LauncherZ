@@ -95,10 +95,11 @@
     <ProjectReference Include="..\LauncherZ\LauncherZ.csproj">
       <Project>{8735cfb4-7232-4076-8e22-63ace8e5e6fd}</Project>
       <Name>LauncherZ</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="I18N\CoreCommandsStrings.en-US.json">
+    <Content Include="I18N\LZCoreCommands.en-US.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -114,15 +115,15 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="I18N\MathEvaluatorStrings.en-US.json">
+    <Content Include="I18N\LZMathEvaluator.en-US.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(ProjectDir)$(OutDir)$(TargetFileName)" "$(SolutionDir)LauncherZ\bin\Debug\Plugins\CorePlugin\" /Y
-xcopy "$(ProjectDir)$(OutDir)I18N" "$(SolutionDir)LauncherZ\bin\Debug\Plugins\CorePlugin\I18N\" /E /Y</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(ProjectDir)$(OutDir)$(TargetFileName)" "$(SolutionDir)LauncherZ\bin\Debug\Plugins\CorePlugins\" /Y
+xcopy "$(ProjectDir)$(OutDir)I18N" "$(SolutionDir)LauncherZ\bin\Debug\Plugins\CorePlugins\I18N\" /E /Y</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
