@@ -90,4 +90,6 @@
     <BitmapImage x:Key="IconCalculator" UriSource="../Assets/IconCalculator.png" presentationOptions:Freeze="True"></BitmapImage>
     <BitmapImage x:Key="IconFolder" UriSource="../Assets/IconFolder.png" presentationOptions:Freeze="True"></BitmapImage>
     <BitmapImage x:Key="IconBlank" UriSource="../Assets/IconBlank.png" presentationOptions:Freeze="True"></BitmapImage>
+    <BitmapImage x:Key="IconComponentActive" UriSource="../Assets/IconComponentActive.png" presentationOptions:Freeze="True"></BitmapImage>
+    <BitmapImage x:Key="IconComponentInactive" UriSource="../Assets/IconComponentInactive.png" presentationOptions:Freeze="True"></BitmapImage>
 </ResourceDictionary>

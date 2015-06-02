@@ -3,6 +3,12 @@
     "PluginFriendlyName": "LauncherZ Internals",
     "PluginDescription": "Provides internal commands.",
     /* en-US */
+    "AuthorSeparator": ", ",
+    "NoDescriptionGiven": "No description given.",
     "AboutCommandTitle": "About [LauncherZ]",
-    "AboutCommandDescription":  "By [{0}]. Version [{1}]."
+    "AboutCommandDescription": "By [{0}]. Version [{1}].",
+    "PluginCommandListTitle": "[{0}] ~by {1}~",
+    "PluginCommandListDescription": "{0}\nStatus: [{1}]",
+    "PluginStatusActivated": "Activated",
+    "PluginStatusDeactivated":  "Deactivated"
 }

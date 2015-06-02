@@ -15,7 +15,7 @@ namespace LauncherZ.Plugin
 
         public override string CommandName
         {
-            get { return "about"; }
+            get { return "lz-about"; }
         }
 
         public override IEnumerable<CommandLauncherData> HandleQuery(LauncherQuery query)

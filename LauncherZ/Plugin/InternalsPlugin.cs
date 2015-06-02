@@ -17,7 +17,8 @@ namespace LauncherZ.Plugin
         {
             base.Activate(serviceProvider);
             _commandModule = new CommandModule<BasicCommandHandler>(true);
-            _commandModule.AddOrUpdateCommandHanlder(new AboutCommandHandler(ServiceProvider));
+            _commandModule.AddOrUpdateCommandHanlder(new AboutCommandHandler(serviceProvider));
+            _commandModule.AddOrUpdateCommandHanlder(new PluginCommandHandler(serviceProvider));
         }
 
         public override void Deactivate(IPluginServiceProvider serviceProvider)

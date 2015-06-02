@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using LauncherZLib.Launcher;
 
 namespace LauncherZLib.Plugin.Template
@@ -41,6 +42,10 @@ namespace LauncherZLib.Plugin.Template
                 throw new ArgumentNullException("handler");
             if (string.IsNullOrWhiteSpace(handler.CommandName))
                 throw new Exception("Command name cannot be null or whitespace.");
+            if (Regex.IsMatch(handler.CommandName, @"\s"))
+            {
+                throw new Exception("Command name cannot contain whitespaces.");
+            }
             bool update = CommandHandlers.ContainsKey(handler.CommandName) &&
                           CommandHandlers[handler.CommandName].Equals(handler);
             CommandHandlers[handler.CommandName] = handler;

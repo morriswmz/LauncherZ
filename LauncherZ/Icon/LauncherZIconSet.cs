@@ -10,6 +10,8 @@ namespace LauncherZ.Icon
         public static IconLocation Gear { get; private set; }
         public static IconLocation Network { get; private set; }
         public static IconLocation Calculator { get; private set; }
+        public static IconLocation ComponentActive { get; private set; }
+        public static IconLocation ComponentInactive { get; private set; }
 
         static LauncherZIconSet()
         {
@@ -18,6 +20,8 @@ namespace LauncherZ.Icon
             Gear = IconLocation.NotFound;
             Network = IconLocation.NotFound;
             Calculator = IconLocation.NotFound;
+            ComponentActive = IconLocation.NotFound;
+            ComponentInactive = IconLocation.NotFound;
         }
 
         internal static void RegisterIconSet(LauncherZApp app, IIconRegisterer iconRegisterer)
@@ -28,6 +32,8 @@ namespace LauncherZ.Icon
             Gear = RegisterIcon(iconRegisterer, app.FindResource("IconGear") as BitmapSource);
             Network = RegisterIcon(iconRegisterer, app.FindResource("IconNetwork") as BitmapSource);
             Calculator = RegisterIcon(iconRegisterer, app.FindResource("IconCalculator") as BitmapSource);
+            ComponentActive = RegisterIcon(iconRegisterer, app.FindResource("IconComponentActive") as BitmapSource);
+            ComponentInactive = RegisterIcon(iconRegisterer, app.FindResource("IconComponentInactive") as BitmapSource);
         }
 
         internal static IconLocation RegisterIcon(IIconRegisterer iconRegisterer, BitmapSource icon)
