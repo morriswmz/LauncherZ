@@ -26,7 +26,7 @@ namespace CorePlugins.CoreCommands.Commands
                 {
                     Title = Localization["ExitCommandTitle"],
                     Description = Localization["ExitCommandDescription"],
-                    IconLocation = LauncherZIconSet.Gear.ToString()
+                    IconLocation = LauncherZIconSet.Exit.ToString()
                 }
             };
         }

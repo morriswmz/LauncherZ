@@ -83,6 +83,8 @@
     <!-- Icons -->
     <SolidColorBrush x:Key="IconBorderBrush" Color="White"></SolidColorBrush>
     <BitmapImage x:Key="IconProgram" UriSource="../Assets/IconProgram.png" presentationOptions:Freeze="True"></BitmapImage>
+    <BitmapImage x:Key="IconExit" UriSource="../Assets/IconExit.png" presentationOptions:Freeze="True"></BitmapImage>
+    <BitmapImage x:Key="IconLink" UriSource="../Assets/IconLink.png" presentationOptions:Freeze="True"></BitmapImage>
     <BitmapImage x:Key="IconGear" UriSource="../Assets/IconGear.png" presentationOptions:Freeze="True"></BitmapImage>
     <BitmapImage x:Key="IconNetwork" UriSource="../Assets/IconNetwork.png" presentationOptions:Freeze="True"></BitmapImage>
     <BitmapImage x:Key="IconCalculator" UriSource="../Assets/IconCalculator.png" presentationOptions:Freeze="True"></BitmapImage>
