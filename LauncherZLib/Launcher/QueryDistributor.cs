@@ -13,16 +13,18 @@ namespace LauncherZLib.Launcher
     {
 
         private readonly PluginManager _pluginManager;
+        private readonly ILogger _logger;
         private int _maxResults;
 
         private LauncherQuery _currentQuery;
 
-        public QueryDistributor(PluginManager manager, int maxResults)
+        public QueryDistributor(PluginManager manager, ILogger logger, int maxResults)
         {
             if (manager == null)
                 throw new ArgumentNullException("manager");
 
             _pluginManager = manager;
+            _logger = logger;
             _maxResults = maxResults;
         }
 
@@ -38,7 +40,6 @@ namespace LauncherZLib.Launcher
 
         public LauncherQuery CurrentQuery { get { return _currentQuery; } }
 
-
         public void DistributeQuery(LauncherQuery query)
         {
             _currentQuery = query;
@@ -47,12 +48,42 @@ namespace LauncherZLib.Launcher
             var sw = new Stopwatch();
             sw.Start();
 #endif
-            foreach (var container in _pluginManager.SortedActivePlugins)
+            if (query.IsBroadcast)
             {
-                if (resultsSync.Count > _maxResults)
-                    break;
-                var immResults = container.PluginInstance.Query(query);
-                resultsSync.AddRange(immResults.Select(launcherData => new TaggedObject<LauncherData>(container.PluginId, launcherData)));
+                foreach (var container in _pluginManager.SortedActivePlugins)
+                {
+                    if (resultsSync.Count > _maxResults)
+                        break;
+                    try
+                    {
+                        var immResults = container.PluginInstance.Query(query);
+                        resultsSync.AddRange(
+                            immResults.Select(
+                                launcherData => new TaggedObject<LauncherData>(container.PluginId, launcherData)));
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.Error("An exception occurred while query {0} with input {1}. Details:{2}{3}",
+                            container, query.OriginalInput, Environment.NewLine, ex);
+                    }
+                }
+            }
+            else
+            {
+                if (_pluginManager.IsPluginActivated(query.TargetPluginId))
+                {
+                    var pc = _pluginManager.GetPluginContainer(query.TargetPluginId);
+                    try
+                    {
+                        resultsSync.AddRange(
+                            pc.PluginInstance.Query(query).Select(x => new TaggedObject<LauncherData>(pc.PluginId, x)));
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.Error("An exception occurred while query {0} with input {1}. Details:{2}{3}",
+                            pc, query.OriginalInput, Environment.NewLine, ex);
+                    }
+                }
             }
 #if DEBUG
             sw.Stop();

@@ -12,19 +12,19 @@
         /// </summary>
         public static readonly PostLaunchAction DoNothing = new PostLaunchAction(false, false, false, "");
         /// <summary>
-        /// Resets input and enters exclusive mode. Window is kept shown.
+        /// Resets input and enters standalone mode. Window is kept shown.
         /// </summary>
-        public static readonly PostLaunchAction ResetInputAndEnterExclusiveMode = new PostLaunchAction(false, true, true, "");
+        public static readonly PostLaunchAction ResetInputAndEnableStandaloneMode = new PostLaunchAction(false, true, true, "");
         /// <summary>
-        /// Resets input and exits exclusive mode. Window is kept shown.
+        /// Resets input and exits standalone mode. Window is kept shown.
         /// </summary>
-        public static readonly PostLaunchAction ResetInputAndExitExclusiveMode = new PostLaunchAction(false, true, false, "");
+        public static readonly PostLaunchAction ResetInputAndDisableStandaloneMode = new PostLaunchAction(false, true, false, "");
 
-        public PostLaunchAction(bool hideWindow, bool modifyInput, bool enterExclusiveMode, string modifiedInput)
+        public PostLaunchAction(bool hideWindow, bool modifyInput, bool enableStandaloneMode, string modifiedInput)
         {
             HideWindow = hideWindow;
             ModifyInput = modifyInput;
-            EnterExclusiveMode = enterExclusiveMode;
+            EnableStandaloneMode = enableStandaloneMode;
             ModifiedInput = modifiedInput;
         }
 
@@ -39,10 +39,10 @@
         public bool ModifyInput { get; set; }
         
         /// <summary>
-        /// Set to true to enter exclusive mode, where following queries will be handled exclusively by
-        /// this plugin.
+        /// Set to true to enter standalone mode, where following queries will be handled by this plugin
+        /// only.
         /// </summary>
-        public bool EnterExclusiveMode { get; set; }
+        public bool EnableStandaloneMode { get; set; }
         
         /// <summary>
         /// Modfied input. Effective when <see cref="P:LauncherZLib.Launcher.PostLaunchAction.ModifyInput"/>

@@ -12,6 +12,7 @@ using LauncherZ.Configuration;
 using LauncherZLib;
 using LauncherZLib.Event;
 using LauncherZLib.Event.Launcher;
+using LauncherZLib.Event.Plugin;
 using LauncherZLib.Launcher;
 using LauncherZLib.Plugin;
 using LauncherZLib.Utils;
@@ -44,6 +45,8 @@ namespace LauncherZ.Windows
         private LauncherData _lastSelectedLauncher;
         private bool _mwDeactivating;
         private bool _mwActivating;
+        private bool _mwLaunching;
+        private string _standaloneId;
 
         public MainWindowController(LauncherZApp app)
         {
@@ -63,7 +66,7 @@ namespace LauncherZ.Windows
                 Detach();
 
             // prepare components
-            _queryDistributor = new QueryDistributor(_pluginManager, _config.MaxResultCount);
+            _queryDistributor = new QueryDistributor(_pluginManager, _logger, _config.MaxResultCount);
             _resultManager = new ResultManager(_pluginManager, _queryDistributor);
             _globalEventBus.Register(_queryDistributor);
 
@@ -169,7 +172,10 @@ namespace LauncherZ.Windows
                 // otherwise we may see phantoms upon shown
                 _mw.Dispatcher.InvokeAsync(() =>
                 {
-                    _mw.Hide();
+                    if (_mw != null)
+                    {
+                        _mw.Hide();
+                    }
                     _mwDeactivating = false;
                 }, DispatcherPriority.ContextIdle);
             }
@@ -212,6 +218,20 @@ namespace LauncherZ.Windows
         private void ClearResults()
         {
             _queryDistributor.ClearCurrentQuery();
+            if (_standaloneId != null)
+            {
+                _pluginManager.DistributeEventTo(_standaloneId, new StandaloneModeChangedEvent(false));
+                _standaloneId = null;
+            }
+        }
+
+        private void DistributeNewQuery()
+        {
+            ClearResults();
+            if (!string.IsNullOrWhiteSpace(_mwModel.InputText))
+            {
+                _queryDistributor.DistributeQuery(new LauncherQuery(_mwModel.InputText.Trim(), _standaloneId));
+            }
         }
 
         #region Event Handlers
@@ -235,32 +255,52 @@ namespace LauncherZ.Windows
         {
             if (e.Key.Equals(Key.Enter))
             {
+                _mwLaunching = true;
                 LauncherData launcherData = _mwModel.SelectedLauncher;
-                if (launcherData != null)
+                if (launcherData == null)
                 {
-                    var pluginId = _resultManager.GetPluginIdOf(launcherData);
-                    PostLaunchAction action = _pluginManager
-                        .GetPluginContainer(pluginId)
-                        .PluginInstance
-                        .Launch(launcherData);
-                    _historyManager.PushHistory(_mwModel.InputText, pluginId);
-                    if (action.HideWindow)
+                    _mwLaunching = false;
+                    return;
+                }
+                var pluginId = _resultManager.GetPluginIdOf(launcherData);
+                PostLaunchAction action = _pluginManager
+                    .GetPluginContainer(pluginId)
+                    .PluginInstance
+                    .Launch(launcherData);
+                _historyManager.PushHistory(_mwModel.InputText, pluginId);
+                if (action.HideWindow)
+                {
+                    ClearAndHideMainWindow();
+                }
+                else
+                {
+                    if (action.EnableStandaloneMode)
                     {
-                        ClearAndHideMainWindow();
+                        if (_standaloneId != pluginId)
+                        {
+                            if (_standaloneId != null)
+                            {
+                                _pluginManager.DistributeEventTo(pluginId, new StandaloneModeChangedEvent(false));
+                            }
+                            _standaloneId = pluginId;
+                            _pluginManager.DistributeEventTo(pluginId, new StandaloneModeChangedEvent(true));
+                        }
                     }
                     else
                     {
-                        if (action.ModifyInput)
+                        if (_standaloneId != null)
                         {
-                            _mwModel.InputText = action.ModifiedInput;
+                            _pluginManager.DistributeEventTo(pluginId, new StandaloneModeChangedEvent(false));
                         }
-                        if (action.EnterExclusiveMode)
-                        {
-                            
-                        }
+                        _standaloneId = null;
                     }
-                    e.Handled = true;
+                    if (action.ModifyInput && action.ModifiedInput != _mwModel.InputText)
+                    {
+                        _mwModel.InputText = action.ModifiedInput;
+                        DistributeNewQuery();
+                    }
                 }
+                e.Handled = true;
             }
         }
         
@@ -314,7 +354,7 @@ namespace LauncherZ.Windows
             switch (e.PropertyName)
             {
                 case "InputText":
-                    if (_mwDeactivating)
+                    if (_mwDeactivating || _mwLaunching)
                         return;
                     _inputDelayTimer.Interval = InputResponseDelay;
                     _inputDelayTimer.Start();
@@ -383,11 +423,7 @@ namespace LauncherZ.Windows
 
         private void InputDelayTimer_Tick(object sender, EventArgs eventArgs)
         {
-            ClearResults();
-            if (!string.IsNullOrWhiteSpace(_mwModel.InputText))
-            {
-                _queryDistributor.DistributeQuery(new LauncherQuery(_mwModel.InputText.Trim()));
-            }
+            DistributeNewQuery();
             _inputDelayTimer.Stop();
         }
 

@@ -12,6 +12,7 @@ namespace LauncherZLib.Launcher
         private static long _queryCounter = 0;
 
         private readonly long _queryId;
+        private readonly string _targetPluginId;
         private readonly string _originalInput;
         private readonly ArgumentCollection _arguments;
 
@@ -19,13 +20,17 @@ namespace LauncherZLib.Launcher
         /// Creates a new query from given input.
         /// </summary>
         /// <param name="input"></param>
-        public LauncherQuery(string input)
+        /// <param name="targetPluginId"></param>
+        public LauncherQuery(string input, string targetPluginId)
         {
             long newId = Interlocked.Increment(ref _queryCounter);
             _queryId = newId;
             _originalInput = input;
+            _targetPluginId = targetPluginId;
             _arguments = new ArgumentCollection(ParseArguments(input));
         }
+
+        public LauncherQuery(string input) : this(input, null) { }
 
         /// <summary>
         /// Gets the unique query id.
@@ -41,6 +46,17 @@ namespace LauncherZLib.Launcher
         /// Gets the parse arguments.
         /// </summary>
         public ArgumentCollection Arguments { get { return _arguments; } }
+
+        /// <summary>
+        /// If the query targets a specific plugin, gets the id of the target plugin.
+        /// Otherwise null is returned.
+        /// </summary>
+        public string TargetPluginId { get { return _targetPluginId; } }
+
+        /// <summary>
+        /// Checks if this query is a broadcast query (i.e. not targeting any specific plugin).
+        /// </summary>
+        public bool IsBroadcast { get { return _targetPluginId == null; } }
 
         /// <summary>
         /// Splits original input into arguments by space and double quotes.

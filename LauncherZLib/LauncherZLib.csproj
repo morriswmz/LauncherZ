@@ -62,6 +62,7 @@
     <Compile Include="Event\PluginInternal\PluginEventInternal.cs" />
     <Compile Include="Event\PluginInternal\QueryResultUpdateEventI.cs" />
     <Compile Include="Event\Plugin\QueryResultUpdateEvent.cs" />
+    <Compile Include="Event\Plugin\StandaloneModeChangedEvent.cs" />
     <Compile Include="FormattedText\FormattedSegment.cs" />
     <Compile Include="FormattedText\FormattedTextEngine.cs" />
     <Compile Include="FormattedText\TextFormat.cs" />
