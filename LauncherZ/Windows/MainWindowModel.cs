@@ -10,6 +10,8 @@ namespace LauncherZ.Windows
     {
 
         private string _inputText = "";
+        private string _hintText = "LauncherZ";
+        private bool _isInputEnabled = true;
         private SelectionRange _inputSelectionRange = new SelectionRange(0, 0);
         private ReadOnlyObservableCollection<LauncherData> _launchers;
         private LauncherData _selectedLauncher;
@@ -24,6 +26,32 @@ namespace LauncherZ.Windows
                 if (_inputText != value)
                 {
                     _inputText = value;
+                    RaisePropertyChangedEvent();
+                }
+            }
+        }
+
+        public string HintText
+        {
+            get { return _hintText; }
+            set
+            {
+                if (_hintText != value)
+                {
+                    _hintText = value;
+                    RaisePropertyChangedEvent();
+                }
+            }
+        }
+
+        public bool IsInputEnabled
+        {
+            get { return _isInputEnabled; }
+            set
+            {
+                if (_isInputEnabled != value)
+                {
+                    _isInputEnabled = value;
                     RaisePropertyChangedEvent();
                 }
             }

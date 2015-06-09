@@ -16,9 +16,9 @@
     <Grid Margin="0,0,0,0">
         <Border Style="{DynamicResource MainWindowBorderStyle}">
             <StackPanel>
-                <TextBlock x:Name="CtlHintText" Text="LauncherZ" Style="{DynamicResource HintTextStyle}"/>
+                <TextBlock x:Name="CtlHintText" Text="{Binding HintText}" Style="{DynamicResource HintTextStyle}"/>
                 <!--<TextBox x:Name="CtlInputBox" Padding="2,4" Margin="10,4,10,10" Style="{DynamicResource InputTextBoxStyle}" Text="{Binding InputText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="32"/>-->
-                <controls:SelectionRangeAwareTextBox x:Name="CtlInputBox" Style="{DynamicResource InputTextBoxStyle}" Text="{Binding InputText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectionRange="{Binding InputSelectionRange, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <controls:SelectionRangeAwareTextBox x:Name="CtlInputBox" Style="{DynamicResource InputTextBoxStyle}" Text="{Binding InputText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectionRange="{Binding InputSelectionRange, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsInputEnabled, FallbackValue=True}"/>
                 <controls:LauncherListView x:Name="CtlLauncherList" Style="{DynamicResource LauncherListStyle}" SelectedLauncher="{Binding DataContext.SelectedLauncher, ElementName=MainWindowInstance, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DataContext="{Binding Launchers}" Focusable="False"/>
             </StackPanel>
         </Border>

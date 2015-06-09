@@ -6,24 +6,17 @@
         /// <summary>
         /// Default action. Hides window.
         /// </summary>
-        public static readonly PostLaunchAction Default = new PostLaunchAction(true, false, false, "");
+        public static readonly PostLaunchAction Default = new PostLaunchAction(true, false, false, false, "");
         /// <summary>
         /// Does nothing.
         /// </summary>
-        public static readonly PostLaunchAction DoNothing = new PostLaunchAction(false, false, false, "");
-        /// <summary>
-        /// Resets input and enters standalone mode. Window is kept shown.
-        /// </summary>
-        public static readonly PostLaunchAction ResetInputAndEnableStandaloneMode = new PostLaunchAction(false, true, true, "");
-        /// <summary>
-        /// Resets input and exits standalone mode. Window is kept shown.
-        /// </summary>
-        public static readonly PostLaunchAction ResetInputAndDisableStandaloneMode = new PostLaunchAction(false, true, false, "");
+        public static readonly PostLaunchAction DoNothing = new PostLaunchAction(false, false, false, false, "");
 
-        public PostLaunchAction(bool hideWindow, bool modifyInput, bool enableStandaloneMode, string modifiedInput)
+        public PostLaunchAction(bool hideWindow, bool modifyInput, bool lockUserInput, bool enableStandaloneMode, string modifiedInput)
         {
             HideWindow = hideWindow;
             ModifyInput = modifyInput;
+            LockUserInput = lockUserInput;
             EnableStandaloneMode = enableStandaloneMode;
             ModifiedInput = modifiedInput;
         }
@@ -37,15 +30,21 @@
         /// Set to true to enable modification of the input.
         /// </summary>
         public bool ModifyInput { get; set; }
+
+        /// <summary>
+        /// Set to true to lock the input so user cannot modify the query.
+        /// Setting to false will unlock the user input.
+        /// </summary>
+        public bool LockUserInput { get; set; }
         
         /// <summary>
         /// Set to true to enter standalone mode, where following queries will be handled by this plugin
-        /// only.
+        /// only. Setting to false to disable standalone mode.
         /// </summary>
         public bool EnableStandaloneMode { get; set; }
         
         /// <summary>
-        /// Modfied input. Effective when <see cref="P:LauncherZLib.Launcher.PostLaunchAction.ModifyInput"/>
+        /// Gets or sets the modfied input. Effective when <see cref="P:LauncherZLib.Launcher.PostLaunchAction.ModifyInput"/>
         /// is true.
         /// </summary>
         public string ModifiedInput { get; set; }

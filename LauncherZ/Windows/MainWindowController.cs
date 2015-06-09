@@ -1,6 +1,4 @@
-﻿
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -26,6 +24,7 @@ namespace LauncherZ.Windows
     {
 
         private static readonly TimeSpan MinInputResponseDelay = new TimeSpan(0, 0, 0, 0, 100);
+        private const string LauncherZString = "LauncherZ";
 
         private MainWindow _mw;
         private MainWindowModel _mwModel;
@@ -52,7 +51,7 @@ namespace LauncherZ.Windows
         {
             if (app == null)
                 throw new ArgumentNullException("app");
-
+            
             _config = app.Configuration;
             _historyManager = app.LaunchHistoryManager;
             _pluginManager = app.PluginManager;
@@ -222,6 +221,8 @@ namespace LauncherZ.Windows
             {
                 _pluginManager.DistributeEventTo(_standaloneId, new StandaloneModeChangedEvent(false));
                 _standaloneId = null;
+                _mwModel.HintText = LauncherZString;
+                _mwModel.IsInputEnabled = true;
             }
         }
 
@@ -283,6 +284,7 @@ namespace LauncherZ.Windows
                                 _pluginManager.DistributeEventTo(pluginId, new StandaloneModeChangedEvent(false));
                             }
                             _standaloneId = pluginId;
+                            _mwModel.HintText = _pluginManager.GetPluginContainer(pluginId).PluginFriendlyName;
                             _pluginManager.DistributeEventTo(pluginId, new StandaloneModeChangedEvent(true));
                         }
                     }
@@ -293,7 +295,9 @@ namespace LauncherZ.Windows
                             _pluginManager.DistributeEventTo(pluginId, new StandaloneModeChangedEvent(false));
                         }
                         _standaloneId = null;
+                        _mwModel.HintText = LauncherZString;
                     }
+                    _mwModel.IsInputEnabled = !action.LockUserInput;
                     if (action.ModifyInput && action.ModifiedInput != _mwModel.InputText)
                     {
                         _mwModel.InputText = action.ModifiedInput;
