@@ -7,7 +7,7 @@ using LauncherZLib.Launcher;
 using LauncherZLib.Plugin.Service;
 using LauncherZLib.Utils;
 
-namespace LauncherZLib.Plugin.Template
+namespace LauncherZLib.Plugin.Modules
 {
     public abstract class EmptyPlugin : IPlugin
     {
@@ -72,7 +72,7 @@ namespace LauncherZLib.Plugin.Template
             return LauncherQuery.EmptyResult;
         }
 
-        public virtual PostLaunchAction Launch(LauncherData launcherData)
+        public virtual PostLaunchAction Launch(LauncherData launcherData, LaunchContext context)
         {
             return PostLaunchAction.Default;
         }

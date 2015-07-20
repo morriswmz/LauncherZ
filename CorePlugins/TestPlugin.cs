@@ -62,7 +62,7 @@ namespace CorePlugins
             return Enumerable.Empty<LauncherData>();
         }
 
-        public PostLaunchAction Launch(LauncherData launcherData)
+        public PostLaunchAction Launch(LauncherData launcherData, LaunchContext context)
         {
             return PostLaunchAction.Default;
         }

@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
 using LauncherZ.Icon;
 using LauncherZLib.FormattedText;
 using LauncherZLib.I18N;
 using LauncherZLib.Launcher;
 using LauncherZLib.Plugin;
+using LauncherZLib.Plugin.Modules;
 using LauncherZLib.Plugin.Service;
-using LauncherZLib.Plugin.Template;
 
 namespace LauncherZ.Plugin
 {
@@ -23,9 +21,9 @@ namespace LauncherZ.Plugin
             get { return "lz-plugin"; }
         }
 
-        public override IEnumerable<CommandLauncherData> HandleQuery(LauncherQuery query)
+        public override IEnumerable<LauncherData> HandleQuery(LauncherQuery query)
         {
-            if (query.Arguments.Count == 1)
+            if (query.InputArguments.Count == 1)
             {
                 PluginManager pm = LauncherZApp.Instance.PluginManager;
                 ILocalizationDictionary localization = ServiceProvider.Essentials.Localization;
@@ -42,7 +40,7 @@ namespace LauncherZ.Plugin
                                 : pc.PluginDescription,
                             localization[pm.IsPluginActivated(x) ? "PluginStatusActivated" : "PluginStatusDeactivated"]
                             );
-                        return new CommandLauncherData(query.Arguments, 1.0)
+                        return new LauncherData(1.0)
                         {
                             Title = title,
                             Description = description,
@@ -50,13 +48,11 @@ namespace LauncherZ.Plugin
                         };
                     });
             }
-            else
-            {
-                return Enumerable.Empty<CommandLauncherData>();
-            }
+            
+            return LauncherQuery.EmptyResult;    
         }
 
-        public override PostLaunchAction HandleLaunch(CommandLauncherData cmdData)
+        public override PostLaunchAction HandleLaunch(LauncherData data, LaunchContext context)
         {
             return PostLaunchAction.DoNothing;
         }

@@ -30,7 +30,7 @@ namespace CorePlugins.AppLauncher
                 Title = Title, 
                 Description = FormattedTextEngine.Escape(Description), 
                 IconLocation = "file://" + LinkFileLocation,
-                StringData = LinkFileLocation
+                UserData = LinkFileLocation
             };
         }
     }

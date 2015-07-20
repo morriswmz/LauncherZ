@@ -70,10 +70,13 @@ namespace LauncherZLib.Utils
         {
             if (_logFileValid && _isRunning)
             {
-                _messages.Add(string.Format(
-                    "[{0}]{1}",
+                var fullMessage = string.Format("[{0}]{1}",
                     DateTime.Now.ToString("s"),
-                    objects.Length == 0 ? msg : string.Format(msg, objects)));
+                    objects.Length == 0 ? msg : string.Format(msg, objects));
+#if DEBUG
+                System.Diagnostics.Trace.WriteLine(fullMessage);
+#endif
+                _messages.Add(fullMessage);
             }
         }
 

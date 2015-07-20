@@ -1,53 +1,86 @@
-﻿namespace LauncherZLib.Launcher
+﻿using System;
+
+namespace LauncherZLib.Launcher
 {
+    [Flags]
+    public enum PostLaunchActionType
+    {
+        /// <summary>
+        /// Hides window, overrides all other actions, and resets query.
+        /// </summary>
+        HideWindow = 0x80,
+        /// <summary>
+        /// Modifies query uri, useful for special actions requiring a non-standard query uri.
+        /// You should change the query uri back to a standarded one upon completing the special action.
+        /// Overrides modify input action.
+        /// </summary>
+        ModifyUri = 0x40,
+        /// <summary>
+        /// Modifies the input only, other query parameters will remain unchanged.
+        /// </summary>
+        ModifyInput = 0x20,
+        /// <summary>
+        /// Modifies hint text.
+        /// </summary>
+        ModifyHint = 0x02,
+        /// <summary>
+        /// Locks user input.
+        /// </summary>
+        LockInput = 0x01,
+        /// <summary>
+        /// Do nothing, zero flag.
+        /// </summary>
+        None = 0x00
+    }
+
     public sealed class PostLaunchAction
     {
 
         /// <summary>
         /// Default action. Hides window.
         /// </summary>
-        public static readonly PostLaunchAction Default = new PostLaunchAction(true, false, false, false, "");
+        public static readonly PostLaunchAction Default = new PostLaunchAction(PostLaunchActionType.HideWindow, "", "", "");
         /// <summary>
         /// Does nothing.
         /// </summary>
-        public static readonly PostLaunchAction DoNothing = new PostLaunchAction(false, false, false, false, "");
+        public static readonly PostLaunchAction DoNothing = new PostLaunchAction();
 
-        public PostLaunchAction(bool hideWindow, bool modifyInput, bool lockUserInput, bool enableStandaloneMode, string modifiedInput)
+        public PostLaunchAction() : this(PostLaunchActionType.None, "", "", "")
         {
-            HideWindow = hideWindow;
-            ModifyInput = modifyInput;
-            LockUserInput = lockUserInput;
-            EnableStandaloneMode = enableStandaloneMode;
+        }
+
+        public PostLaunchAction(PostLaunchActionType actionType, string modifiedInput, string modifiedUri, string modifiedHint)
+        {
+            ActionType = actionType;
             ModifiedInput = modifiedInput;
+            ModifiedUri = modifiedUri;
+            ModifiedHint = modifiedHint;
         }
 
         /// <summary>
-        /// Hides the window and resets everything. If set to true, all other properties will be ignored.
+        /// Gets or sets the action type.
         /// </summary>
-        public bool HideWindow { get; set; }
-        
-        /// <summary>
-        /// Set to true to enable modification of the input.
-        /// </summary>
-        public bool ModifyInput { get; set; }
+        public PostLaunchActionType ActionType { get; set; }
 
         /// <summary>
-        /// Set to true to lock the input so user cannot modify the query.
-        /// Setting to false will unlock the user input.
+        /// Gets or sets the modified uri.
         /// </summary>
-        public bool LockUserInput { get; set; }
-        
+        /// <see cref="T:LauncherZLib.Launcher.PostLaunchActionType"/>
+        public string ModifiedUri { get; set; }
+
         /// <summary>
-        /// Set to true to enter standalone mode, where following queries will be handled by this plugin
-        /// only. Setting to false to disable standalone mode.
+        /// Gets or sets the modified input.
         /// </summary>
-        public bool EnableStandaloneMode { get; set; }
-        
-        /// <summary>
-        /// Gets or sets the modfied input. Effective when <see cref="P:LauncherZLib.Launcher.PostLaunchAction.ModifyInput"/>
-        /// is true.
-        /// </summary>
+        /// <see cref="T:LauncherZLib.Launcher.PostLaunchActionType"/>
         public string ModifiedInput { get; set; }
 
+        /// <summary>
+        /// Gets or sets the modified hint, shown above the input.
+        /// Set to null or empty to reset. 
+        /// </summary>
+        /// <see cref="T:LauncherZLib.Launcher.PostLaunchActionType"/>
+        public string ModifiedHint { get; set; }
+        
     }
+
 }

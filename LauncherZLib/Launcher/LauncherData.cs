@@ -12,14 +12,13 @@ namespace LauncherZLib.Launcher
     public class LauncherData : INotifyPropertyChanged
     {
 
-        private static readonly string DefaultFontFamily = "Global User Interface";
         private static long _uidCounter = 0;
 
-        private string _title = "";
-        private string _description = "";
+        private string _title;
+        private string _description;
         private bool _usesDescription = true;
         private bool _usesTitle = true;
-        private string _iconLocation = "";
+        private string _iconLocation;
         private readonly double _relevance;
         private readonly long _uniqueId;
 
@@ -29,7 +28,7 @@ namespace LauncherZLib.Launcher
         /// Creates a new LauncherData with specified relevance.
         /// </summary>
         /// <param name="relavance"></param>
-        public LauncherData(double relavance) : this("Untitled launcher", "No description", "", relavance)
+        public LauncherData(double relavance) : this("", "", "", relavance)
         {
 
         }
@@ -50,6 +49,20 @@ namespace LauncherZLib.Launcher
             Tickable = false;
             CurrentTickRate = TickRate.Normal;
             _uniqueId = Interlocked.Increment(ref _uidCounter);
+        }
+
+        /// <summary>
+        /// Creates a new LauncherData using the data from a existing one.
+        /// </summary>
+        /// <param name="other"></param>
+        public LauncherData(LauncherData other)
+            : this(other._title, other._description, other._iconLocation, other._relevance)
+        {
+            _usesTitle = other._usesTitle;
+            _usesDescription = other._usesDescription;
+            UserData = other.UserData;
+            Tickable = other.Tickable;
+            CurrentTickRate = other.CurrentTickRate;
         }
 
         #region Properties
@@ -164,7 +177,7 @@ namespace LauncherZLib.Launcher
         /// Gets or sets the string data. You may use this property to store extra string data
         /// without extending this class.
         /// </summary>
-        public string StringData { get; set; }
+        public string UserData { get; set; }
 
         /// <summary>
         /// Gets the unique id associated with the metadata.

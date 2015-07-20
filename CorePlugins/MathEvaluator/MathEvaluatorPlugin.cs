@@ -6,8 +6,8 @@ using System.Windows;
 using LauncherZ.Icon;
 using LauncherZLib.Launcher;
 using LauncherZLib.Plugin;
+using LauncherZLib.Plugin.Modules;
 using LauncherZLib.Plugin.Service;
-using LauncherZLib.Plugin.Template;
 
 namespace CorePlugins.MathEvaluator
 {
@@ -45,7 +45,7 @@ namespace CorePlugins.MathEvaluator
             return LauncherQuery.EmptyResult;
         }
 
-        public override PostLaunchAction Launch(LauncherData launcherData)
+        public override PostLaunchAction Launch(LauncherData launcherData, LaunchContext context)
         {
             Clipboard.SetText(launcherData.Title);
             return PostLaunchAction.DoNothing;

@@ -7,10 +7,8 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 using LauncherZ.Configuration;
-using LauncherZLib;
 using LauncherZLib.Event;
 using LauncherZLib.Event.Launcher;
-using LauncherZLib.Event.Plugin;
 using LauncherZLib.Launcher;
 using LauncherZLib.Plugin;
 using LauncherZLib.Utils;
@@ -45,7 +43,6 @@ namespace LauncherZ.Windows
         private bool _mwDeactivating;
         private bool _mwActivating;
         private bool _mwLaunching;
-        private string _standaloneId;
 
         public MainWindowController(LauncherZApp app)
         {
@@ -152,7 +149,10 @@ namespace LauncherZ.Windows
 
             _attached = false;
         }
-     
+        
+        /// <summary>
+        /// Gets or sets the response delay after input updating.
+        /// </summary>
         public TimeSpan InputResponseDelay
         {
             get { return _inputResponseDelay; }
@@ -166,7 +166,7 @@ namespace LauncherZ.Windows
                 _mwDeactivating = true;
                 _mwModel.InputText = "";
                 // force clear
-                ClearResults();
+                ClearAndReset();
                 // ensure render updates
                 // otherwise we may see phantoms upon shown
                 _mw.Dispatcher.InvokeAsync(() =>
@@ -214,24 +214,23 @@ namespace LauncherZ.Windows
             }
         }
 
-        private void ClearResults()
+        private void ClearAndReset()
         {
             _queryDistributor.ClearCurrentQuery();
-            if (_standaloneId != null)
-            {
-                _pluginManager.DistributeEventTo(_standaloneId, new StandaloneModeChangedEvent(false));
-                _standaloneId = null;
-                _mwModel.HintText = LauncherZString;
-                _mwModel.IsInputEnabled = true;
-            }
+            _mwModel.HintText = LauncherZString;
+            _mwModel.IsInputEnabled = true;
         }
 
         private void DistributeNewQuery()
         {
-            ClearResults();
+            LauncherQuery lastQuery = _queryDistributor.CurrentQuery;
+            _queryDistributor.ClearCurrentQuery();
             if (!string.IsNullOrWhiteSpace(_mwModel.InputText))
             {
-                _queryDistributor.DistributeQuery(new LauncherQuery(_mwModel.InputText.Trim(), _standaloneId));
+                var newQuery = lastQuery == null
+                    ? new LauncherQuery(_mwModel.InputText.Trim())
+                    : new LauncherQuery(lastQuery, _mwModel.InputText.Trim());
+                _queryDistributor.DistributeQuery(newQuery);
             }
         }
 
@@ -267,43 +266,57 @@ namespace LauncherZ.Windows
                 PostLaunchAction action = _pluginManager
                     .GetPluginContainer(pluginId)
                     .PluginInstance
-                    .Launch(launcherData);
+                    .Launch(launcherData, new LaunchContext(_queryDistributor.CurrentQuery));
                 _historyManager.PushHistory(_mwModel.InputText, pluginId);
-                if (action.HideWindow)
+                if (action.ActionType.HasFlag(PostLaunchActionType.HideWindow))
                 {
                     ClearAndHideMainWindow();
                 }
                 else
                 {
-                    if (action.EnableStandaloneMode)
+                    _mwModel.IsInputEnabled = !action.ActionType.HasFlag(PostLaunchActionType.LockInput);
+                    if (action.ActionType.HasFlag(PostLaunchActionType.ModifyHint))
                     {
-                        if (_standaloneId != pluginId)
+                        _mwModel.HintText = string.IsNullOrEmpty(action.ModifiedHint)
+                            ? LauncherZString
+                            : action.ModifiedHint;
+                    }
+                    if (action.ActionType.HasFlag(PostLaunchActionType.ModifyUri))
+                    {
+                        // modify query uri
+                        try
                         {
-                            if (_standaloneId != null)
+                            var newQuery = new LauncherQuery(new Uri(action.ModifiedUri));
+                            if (!string.IsNullOrEmpty(newQuery.OriginalInput))
                             {
-                                _pluginManager.DistributeEventTo(pluginId, new StandaloneModeChangedEvent(false));
+                                _mwModel.InputText = newQuery.OriginalInput;
                             }
-                            _standaloneId = pluginId;
-                            _mwModel.HintText = _pluginManager.GetPluginContainer(pluginId).PluginFriendlyName;
-                            _pluginManager.DistributeEventTo(pluginId, new StandaloneModeChangedEvent(true));
+                            _queryDistributor.DistributeQuery(newQuery);
                         }
-                    }
-                    else
-                    {
-                        if (_standaloneId != null)
+                        catch (Exception ex)
                         {
-                            _pluginManager.DistributeEventTo(pluginId, new StandaloneModeChangedEvent(false));
+                            _logger.Error("Invalid query uri \"{0}\". Details:{1}{2}",
+                                action.ModifiedUri, Environment.NewLine, ex);
+                            _queryDistributor.ClearCurrentQuery();
                         }
-                        _standaloneId = null;
-                        _mwModel.HintText = LauncherZString;
                     }
-                    _mwModel.IsInputEnabled = !action.LockUserInput;
-                    if (action.ModifyInput && action.ModifiedInput != _mwModel.InputText)
+                    else if (action.ActionType.HasFlag(PostLaunchActionType.ModifyInput))
                     {
-                        _mwModel.InputText = action.ModifiedInput;
-                        DistributeNewQuery();
+                        // modify input
+                        if (string.IsNullOrWhiteSpace(action.ModifiedInput))
+                        {
+                            _queryDistributor.ClearCurrentQuery();
+                        }
+                        else
+                        {
+                            var newQuery = _queryDistributor.CurrentQuery == null
+                                ? new LauncherQuery(action.ModifiedInput)
+                                : new LauncherQuery(_queryDistributor.CurrentQuery, action.ModifiedInput);
+                            _queryDistributor.DistributeQuery(newQuery);
+                        }
                     }
                 }
+                _mwLaunching = false;
                 e.Handled = true;
             }
         }

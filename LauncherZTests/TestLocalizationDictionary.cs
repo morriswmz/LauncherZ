@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 namespace LauncherZTests
 {
     /// <summary>
-    /// Summary description for UnitTest1
+    /// Summary description for TestUrlRouter
     /// </summary>
     [TestClass]
     [DeploymentItem("I18NSamples", "I18NSamples")]

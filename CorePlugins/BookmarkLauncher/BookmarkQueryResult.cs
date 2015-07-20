@@ -28,7 +28,7 @@ namespace CorePlugins.BookmarkLauncher
                 Title = Title,
                 Description = Description,
                 IconLocation = LauncherZIconSet.Link.ToString(),
-                StringData = Url
+                UserData = Url
             };
         }
     }

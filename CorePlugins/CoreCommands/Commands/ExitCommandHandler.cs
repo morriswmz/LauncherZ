@@ -2,8 +2,8 @@
 using System.Windows;
 using LauncherZ.Icon;
 using LauncherZLib.Launcher;
+using LauncherZLib.Plugin.Modules;
 using LauncherZLib.Plugin.Service;
-using LauncherZLib.Plugin.Template;
 
 namespace CorePlugins.CoreCommands.Commands
 {
@@ -18,11 +18,11 @@ namespace CorePlugins.CoreCommands.Commands
             get { return "EXIT"; }
         }
         
-        public override IEnumerable<CommandLauncherData> HandleQuery(LauncherQuery query)
+        public override IEnumerable<LauncherData> HandleQuery(LauncherQuery query)
         {
             return new []
             {
-                new CommandLauncherData(query.Arguments, 1.0)
+                new LauncherData(1.0)
                 {
                     Title = Localization["ExitCommandTitle"],
                     Description = Localization["ExitCommandDescription"],
@@ -31,7 +31,7 @@ namespace CorePlugins.CoreCommands.Commands
             };
         }
 
-        public override PostLaunchAction HandleLaunch(CommandLauncherData cmdData)
+        public override PostLaunchAction HandleLaunch(LauncherData data, LaunchContext context)
         {
             Application.Current.Shutdown();
             return PostLaunchAction.Default;

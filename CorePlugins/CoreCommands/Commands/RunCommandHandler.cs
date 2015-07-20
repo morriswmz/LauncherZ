@@ -4,8 +4,8 @@ using System.Linq;
 using LauncherZ.Icon;
 using LauncherZLib.FormattedText;
 using LauncherZLib.Launcher;
+using LauncherZLib.Plugin.Modules;
 using LauncherZLib.Plugin.Service;
-using LauncherZLib.Plugin.Template;
 
 namespace CorePlugins.CoreCommands.Commands
 {
@@ -20,35 +20,36 @@ namespace CorePlugins.CoreCommands.Commands
             get { return "run"; }
         }
 
-        public override IEnumerable<CommandLauncherData> HandleQuery(LauncherQuery query)
+        public override IEnumerable<LauncherData> HandleQuery(LauncherQuery query)
         {
-            if (query.Arguments.Count <= 1)
-                return Enumerable.Empty<CommandLauncherData>();
+            if (query.InputArguments.Count <= 1)
+                return LauncherQuery.EmptyResult;
             return new[]
             {
-                new CommandLauncherData(query.Arguments, 1.0)
+                new LauncherData(1.0)
                 {
-                    Title = string.Format(Localization["RunCommandTitle"], FormattedTextEngine.Escape(string.Join(" ", query.Arguments.Skip(1)))),
+                    Title = string.Format(Localization["RunCommandTitle"], FormattedTextEngine.Escape(string.Join(" ", query.InputArguments.Skip(1)))),
                     Description = Localization["RunCommandNormalDescription"],
                     IconLocation = LauncherZIconSet.Program.ToString()
                 }
             };
         }
 
-        public override PostLaunchAction HandleLaunch(CommandLauncherData cmdData)
+        public override PostLaunchAction HandleLaunch(LauncherData data, LaunchContext context)
         {
-            if (cmdData.StringData == "error")
+            if (data.UserData == "error")
                 return PostLaunchAction.DoNothing;
             try
             {
-                string args = cmdData.CommandArgs.Count > 2 ? string.Join(" ", cmdData.CommandArgs.Skip(2)) : "";
-                Process.Start(cmdData.CommandArgs[1], args);
+                ArgumentCollection cmdArgs = context.CurrentQuery.InputArguments;
+                string args = cmdArgs.Count > 2 ? string.Join(" ", cmdArgs.Skip(2)) : "";
+                Process.Start(cmdArgs[1], args);
                 return PostLaunchAction.Default;
             }
             catch
             {
-                cmdData.StringData = "error";
-                cmdData.Description = Localization["RunCommandErrorDescription"];
+                data.UserData = "error";
+                data.Description = Localization["RunCommandErrorDescription"];
                 return PostLaunchAction.DoNothing;
             }
         }

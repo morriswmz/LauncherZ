@@ -3,12 +3,13 @@ using System.IO;
 using LauncherZLib.Utils;
 using Newtonsoft.Json;
 
-namespace LauncherZLib.Plugin.Template
+namespace LauncherZLib.Plugin.Modules
 {
     /// <summary>
     /// Provides configuration via json.
     /// </summary>
     /// <typeparam name="TC">Configuration class.</typeparam>
+    /// todo: add attributes for config class to control interative config module
     public class ConfigModule<TC> where TC : class
     {
 

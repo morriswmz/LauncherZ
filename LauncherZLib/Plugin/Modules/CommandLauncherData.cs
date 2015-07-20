@@ -1,6 +1,6 @@
 ﻿using LauncherZLib.Launcher;
 
-namespace LauncherZLib.Plugin.Template
+namespace LauncherZLib.Plugin.Modules
 {
     public class CommandLauncherData : LauncherData
     {
@@ -9,10 +9,10 @@ namespace LauncherZLib.Plugin.Template
         /// </summary>
         public ArgumentCollection CommandArgs { get; private set; }
 
-        public CommandLauncherData(ArgumentCollection commandArgs, double relevance)
-            : base(relevance)
+        public CommandLauncherData(LauncherData launcherData, ArgumentCollection args)
+            : base(launcherData)
         {
-            CommandArgs = commandArgs;
+            CommandArgs = args;
         }
 
     }

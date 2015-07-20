@@ -6,8 +6,8 @@ using LauncherZLib.Event;
 using LauncherZLib.Event.Launcher;
 using LauncherZLib.Launcher;
 using LauncherZLib.Plugin;
+using LauncherZLib.Plugin.Modules;
 using LauncherZLib.Plugin.Service;
-using LauncherZLib.Plugin.Template;
 
 namespace CorePlugins.CoreCommands
 {
@@ -45,34 +45,34 @@ namespace CorePlugins.CoreCommands
             return _commandModule.HandleQuery(query);
         }
 
-        public override PostLaunchAction Launch(LauncherData launcherData)
+        public override PostLaunchAction Launch(LauncherData launcherData, LaunchContext context)
         {
             // the casting should be aways successful.
-            return _commandModule.HandleLaunch((CommandLauncherData) launcherData);
+            return _commandModule.HandleLaunch(launcherData, context);
         }
 
         [SubscribeEvent]
         public void LauncherTickEventHandler(LauncherTickEvent e)
         {
-            var handler = _commandModule.GetCommandHandler((CommandLauncherData) e.LauncherData);
+            var handler = (CoreCommandHandler) _commandModule.CurrentCommandHandler;
             if (handler != null)
-                handler.HandleTick((CommandLauncherData) e.LauncherData);
+                handler.HandleTick(e.LauncherData);
         }
 
         [SubscribeEvent]
         public void LauncherSelectedEventHandler(LauncherSelectedEvent e)
         {
-            var handler = _commandModule.GetCommandHandler((CommandLauncherData) e.LauncherData);
+            var handler = (CoreCommandHandler)_commandModule.CurrentCommandHandler;
             if (handler != null)
-                handler.HandleSelection((CommandLauncherData) e.LauncherData);
+                handler.HandleSelection(e.LauncherData);
         }
 
         [SubscribeEvent]
         public void LauncherDeselectedEventHandler(LauncherDeselectedEvent e)
         {
-            var handler = _commandModule.GetCommandHandler((CommandLauncherData) e.LauncherData);
+            var handler = (CoreCommandHandler)_commandModule.CurrentCommandHandler;
             if (handler != null)
-                handler.HandleDeselection((CommandLauncherData) e.LauncherData);
+                handler.HandleDeselection(e.LauncherData);
         }
     
     }

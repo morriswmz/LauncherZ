@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Reflection;
 using LauncherZLib.Launcher;
+using LauncherZLib.Plugin.Modules;
 using LauncherZLib.Plugin.Service;
-using LauncherZLib.Plugin.Template;
 
 namespace LauncherZ.Plugin
 {
@@ -18,21 +18,16 @@ namespace LauncherZ.Plugin
             get { return "lz-about"; }
         }
 
-        public override IEnumerable<CommandLauncherData> HandleQuery(LauncherQuery query)
+        public override IEnumerable<LauncherData> HandleQuery(LauncherQuery query)
         {
-            return new CommandLauncherData[]
+            return new LauncherData[]
             {
-                new CommandLauncherData(query.Arguments, 1.0)
+                new LauncherData(1.0)
                 {
                     Title = ServiceProvider.Essentials.Localization["AboutCommandTitle"],
                     Description = string.Format(ServiceProvider.Essentials.Localization["AboutCommandDescription"], "morriswmz", Assembly.GetEntryAssembly().GetName().Version)
                 }
             };
-        }
-
-        public override PostLaunchAction HandleLaunch(CommandLauncherData cmdData)
-        {
-            return PostLaunchAction.DoNothing;
         }
     }
 }

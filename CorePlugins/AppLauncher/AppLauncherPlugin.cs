@@ -8,8 +8,8 @@ using LauncherZLib.FormattedText;
 using LauncherZLib.Launcher;
 using LauncherZLib.Matching;
 using LauncherZLib.Plugin;
+using LauncherZLib.Plugin.Modules;
 using LauncherZLib.Plugin.Service;
-using LauncherZLib.Plugin.Template;
 using LauncherZLib.Utils;
 
 namespace CorePlugins.AppLauncher
@@ -63,7 +63,7 @@ namespace CorePlugins.AppLauncher
             var candidates = new List<AppQueryResult>();
             foreach (var app in _manager.GetAppDescriptions())
             {
-                FlexMatchResult matchResult = _matcher.Match(app.Name, query.Arguments.ToArray(), FlexLexicon.GlobalLexicon);
+                FlexMatchResult matchResult = _matcher.Match(app.Name, query.InputArguments.ToArray(), FlexLexicon.GlobalLexicon);
                 if (matchResult.Success)
                 {
                     double baseScore = _scorer.Score(app.Name, matchResult);
@@ -83,17 +83,17 @@ namespace CorePlugins.AppLauncher
                 .ToArray();
         }
 
-        public override PostLaunchAction Launch(LauncherData launcherData)
+        public override PostLaunchAction Launch(LauncherData launcherData, LaunchContext context)
         {
             try
             {
-                Process.Start(launcherData.StringData);
-                _manager.IncreaseFrequencyFor(launcherData.StringData);
+                Process.Start(launcherData.UserData);
+                _manager.IncreaseFrequencyFor(launcherData.UserData);
                 return PostLaunchAction.Default;
             }
             catch (Exception)
             {
-                Logger.Warning(string.Format("Unable to start process from: {0}", launcherData.StringData));
+                Logger.Warning(string.Format("Unable to start process from: {0}", launcherData.UserData));
                 return PostLaunchAction.DoNothing;
             }
         }

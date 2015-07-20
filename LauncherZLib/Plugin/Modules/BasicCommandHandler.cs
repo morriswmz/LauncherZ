@@ -2,9 +2,9 @@
 using LauncherZLib.Launcher;
 using LauncherZLib.Plugin.Service;
 
-namespace LauncherZLib.Plugin.Template
+namespace LauncherZLib.Plugin.Modules
 {
-    public abstract class BasicCommandHandler :ICommandHandler
+    public abstract class BasicCommandHandler : ICommandHandler
     {
         protected IPluginServiceProvider ServiceProvider;
 
@@ -15,8 +15,13 @@ namespace LauncherZLib.Plugin.Template
 
         public abstract string CommandName { get; }
 
-        public abstract IEnumerable<CommandLauncherData> HandleQuery(LauncherQuery query);
+        public abstract IEnumerable<LauncherData> HandleQuery(LauncherQuery query);
 
-        public abstract PostLaunchAction HandleLaunch(CommandLauncherData cmdData);
+        public virtual PostLaunchAction HandleLaunch(LauncherData data, LaunchContext context)
+        {
+            return PostLaunchAction.DoNothing;
+        }
+
+
     }
 }

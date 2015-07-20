@@ -2,8 +2,8 @@
 using System.ComponentModel;
 using LauncherZLib.Launcher;
 using LauncherZLib.Plugin;
+using LauncherZLib.Plugin.Modules;
 using LauncherZLib.Plugin.Service;
-using LauncherZLib.Plugin.Template;
 
 namespace LauncherZ.Plugin
 {
@@ -33,9 +33,9 @@ namespace LauncherZ.Plugin
             return _commandModule.HandleQuery(query);
         }
 
-        public override PostLaunchAction Launch(LauncherData launcherData)
+        public override PostLaunchAction Launch(LauncherData data, LaunchContext context)
         {
-            return _commandModule.HandleLaunch((CommandLauncherData) launcherData);
+            return _commandModule.HandleLaunch(data, context);
         }
     }
 }

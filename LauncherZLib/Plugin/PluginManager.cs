@@ -2,16 +2,11 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using LauncherZLib.Event;
-using LauncherZLib.I18N;
-using LauncherZLib.Plugin.Loader;
-using LauncherZLib.Plugin.Service;
 using LauncherZLib.Utils;
 
 namespace LauncherZLib.Plugin
 {
-    // todo: plugin manager should support register/unregister plugin on the fly. load method should be removed
     public sealed class PluginManager : IAutoCompletionProvider
     {
         // note that id is case insensitive

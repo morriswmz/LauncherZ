@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
 using LauncherZLib.Launcher;
 
-namespace LauncherZLib.Plugin.Template
+namespace LauncherZLib.Plugin.Modules
 {
     /// <summary>
     /// Provides basic command management.
@@ -13,7 +12,7 @@ namespace LauncherZLib.Plugin.Template
     public class CommandModule<TC> where TC : class, ICommandHandler
     {
         protected readonly bool CaseSensitive;
-        protected readonly Dictionary<string, TC> CommandHandlers; 
+        protected readonly Dictionary<string, TC> CommandHandlers;
 
         public CommandModule(bool caseSensitive)
         {
@@ -30,6 +29,18 @@ namespace LauncherZLib.Plugin.Template
         {
             get { return CaseSensitive; }
         }
+
+        /// <summary>
+        /// Gets the arguments being handled. This property is updated when
+        /// HandleQuery is called.
+        /// </summary>
+        public ArgumentCollection CurrentArguments { get; protected set; }
+
+        /// <summary>
+        /// Gets the command handler for current arguments. This property is updated
+        /// when HandleQuery is called.
+        /// </summary>
+        public ICommandHandler CurrentCommandHandler { get; protected set; }
 
         /// <summary>
         /// Adds or updates a command handler.
@@ -86,45 +97,35 @@ namespace LauncherZLib.Plugin.Template
         }
 
         /// <summary>
-        /// Retrieves a command handler by launcher cmdData.
-        /// </summary>
-        /// <param name="cmdData">Launcher cmdData. Null is allowed since return value may be null.</param>
-        /// <returns>
-        /// Corresponding command handler. Null if not found, cmdData is null, or arguments are not valid.
-        /// </returns>
-        public virtual TC GetCommandHandler(CommandLauncherData cmdData)
-        {
-            if (cmdData == null || cmdData.CommandArgs == null || cmdData.CommandArgs.Count == 0)
-                return null;
-            return GetCommandHandler(cmdData.CommandArgs[0]);
-        }
-
-        /// <summary>
         /// Handles query.
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public virtual IEnumerable<CommandLauncherData> HandleQuery(LauncherQuery query)
+        public virtual IEnumerable<LauncherData> HandleQuery(LauncherQuery query)
         {
             if (query == null)
                 throw new ArgumentNullException("query");
-            if (query.Arguments.Count == 0)
-                return Enumerable.Empty<CommandLauncherData>();
-            TC handler = GetCommandHandler(query.Arguments[0]);
-            return handler == null ? Enumerable.Empty<CommandLauncherData>() : handler.HandleQuery(query);
+            if (query.InputArguments.Count == 0)
+                return LauncherQuery.EmptyResult;
+
+            CurrentArguments = query.InputArguments;
+            CurrentCommandHandler = GetCommandHandler(CurrentArguments[0]);
+            return CurrentCommandHandler == null ? LauncherQuery.EmptyResult : CurrentCommandHandler.HandleQuery(query);
         }
 
         /// <summary>
         /// Handles launch.
         /// </summary>
         /// <param name="data"></param>
+        /// <param name="context"></param>
         /// <returns></returns>
-        public virtual PostLaunchAction HandleLaunch(CommandLauncherData data)
+        public virtual PostLaunchAction HandleLaunch(LauncherData data, LaunchContext context)
         {
             if (data == null)
                 throw new ArgumentNullException("data");
-            TC handler = GetCommandHandler(data);
-            return handler == null ? PostLaunchAction.Default : handler.HandleLaunch(data);
+            
+            TC handler = GetCommandHandler(context.CurrentQuery.InputArguments[0]);
+            return handler == null ? PostLaunchAction.Default : handler.HandleLaunch(data, context);
         }
 
     }

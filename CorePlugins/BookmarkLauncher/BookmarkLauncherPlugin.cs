@@ -12,8 +12,8 @@ using LauncherZLib.FormattedText;
 using LauncherZLib.Launcher;
 using LauncherZLib.Matching;
 using LauncherZLib.Plugin;
+using LauncherZLib.Plugin.Modules;
 using LauncherZLib.Plugin.Service;
-using LauncherZLib.Plugin.Template;
 
 namespace CorePlugins.BookmarkLauncher
 {
@@ -66,16 +66,16 @@ namespace CorePlugins.BookmarkLauncher
 
        
 
-        public override PostLaunchAction Launch(LauncherData launcherData)
+        public override PostLaunchAction Launch(LauncherData launcherData, LaunchContext context)
         {
             try
             {
-                Process.Start(launcherData.StringData);
+                Process.Start(launcherData.UserData);
             }
             catch (Exception ex)
             {
                 Logger.Warning(string.Format("Failed to open url \"{0}\". Details: {1}{2}",
-                    launcherData.StringData, Environment.NewLine, ex));
+                    launcherData.UserData, Environment.NewLine, ex));
             }
             return PostLaunchAction.Default;
         }
@@ -84,7 +84,7 @@ namespace CorePlugins.BookmarkLauncher
         {
             var mathcer = new FlexMatcher();
             var scorer = new FlexScorer();
-            var keywords = query.Arguments.ToArray();
+            var keywords = query.InputArguments.ToArray();
 #if DEBUG
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();

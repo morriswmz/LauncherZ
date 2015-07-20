@@ -43,7 +43,8 @@ namespace LauncherZLib.Plugin
         /// Launch!
         /// </summary>
         /// <param name="launcherData"></param>
+        /// <param name="context"></param>
         /// <returns></returns>
-        PostLaunchAction Launch(LauncherData launcherData);
+        PostLaunchAction Launch(LauncherData launcherData, LaunchContext context);
     }
 }
