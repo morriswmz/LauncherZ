@@ -1,0 +1,7 @@
+﻿{
+    /* the following items should match the attributes */
+    "PluginFriendlyName": "LauncherZ Unit Converter",
+    "PluginDescription": "Provides convenient conversions between different units.",
+
+    "DefaultDescription": "Press [Enter] to copy the result to clipboard."
+}

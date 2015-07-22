@@ -115,13 +115,13 @@ namespace LauncherZTests
             TestContext.WriteLine("Testing trimming...");
             for (var i = 0; i < fileNames.Length; i++)
             {
-                Assert.AreEqual(trimResults[i], LocalizationDictionary.TrimCultureNameFromPath(fileNames[i]));
+                Assert.AreEqual(trimResults[i], LocalizationHelper.TrimCultureNameFromPath(fileNames[i]));
             }
             TestContext.WriteLine("Testing adding...");
             var culture = new CultureInfo("zh-CN");
             for (var i = 0; i < fileNames.Length; i++)
             {
-                Assert.AreEqual(addResults[i], LocalizationDictionary.AddCultureNameToPath(fileNames[i], culture));
+                Assert.AreEqual(addResults[i], LocalizationHelper.AddCultureNameToPath(fileNames[i], culture));
             }
         }
 

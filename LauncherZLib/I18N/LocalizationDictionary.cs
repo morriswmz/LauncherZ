@@ -12,8 +12,6 @@ namespace LauncherZLib.I18N
     /// </summary>
     public class LocalizationDictionary : ILocalizationDictionary
     {
-        private static readonly List<string> PossibleCultureNames;
-
         private readonly List<string> _loadedLanguageFiles = new List<string>();
         private readonly Dictionary<string, string> _strings = new Dictionary<string, string>();
         
@@ -23,12 +21,6 @@ namespace LauncherZLib.I18N
         public delegate void CultureChangedEventHandler(object sender, CultureChangedEventArgs e);
 
         public event CultureChangedEventHandler CultureChanged;
-
-        static LocalizationDictionary()
-        {
-            PossibleCultureNames = CultureInfo.GetCultures(CultureTypes.AllCultures)
-                    .Select(c => c.Name.ToLowerInvariant()).ToList();
-        }
 
         public LocalizationDictionary()
         {
@@ -74,11 +66,11 @@ namespace LauncherZLib.I18N
 
         public void LoadLanguageFile(string fileName, bool fallback)
         {
-            string baseFileName = TrimCultureNameFromPath(fileName);
+            string baseFileName = LocalizationHelper.TrimCultureNameFromPath(fileName);
             if (_loadedLanguageFiles.Contains(baseFileName))
                 return;
             
-            string expectedFileName = AddCultureNameToPath(baseFileName, _culture);
+            string expectedFileName = LocalizationHelper.AddCultureNameToPath(baseFileName, _culture);
             if (File.Exists(expectedFileName))
             {
                 LoadLanguageFileImpl(expectedFileName);
@@ -91,14 +83,14 @@ namespace LauncherZLib.I18N
             }
 
             // check fallback
-            var fallbackFileName = AddCultureNameToPath(baseFileName, _culture.GetConsoleFallbackUICulture());
+            var fallbackFileName = LocalizationHelper.AddCultureNameToPath(baseFileName, _culture.GetConsoleFallbackUICulture());
             if (File.Exists(fallbackFileName))
             {
                 LoadLanguageFileImpl(fallbackFileName);
                 return;
             }
             // check en-US as last resort
-            fallbackFileName = AddCultureNameToPath(baseFileName, CultureInfo.CreateSpecificCulture("en-US"));
+            fallbackFileName = LocalizationHelper.AddCultureNameToPath(baseFileName, CultureInfo.CreateSpecificCulture("en-US"));
             if (File.Exists(fallbackFileName))
             {
                 LoadLanguageFileImpl(fallbackFileName);
@@ -120,93 +112,6 @@ namespace LauncherZLib.I18N
         {
             _strings.Clear();
             _loadedLanguageFiles.Clear();
-        }
-
-        /// <summary>
-        /// Removes culture name from given path.
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        /// <example>
-        /// Strings.json             -> Strings.json
-        /// Strings.en-US.json       -> Strings.json
-        /// Strings.en-US.zh-CN.json -> Strings.en-US.json
-        /// </example>
-        public static string TrimCultureNameFromPath(string path)
-        {
-            string fileName = Path.GetFileName(path);
-            string dirName = Path.GetDirectoryName(path);
-            string ext = Path.GetExtension(fileName);
-            // check existing extension
-            if (string.IsNullOrEmpty(ext))
-                return path;
-            if (PossibleCultureNames.IndexOf(ext.TrimStart('.').ToLowerInvariant()) >= 0)
-            {
-                // file extension is culture name
-                if (string.IsNullOrEmpty(dirName))
-                {
-                    return Path.GetFileNameWithoutExtension(fileName);
-                }
-                return string.Format("{0}{1}{2}",
-                    dirName, Path.DirectorySeparatorChar, Path.GetFileNameWithoutExtension(fileName));
-            }
-            // file name is fff.xxx, fff.en-US.xxx or fff.nnn.xxx
-            string fileNameNoLastExt = Path.GetFileNameWithoutExtension(fileName);
-            string cultureName = Path.GetExtension(fileNameNoLastExt);
-            if (string.IsNullOrEmpty(cultureName))
-                return path;
-            if (PossibleCultureNames.IndexOf(cultureName.TrimStart('.').ToLowerInvariant()) >= 0)
-            {
-                // file name is of format fff.en-US.xxx
-                if (string.IsNullOrEmpty(dirName))
-                {
-                    return string.Format("{0}{1}", Path.GetFileNameWithoutExtension(fileNameNoLastExt), ext);
-                }
-                return string.Format("{0}{1}{2}{3}",
-                    dirName, Path.DirectorySeparatorChar,
-                    Path.GetFileNameWithoutExtension(fileNameNoLastExt), ext);
-            }
-            return path;
-        }
-
-        /// <summary>
-        /// Append culture name to given path.
-        /// </summary>
-        /// <param name="path"></param>
-        /// <param name="culture"></param>
-        /// <returns></returns>
-        /// <example>
-        /// Strings            -> Strings.en-US
-        /// Strings.json       -> Strings.en-US.json
-        /// Strings.en-US.json -> Strings.en-US.en-US.json
-        /// </example>
-        public static string AddCultureNameToPath(string path, CultureInfo culture)
-        {
-            string fileName = Path.GetFileName(path);
-            string dirName = Path.GetDirectoryName(path);
-            string ext = Path.GetExtension(fileName); // note the dot is not removed!
-            if (string.IsNullOrEmpty(ext))
-            {
-                // no extension
-                if (string.IsNullOrEmpty(dirName))
-                {
-                    return string.Format("{0}.{1}", fileName, culture.Name);
-                }
-                return string.Format("{0}{1}{2}.{3}",
-                    dirName, Path.DirectorySeparatorChar, fileName, culture.Name);
-            }
-            else
-            {
-                // has extension
-                if (string.IsNullOrEmpty(dirName))
-                    return string.Format("{0}.{1}{2}",
-                        Path.GetFileNameWithoutExtension(fileName),
-                        culture.Name, ext);
-                return string.Format("{0}{1}{2}.{3}{4}",
-                    dirName, Path.DirectorySeparatorChar,
-                    Path.GetFileNameWithoutExtension(fileName),
-                    culture.Name, ext);
-            }
         }
 
         private void LoadLanguageFileImpl(string fileName)

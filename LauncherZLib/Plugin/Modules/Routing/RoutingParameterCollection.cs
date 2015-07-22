@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace LauncherZLib.Plugin.Modules
+namespace LauncherZLib.Plugin.Modules.Routing
 {
     public class RoutingParameterCollection
     {

@@ -184,12 +184,5 @@ namespace LauncherZTests
             Assert.IsFalse(tagBadResult2.Success);
         }
 
-        class AdvancedRoutingTestEntry
-        {
-            public Uri FullUrl { get; set; }
-            public string ExpectedData { get; set; }
-            public ParameterCollection ExpectedParams { get; set; }
-        }
-
     }
 }

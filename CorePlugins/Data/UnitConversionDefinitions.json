@@ -1,0 +1,222 @@
+﻿{
+    "Version": 1,
+    "ConversionGroups": [
+        /* length */
+        {
+            "Dimension": "length",
+            "Units": [
+                {
+                    "Name": "kilometer",
+                    "Aliases": "#|km"
+                },
+                {
+                    "Name": "meter",
+                    "Aliases": "#|m"
+                },
+                {
+                    "Name": "decimeter",
+                    "Aliases": "#|dm"
+
+                },
+                {
+                    "Name": "centimeter",
+                    "Aliases": "#|cm"
+                },
+                {
+                    "Name": "millimeter",
+                    "Aliases": "#|mm"
+                },
+                {
+                    "Name": "micrometer",
+                    "Aliases": "#|um"
+                },
+                {
+                    "Name": "nanometer",
+                    "Aliases": "#|nm"
+                },
+                {
+                    "Name": "inch",
+                    "Aliases": "#|in."
+                },
+                {
+                    "Name": "foot",
+                    "Aliases": "#|ft."
+                },
+                {
+                    "Name": "yard",
+                    "Aliases": "#|yd."
+                },
+                {
+                    "Name": "mile",
+                    "Aliases": "#|mi."
+                }
+            ],
+            "Conversions": [
+                {
+                    "From": "kilometer",
+                    "To": "meter",
+                    "Factor": 1000
+                },
+                {
+                    "From": "meter",
+                    "To": "decimeter",
+                    "Factor": 10
+                },
+                {
+                    "From": "decimeter",
+                    "To": "centimeter",
+                    "Factor": 10
+                },
+                {
+                    "From": "centimeter",
+                    "To": "millimeter",
+                    "Factor": 10
+                },
+                {
+                    "From": "millimeter",
+                    "To": "micrometer",
+                    "Factor": 1000
+                },
+                {
+                    "From": "micrometer",
+                    "To": "nanometer",
+                    "Factor": 1000
+                },
+                {
+                    "From": "inch",
+                    "To": "centimeter",
+                    "Factor": 2.54
+                },
+                {
+                    "From": "foot",
+                    "To": "inch",
+                    "Factor": 12
+                },
+                {
+                    "From": "yard",
+                    "To": "foot",
+                    "Factor": 3
+                },
+                {
+                    "From": "mile",
+                    "To": "yard",
+                    "Factor": 1760
+                }
+            ]
+        },
+        /* volume */
+        {
+            "Dimension": "volume",
+            "Units": [
+                {
+                    "Name": "cubic_meter",
+                    "Aliases": "#|m3"
+                },
+                {
+                    "Name": "liter",
+                    "Aliases": "#|l"
+                },
+                {
+                    "Name": "milliliter",
+                    "Aliases": "#|ml"
+                },
+                {
+                    "Name": "us.gallon",
+                    "Aliases": "gallon|gallons|gal."
+                },
+                {
+                    "Name": "uk.gallon",
+                    "Aliases": "gallon|gallons|gal."
+                }
+            ],
+            "Conversions": [
+                {
+                    "From": "cubic_meter",
+                    "To": "liter",
+                    "Factor": 1000.0
+                },
+                {
+                    "From": "liter",
+                    "To": "milliliter",
+                    "Factor": 1000.0
+                },
+                {
+                    "From": "us.gallon",
+                    "To": "liter",
+                    "Factor": 3.78541178
+                },
+                {
+                    "From": "uk.gallon",
+                    "To": "liter",
+                    "Factor": 4.54609188
+                }
+            ]
+        },
+        /* mass */
+        {
+            "Dimension": "mass",
+            "Units": [
+                {
+                    "Name": "milligram",
+                    "Aliases": "#|mg"
+                },
+                {
+                    "Name": "gram",
+                    "Aliases": "#|g"
+                },
+                {
+                    "Name": "kilogram",
+                    "Aliases": "#|kg"
+                },
+                {
+                    "Name": "ton",
+                    "Aliases": "#|t"
+                },
+                {
+                    "Name": "pound",
+                    "Aliases": "#|lb."
+                },
+                {
+                    "Name": "ounce",
+                    "Aliases": "#|oz."
+                },
+                {
+                    "Name": "carat",
+                    "Aliases": "#|ct"
+                }
+            ],
+            "Conversions": [
+                {
+                    "From": "ton",
+                    "To": "kilogram",
+                    "Factor": 1000
+                },
+                {
+                    "From": "kilogram",
+                    "To": "gram",
+                    "Factor": 1000
+                },
+                {
+                    "From": "gram",
+                    "To": "milligram",
+                    "Factor": 1000
+                },
+                {
+                    "From": "kilogram",
+                    "To": "pound",
+                    "Factor": 2.20462234
+                },
+                {
+                    "From": "pound",
+                    "To": "ounce",
+                    "Factor": 16
+                },
+                {
+                    "From": "carat",
+                    "To": "gram",
+                    "Factor": 0.2
+                }
+            ]
+        }
+    ]
+}

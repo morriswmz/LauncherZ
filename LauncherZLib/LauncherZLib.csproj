@@ -67,6 +67,7 @@
     <Compile Include="FormattedText\FormattedTextEngine.cs" />
     <Compile Include="FormattedText\TextFormat.cs" />
     <Compile Include="I18N\ILocalizationDictionary.cs" />
+    <Compile Include="I18N\LocalizationHelper.cs" />
     <Compile Include="Icon\FileIconProvider.cs" />
     <Compile Include="Icon\IconAvailability.cs" />
     <Compile Include="Icon\IconLoader.cs" />
@@ -99,7 +100,7 @@
     <Compile Include="Plugin\IPlugin.cs" />
     <Compile Include="Plugin\Loader\UncontainedPlugin.cs" />
     <Compile Include="Plugin\Loader\PluginDiscoveryInfo.cs" />
-    <Compile Include="Plugin\Modules\RoutingParameterCollection.cs" />
+    <Compile Include="Plugin\Modules\Routing\RoutingParameterCollection.cs" />
     <Compile Include="Plugin\Modules\Routing\UrlRouter.Session.cs" />
     <Compile Include="Plugin\Modules\Routing\UrlRouter.cs" />
     <Compile Include="Plugin\Modules\Routing\UrlRouterHelper.cs" />
@@ -123,7 +124,6 @@
     <Compile Include="Plugin\Modules\ConfigModule.cs" />
     <Compile Include="Plugin\Modules\EmptyPlugin.cs" />
     <Compile Include="Plugin\Modules\ICommandHandler.cs" />
-    <Compile Include="Plugin\Modules\ParameterCollection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Launcher\LauncherData.cs" />
     <Compile Include="Launcher\LauncherQuery.cs" />

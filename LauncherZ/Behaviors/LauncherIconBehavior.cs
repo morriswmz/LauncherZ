@@ -64,7 +64,7 @@ namespace LauncherZ.Behaviors
                 case IconAvailability.AvailableLater:
                     iconLibrary.GetIconAsync(iconLocation, (location, icon) =>
                     {
-                        if (new IconLocation(GetIconLocation(image)).Equals(location))
+                        if (location.Equals(new IconLocation(GetIconLocation(image))))
                             image.Source = icon;
                     });
                     break;

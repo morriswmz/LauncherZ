@@ -85,6 +85,10 @@
     <Compile Include="MathEvaluator\Tokenizer.cs" />
     <Compile Include="TestPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UnitConverter\ConversionSystem.cs" />
+    <Compile Include="UnitConverter\ConversionTable.cs" />
+    <Compile Include="UnitConverter\DefinitionFile.cs" />
+    <Compile Include="UnitConverter\UnitConverterPlugin.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LauncherZLib\LauncherZLib.csproj">
@@ -118,6 +122,15 @@
     <Content Include="I18N\LZMathEvaluator.en-US.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Data\UnitConversionDefinitions.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="I18N\LZUnitConverter.en-US.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="I18N\UnitNames.en-US.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -126,7 +139,8 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy "$(ProjectDir)$(OutDir)$(TargetFileName)" "$(SolutionDir)LauncherZ\bin\Debug\Plugins\CorePlugins\" /Y
-xcopy "$(ProjectDir)$(OutDir)I18N" "$(SolutionDir)LauncherZ\bin\Debug\Plugins\CorePlugins\I18N\" /E /Y</PostBuildEvent>
+xcopy "$(ProjectDir)$(OutDir)I18N" "$(SolutionDir)LauncherZ\bin\Debug\Plugins\CorePlugins\I18N\" /E /Y
+xcopy "$(ProjectDir)$(OutDir)Data" "$(SolutionDir)LauncherZ\bin\Debug\Plugins\CorePlugins\Data\" /E /Y</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
