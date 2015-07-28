@@ -12,6 +12,7 @@ using LauncherZLib.Launcher;
 using LauncherZLib.Plugin;
 using LauncherZLib.Plugin.Modules;
 using LauncherZLib.Plugin.Service;
+using LauncherZLib.Utils;
 
 namespace CorePlugins.UnitConverter
 {
@@ -22,22 +23,26 @@ namespace CorePlugins.UnitConverter
 
         // pattern: {(123[.123]|.123)[e[+/-]123]}{S1}>{S2}
         private static readonly Regex ConversionPattern = new Regex(@"^((?:\d*\.\d+|\d+)(?:e[+\-]?\d+)?)([^>]+)>(.+?)$", RegexOptions.IgnoreCase);
-        private static readonly Regex InvalidCharPattern = new Regex(@"[\s\.]");
 
+        private UnitInformationRegistry _unitInformationRegistry;
         private ConversionSystem _conversionSystem;
- 
 
         public override void Activate(IPluginServiceProvider serviceProvider)
         {
             base.Activate(serviceProvider);
-            _conversionSystem = new ConversionSystem(Logger);
+            
             string defaultDefFilePath = Path.Combine(PluginInfo.PluginSourceDirectory,
                 @"Data\UnitConversionDefinitions.json");
             string defaultUnitNamePath = Path.Combine(PluginInfo.PluginSourceDirectory,
                 @"I18N\UnitNames.json");
-            _conversionSystem.LoadDefinitionsFrom(defaultDefFilePath);
-            _conversionSystem.LoadAliasesFromLauguageFile(
+
+            var defFileLoader = new DefinitionFileLoader(new[] {defaultDefFilePath}, Logger);
+            defFileLoader.LoadAll();
+            _unitInformationRegistry = defFileLoader.GetLoadedUnitInformation();
+            LoadAliasesFromLauguageFile(
                 LocalizationHelper.AddCultureNameToPath(defaultUnitNamePath, Localization.CurrentCulture));
+            _conversionSystem = new ConversionSystem(_unitInformationRegistry, defFileLoader.GetLoadedConversionProviders());
+
             Localization.LoadLanguageFile(defaultUnitNamePath);
         }
 
@@ -67,23 +72,36 @@ namespace CorePlugins.UnitConverter
             return _conversionSystem.GetAllConversions(fromName, toName)
                 .Select(c =>
                 {
-                    double result = quantity*c.Factor;
+                    double result = c.Converter(quantity);
                     // determine localized unit names
-                    string fromP = c.FullFromUnitName + ".plural";
-                    string toP = c.FullToUnitName + ".plural";
+                    string fromPlural = c.From.FullName + ".plural";
+                    string toPlural = c.To.FullName + ".plural";
                     string localizedFrom = Math.Abs(quantity - 1.0) < double.Epsilon
-                        ? Localization[c.FullFromUnitName]
-                        : (Localization.CanTranslate(fromP) ? Localization[fromP] : Localization[c.FullFromUnitName]);
+                        ? Localization[c.From.FullName]
+                        : (Localization.CanTranslate(fromPlural) ? Localization[fromPlural] : Localization[c.From.FullName]);
+                    string fromAbbr;
+                    if (_unitInformationRegistry.TryGetAbbreviation(c.From, out fromAbbr))
+                    {
+                        localizedFrom = string.Format("{0} {1}{2}{3}",
+                            localizedFrom, Localization["LeftParenthesis"],
+                            fromAbbr, Localization["RightParenthesis"]);
+                    }
                     string localizedTo = Math.Abs(result - 1.0) < double.Epsilon
-                        ? Localization[c.FullToUnitName]
-                        : (Localization.CanTranslate(toP) ? Localization[toP] : Localization[c.FullToUnitName]);
-                    // format result
-                    bool isApprox = Math.Abs(Math.Log10(Math.Abs(c.Factor))) > 4 ||
-                                    Math.Abs(Math.Log10(Math.Abs(quantity))) > 4;
-                    string title = string.Format("{0} {1} {2} {3} {4}",
+                        ? Localization[c.To.FullName]
+                        : (Localization.CanTranslate(toPlural) ? Localization[toPlural] : Localization[c.To.FullName]);
+                    string toAbbr;
+                    if (_unitInformationRegistry.TryGetAbbreviation(c.To, out toAbbr))
+                    {
+                        localizedTo = string.Format("{0} {1}{2}{3}",
+                            localizedTo, Localization["LeftParenthesis"],
+                            toAbbr, Localization["RightParenthesis"]);
+                    }// format result
+                    bool isApprox = Math.Abs(Math.Log10(Math.Abs(result/quantity))) > 4;
+                    isApprox = isApprox || Math.Abs(Math.Log10(Math.Abs(quantity))) > 4;
+                    string title = string.Format("{0:e2} {1} {2} {3:e2} {4}",
                         quantity, localizedFrom,
                         isApprox ? "≈" : "=",
-                        quantity*c.Factor, localizedTo);
+                        result, localizedTo);
                     return new LauncherData(1.0)
                     {
                         Title = title,
@@ -99,5 +117,36 @@ namespace CorePlugins.UnitConverter
             Clipboard.SetText(launcherData.UserData);
             return PostLaunchAction.DoNothing;
         }
+
+        private void LoadAliasesFromLauguageFile(string path)
+        {
+            Dictionary<string, string> locDict;
+            try
+            {
+                locDict = JsonUtils.StreamDeserialize<Dictionary<string, string>>(path);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Failed to load aliases from language file \"{0}\". Details:{1}{2}",
+                    path, Environment.NewLine, ex);
+                return;
+            }
+            foreach (var pair in locDict)
+            {
+                if (string.IsNullOrWhiteSpace(pair.Value))
+                {
+                    continue;
+                }
+                // strip off "plural" affix
+                string fullUnitName = pair.Key.EndsWith(".plural")
+                    ? pair.Key.Substring(0, pair.Key.LastIndexOf('.'))
+                    : pair.Key;
+                if (Unit.IsValidFullName(fullUnitName))
+                {
+                    _unitInformationRegistry.RegisterAlias(Unit.FromFullName(fullUnitName), pair.Value);
+                }
+            }
+        }
+
     }
 }

@@ -35,9 +35,9 @@ namespace LauncherZ.Plugin
                             FormattedTextEngine.Escape(pc.PluginFriendlyName),
                             FormattedTextEngine.Escape(string.Join(localization["AuthorSeparator"], pc.PluginAuthors)));
                         var description = string.Format(localization["PluginCommandListDescription"],
-                            string.IsNullOrWhiteSpace(pc.PluginDescription)
+                            string.IsNullOrWhiteSpace(pc.LocalizedPluginDescription)
                                 ? localization["NoDescriptionGiven"]
-                                : pc.PluginDescription,
+                                : pc.LocalizedPluginDescription,
                             localization[pm.IsPluginActivated(x) ? "PluginStatusActivated" : "PluginStatusDeactivated"]
                             );
                         return new LauncherData(1.0)

@@ -1,0 +1,7 @@
+﻿{
+    /* the following items should match the attributes */
+    "PluginFriendlyName": "LauncherZ 数学工具",
+    "PluginDescription": "计算简单的数学表达式。",
+
+    "MathEvaluatorDescription": "按 [回车] 将结果复制到剪贴板。"
+}

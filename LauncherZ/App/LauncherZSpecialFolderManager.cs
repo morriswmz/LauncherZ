@@ -91,7 +91,7 @@ namespace LauncherZ.App
 #if DEBUG
             UserDataFolder = Path.Combine(systemAppDataPath, "LauncherZ.Debug." + app.AppGuid.Substring(0, 8));
 #else
-            UserDataFolder = Path.Combine(systemAppDataPath, "LauncherZ." + _appGuid.Substring(0, 8));
+            UserDataFolder = Path.Combine(systemAppDataPath, "LauncherZ." + app.AppGuid.Substring(0, 8));
 #endif
             CreateDirectionIfNotExist(UserDataFolder);
 

@@ -1,0 +1,14 @@
+﻿{
+    /* the following items should match the attributes */
+    "PluginFriendlyName": "LauncherZ 核心命令集",
+    "PluginDescription": "提供基本控制命令。",
+    /* en-US */
+    "ExitCommandTitle": "退出 LauncherZ",
+    "ExitCommandDescription": "按 [回车] 退出。",
+    "CpuCommandTitle": "处理器总使用率",
+    "CpuCommandDescription": "按 [回车] 打开任务管理器。",
+    "IpCommandLaunchHint": "按 [回车] 复制数据。",
+    "RunCommandTitle":  "运行 [{0}]",
+    "RunCommandNormalDescription": "按 [回车] 运行。",
+    "RunCommandErrorDescription":  "发生错误，无法运行指定程序 :("
+}

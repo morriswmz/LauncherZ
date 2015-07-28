@@ -14,17 +14,21 @@ namespace LauncherZLib.I18N
     {
         private readonly List<string> _loadedLanguageFiles = new List<string>();
         private readonly Dictionary<string, string> _strings = new Dictionary<string, string>();
-        
 
-        private CultureInfo _culture = CultureInfo.CurrentCulture;
+
+        private CultureInfo _culture;
 
         public delegate void CultureChangedEventHandler(object sender, CultureChangedEventArgs e);
 
         public event CultureChangedEventHandler CultureChanged;
 
-        public LocalizationDictionary()
-        {
+        public LocalizationDictionary() : this(CultureInfo.CurrentCulture) { }
 
+        public LocalizationDictionary(CultureInfo currentCulture)
+        {
+            if (currentCulture == null)
+                throw new ArgumentNullException("currentCulture");
+            _culture = currentCulture;
         }
 
         public string this[string strName]
@@ -87,6 +91,7 @@ namespace LauncherZLib.I18N
             if (File.Exists(fallbackFileName))
             {
                 LoadLanguageFileImpl(fallbackFileName);
+                _loadedLanguageFiles.Add(baseFileName);
                 return;
             }
             // check en-US as last resort
@@ -94,6 +99,7 @@ namespace LauncherZLib.I18N
             if (File.Exists(fallbackFileName))
             {
                 LoadLanguageFileImpl(fallbackFileName);
+                _loadedLanguageFiles.Add(baseFileName);
                 return;
             }
 

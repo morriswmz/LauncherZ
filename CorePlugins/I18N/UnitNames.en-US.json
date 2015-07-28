@@ -44,5 +44,13 @@
     "mass.ounce": "ounce",
     "mass.ounce.plural": "ounces",
     "mass.carat": "carat",
-    "mass.carat.plural": "carats"
+    "mass.carat.plural": "carats",
+
+    "temperature.kelvin": "kelvin",
+    "temperature.kelvin.plural": "kelvins",
+    "temperature.celsius": "celsius",
+    "temperature.celsius.plural": "celsius",
+    "temperature.fahrenheit": "fahrenheit",
+    "temperature.fahrenheit.plural": "fahrenheit"
+    
 }

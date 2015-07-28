@@ -1,4 +1,5 @@
-﻿using CorePlugins.UnitConverter;
+﻿using System;
+using CorePlugins.UnitConverter;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CorePluginTests
@@ -10,46 +11,59 @@ namespace CorePluginTests
         [TestMethod]
         public void TestConversionTable()
         {
-            var lengthUnits = new[] {"meter", "decimeter", "centimeter", "millimeter", "micrometer", "inch", "foot", "yard"};
+            
+            var unitMeter = Unit.FromFullName("length.meter");
+            var unitDecimeter = Unit.FromFullName("length.decimeter");
+            var unitCentimeter = Unit.FromFullName("length.centimeter");
+            var unitMillimeter = Unit.FromFullName("length.millimeter");
+            var unitMicrometer = Unit.FromFullName("length.micrometer");
+            var unitInch = Unit.FromFullName("length.inch");
+            var unitFoot = Unit.FromFullName("length.foot");
+            var unitYard = Unit.FromFullName("length.yard");
+            var lengthUnits = new[] { unitMeter, unitDecimeter, unitCentimeter, unitMillimeter, unitMicrometer, unitInch, unitFoot, unitYard };
+
             var actualConversions = new[]
             {
-                new UnitConversionFactor("millimeter", "centimeter", 0.1),
-                new UnitConversionFactor("millimeter", "decimeter", 0.01),
-                new UnitConversionFactor("millimeter", "meter", 0.001),
-                new UnitConversionFactor("inch", "foot", 1.0/12.0),
-                new UnitConversionFactor("inch", "yard", 1.0/(12.0*3.0)),
-                new UnitConversionFactor("centimeter", "inch", 1.0/2.54),
-                new UnitConversionFactor("meter", "inch", 100.0/2.54),
-                new UnitConversionFactor("meter", "foot", 100.0/(2.54*12.0)),
-                new UnitConversionFactor("meter", "yard", 100.0/(2.54*12.0*3.0)),
+                new UnitConversionFactor(unitMillimeter, unitCentimeter, 0.1),
+                new UnitConversionFactor(unitMillimeter, unitDecimeter, 0.01),
+                new UnitConversionFactor(unitMillimeter, unitMeter, 0.001),
+                new UnitConversionFactor(unitMicrometer, unitMillimeter, 0.001),
+                new UnitConversionFactor(unitInch, unitFoot, 1.0/12.0),
+                new UnitConversionFactor(unitInch, unitYard, 1.0/(12.0*3.0)),
+                new UnitConversionFactor(unitCentimeter, unitInch, 1.0/2.54),
+                new UnitConversionFactor(unitMeter, unitInch, 100.0/2.54),
+                new UnitConversionFactor(unitMeter, unitFoot, 100.0/(2.54*12.0)),
+                new UnitConversionFactor(unitMeter, unitYard, 100.0/(2.54*12.0*3.0)),
             };
-            var ct = new ConversionTable("length", lengthUnits);
-            ct.SetFactor("meter", "decimeter", 10.0);
-            ct.SetFactor("decimeter","centimeter", 10.0);
-            ct.SetFactor("centimeter", "millimeter", 10.0);
-            ct.SetFactor("millimeter", "micrometer", 100.0);
-            ct.SetFactor("inch", "centimeter", 2.54);
-            ct.SetFactor("foot", "inch", 12.0);
-            ct.SetFactor("yard", "foot", 3.0);
-            double result = 0.0;
+
+            var ct = new AffineConversionTable("length", lengthUnits);
+            ct.SetConversionCoefficients(unitMeter, unitDecimeter, 10.0, 0.0);
+            ct.SetConversionCoefficients(unitDecimeter, unitCentimeter, 10.0, 0.0);
+            ct.SetConversionCoefficients(unitCentimeter, unitMillimeter, 10.0, 0.0);
+            ct.SetConversionCoefficients(unitMillimeter, unitMicrometer, 1000.0, 0.0);
+            ct.SetConversionCoefficients(unitInch, unitCentimeter, 2.54, 0.0);
+            ct.SetConversionCoefficients(unitFoot, unitInch, 12.0, 0.0);
+            ct.SetConversionCoefficients(unitYard, unitFoot, 3.0, 0.0);
+
             foreach (UnitConversionFactor c in actualConversions)
             {
-                Assert.IsTrue(ct.TryConvert(c.From, c.To, 1.0, out result));
-                Assert.AreEqual(c.Factor, result, 1e-7);
+                Func<double, double> converter;
+                Assert.IsTrue(ct.TryProvideConverter(c.From, c.To, out converter));
+                Assert.AreEqual(c.Factor, converter(1.0), 1e-7);
             }
         }
 
         class UnitConversionFactor
         {
-            public UnitConversionFactor(string @from, string to, double factor)
+            public UnitConversionFactor(Unit fromUnit, Unit toUnit, double factor)
             {
-                From = @from;
-                To = to;
+                From = fromUnit;
+                To = toUnit;
                 Factor = factor;
             }
 
-            public string From { get; private set; }
-            public string To { get; private set; }
+            public Unit From { get; private set; }
+            public Unit To { get; private set; }
             public double Factor { get; private set; }
         }
     }

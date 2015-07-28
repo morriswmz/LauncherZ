@@ -10,5 +10,5 @@
     "IpCommandLaunchHint": "Press [Enter] to copy the data to clipboard.",
     "RunCommandTitle":  "Run [{0}]",
     "RunCommandNormalDescription": "Press [Enter] to run the command.",
-    "RunCommandErrorDescription":  "I am sorry Dave, I am afraid that I cannot run that command."
+    "RunCommandErrorDescription": "I am sorry Dave, I am afraid that I cannot run that command."
 }

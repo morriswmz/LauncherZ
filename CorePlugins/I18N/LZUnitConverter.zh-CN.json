@@ -1,0 +1,9 @@
+﻿{
+    /* the following items should match the attributes */
+    "PluginFriendlyName": "LauncherZ 单位转换工具",
+    "PluginDescription": "提供基本的单位转换功能。",
+
+    "DefaultDescription": "按 [回车] 将结果复制至剪贴板。",
+    "LeftParenthesis": "（",
+    "RightParenthesis": "）"
+}

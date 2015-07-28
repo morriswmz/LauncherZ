@@ -1,0 +1,30 @@
+﻿{
+    "length.kilometer": "千米",
+    "length.meter": "米",
+    "length.centimeter": "厘米",
+    "length.decimeter": "分米",
+    "length.millimeter": "毫米",
+    "length.micrometer": "微米",
+    "length.nanometer": "纳米",
+    "length.inch": "英寸",
+    "length.foot": "英尺",
+    "length.yard": "码",
+    "length.mile": "英里",
+
+    "volume.liter": "升",
+    "volume.milliliter": "毫升",
+    "volume.us.gallon": "加仑 (美制)",
+    "volume.uk.gallon": "加仑 (英制)",
+
+    "mass.milligram": "毫克",
+    "mass.gram": "克",
+    "mass.kilogram": "千克",
+    "mass.ton": "吨",
+    "mass.pound": "磅",
+    "mass.ounce": "盎司",
+    "mass.carat": "克拉",
+
+    "temperature.kelvin": "开氏度",
+    "temperature.celsius": "摄氏度",
+    "temperature.fahrenheit": "华氏度"
+}

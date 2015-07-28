@@ -1,222 +1,258 @@
 ﻿{
     "Version": 1,
-    "ConversionGroups": [
+    "Units": [
         /* length */
         {
-            "Dimension": "length",
-            "Units": [
-                {
-                    "Name": "kilometer",
-                    "Aliases": "#|km"
-                },
-                {
-                    "Name": "meter",
-                    "Aliases": "#|m"
-                },
-                {
-                    "Name": "decimeter",
-                    "Aliases": "#|dm"
+            "Name": "length.kilometer",
+            "Abbreviation": "km",
+            "Aliases": "#"
+        },
+        {
+            "Name": "length.meter",
+            "Abbreviation": "m",
+            "Aliases": "#"
+        },
+        {
+            "Name": "length.decimeter",
+            "Abbreviation": "dm",
+            "Aliases": "#"
 
-                },
-                {
-                    "Name": "centimeter",
-                    "Aliases": "#|cm"
-                },
-                {
-                    "Name": "millimeter",
-                    "Aliases": "#|mm"
-                },
-                {
-                    "Name": "micrometer",
-                    "Aliases": "#|um"
-                },
-                {
-                    "Name": "nanometer",
-                    "Aliases": "#|nm"
-                },
-                {
-                    "Name": "inch",
-                    "Aliases": "#|in."
-                },
-                {
-                    "Name": "foot",
-                    "Aliases": "#|ft."
-                },
-                {
-                    "Name": "yard",
-                    "Aliases": "#|yd."
-                },
-                {
-                    "Name": "mile",
-                    "Aliases": "#|mi."
-                }
-            ],
-            "Conversions": [
-                {
-                    "From": "kilometer",
-                    "To": "meter",
-                    "Factor": 1000
-                },
-                {
-                    "From": "meter",
-                    "To": "decimeter",
-                    "Factor": 10
-                },
-                {
-                    "From": "decimeter",
-                    "To": "centimeter",
-                    "Factor": 10
-                },
-                {
-                    "From": "centimeter",
-                    "To": "millimeter",
-                    "Factor": 10
-                },
-                {
-                    "From": "millimeter",
-                    "To": "micrometer",
-                    "Factor": 1000
-                },
-                {
-                    "From": "micrometer",
-                    "To": "nanometer",
-                    "Factor": 1000
-                },
-                {
-                    "From": "inch",
-                    "To": "centimeter",
-                    "Factor": 2.54
-                },
-                {
-                    "From": "foot",
-                    "To": "inch",
-                    "Factor": 12
-                },
-                {
-                    "From": "yard",
-                    "To": "foot",
-                    "Factor": 3
-                },
-                {
-                    "From": "mile",
-                    "To": "yard",
-                    "Factor": 1760
-                }
-            ]
+        },
+        {
+            "Name": "length.centimeter",
+            "Abbreviation": "cm",
+            "Aliases": "#"
+        },
+        {
+            "Name": "length.millimeter",
+            "Abbreviation": "mm",
+            "Aliases": "#"
+        },
+        {
+            "Name": "length.micrometer",
+            "Abbreviation": "um",
+            "Aliases": "#"
+        },
+        {
+            "Name": "length.nanometer",
+            "Abbreviation": "nm",
+            "Aliases": "#"
+        },
+        {
+            "Name": "length.inch",
+            "Abbreviation": "in.",
+            "Aliases": "#|in"
+        },
+        {
+            "Name": "length.foot",
+            "Abbreviation": "ft.",
+            "Aliases": "#|ft"
+        },
+        {
+            "Name": "length.yard",
+            "Abbreviation": "yd.",
+            "Aliases": "#|yd"
+        },
+        {
+            "Name": "length.mile",
+            "Abbreviation": "mi.",
+            "Aliases": "#|mi"
         },
         /* volume */
         {
-            "Dimension": "volume",
-            "Units": [
-                {
-                    "Name": "cubic_meter",
-                    "Aliases": "#|m3"
-                },
-                {
-                    "Name": "liter",
-                    "Aliases": "#|l"
-                },
-                {
-                    "Name": "milliliter",
-                    "Aliases": "#|ml"
-                },
-                {
-                    "Name": "us.gallon",
-                    "Aliases": "gallon|gallons|gal."
-                },
-                {
-                    "Name": "uk.gallon",
-                    "Aliases": "gallon|gallons|gal."
-                }
-            ],
-            "Conversions": [
-                {
-                    "From": "cubic_meter",
-                    "To": "liter",
-                    "Factor": 1000.0
-                },
-                {
-                    "From": "liter",
-                    "To": "milliliter",
-                    "Factor": 1000.0
-                },
-                {
-                    "From": "us.gallon",
-                    "To": "liter",
-                    "Factor": 3.78541178
-                },
-                {
-                    "From": "uk.gallon",
-                    "To": "liter",
-                    "Factor": 4.54609188
-                }
-            ]
+            "Name": "volume.cubic_meter",
+            "Abbreviation": "m^3",
+            "Aliases": "#|m3"
+        },
+        {
+            "Name": "volume.liter",
+            "Abbreviation": "l",
+            "Aliases": "#"
+        },
+        {
+            "Name": "volume.milliliter",
+            "Abbreviation": "ml",
+            "Aliases": "#"
+        },
+        {
+            "Name": "volume.us.gallon",
+            "Abbreviation": "gal.",
+            "Aliases": "#|gal|gallons"
+        },
+        {
+            "Name": "volume.uk.gallon",
+            "Abbreviation": "gal.",
+            "Aliases": "#|gal|gallons"
         },
         /* mass */
         {
-            "Dimension": "mass",
-            "Units": [
-                {
-                    "Name": "milligram",
-                    "Aliases": "#|mg"
-                },
-                {
-                    "Name": "gram",
-                    "Aliases": "#|g"
-                },
-                {
-                    "Name": "kilogram",
-                    "Aliases": "#|kg"
-                },
-                {
-                    "Name": "ton",
-                    "Aliases": "#|t"
-                },
-                {
-                    "Name": "pound",
-                    "Aliases": "#|lb."
-                },
-                {
-                    "Name": "ounce",
-                    "Aliases": "#|oz."
-                },
-                {
-                    "Name": "carat",
-                    "Aliases": "#|ct"
-                }
-            ],
-            "Conversions": [
-                {
-                    "From": "ton",
-                    "To": "kilogram",
-                    "Factor": 1000
-                },
-                {
-                    "From": "kilogram",
-                    "To": "gram",
-                    "Factor": 1000
-                },
-                {
-                    "From": "gram",
-                    "To": "milligram",
-                    "Factor": 1000
-                },
-                {
-                    "From": "kilogram",
-                    "To": "pound",
-                    "Factor": 2.20462234
-                },
-                {
-                    "From": "pound",
-                    "To": "ounce",
-                    "Factor": 16
-                },
-                {
-                    "From": "carat",
-                    "To": "gram",
-                    "Factor": 0.2
-                }
-            ]
+            "Name": "mass.milligram",
+            "Abbreviation": "mg",
+            "Aliases": "#"
+        },
+        {
+            "Name": "mass.gram",
+            "Abbreviation": "g",
+            "Aliases": "#"
+        },
+        {
+            "Name": "mass.kilogram",
+            "Abbreviation": "kg",
+            "Aliases": "#"
+        },
+        {
+            "Name": "mass.ton",
+            "Abbreviation": "t",
+            "Aliases": "#"
+        },
+        {
+            "Name": "mass.pound",
+            "Abbreviation": "lb.",
+            "Aliases": "#|lb"
+        },
+        {
+            "Name": "mass.ounce",
+            "Abbreviation": "oz.",
+            "Aliases": "#|oz"
+        },
+        {
+            "Name": "mass.carat",
+            "Abbreviation": "ct.",
+            "Aliases": "#|ct"
+        },
+        /* temperature */
+        {
+            "Name": "temperature.kelvin",
+            "Abbreviation": "°K",
+            "Aliases": "#|K"
+        },
+        {
+            "Name": "temperature.celsius",
+            "Abbreviation": "°C",
+            "Aliases": "#|C"
+        },
+        {
+            "Name": "temperature.fahrenheit",
+            "Abbreviation": "°F",
+            "Aliases": "#|F"
+        }
+    ],
+    "Conversions": [
+        /* length */
+        {
+            "From": "length.kilometer",
+            "To": "length.meter",
+            "Factor": 1000
+        },
+        {
+            "From": "length.meter",
+            "To": "length.decimeter",
+            "Factor": 10
+        },
+        {
+            "From": "length.decimeter",
+            "To": "length.centimeter",
+            "Factor": 10
+        },
+        {
+            "From": "length.centimeter",
+            "To": "length.millimeter",
+            "Factor": 10
+        },
+        {
+            "From": "length.millimeter",
+            "To": "length.micrometer",
+            "Factor": 1000
+        },
+        {
+            "From": "length.micrometer",
+            "To": "length.nanometer",
+            "Factor": 1000
+        },
+        {
+            "From": "length.inch",
+            "To": "length.centimeter",
+            "Factor": 2.54
+        },
+        {
+            "From": "length.foot",
+            "To": "length.inch",
+            "Factor": 12
+        },
+        {
+            "From": "length.yard",
+            "To": "length.foot",
+            "Factor": 3
+        },
+        {
+            "From": "length.mile",
+            "To": "length.yard",
+            "Factor": 1760
+        },
+        /* volume */
+        {
+            "From": "volume.cubic_meter",
+            "To": "volume.liter",
+            "Factor": 1000.0
+        },
+        {
+            "From": "volume.liter",
+            "To": "volume.milliliter",
+            "Factor": 1000.0
+        },
+        {
+            "From": "volume.us.gallon",
+            "To": "volume.liter",
+            "Factor": 3.78541178
+        },
+        {
+            "From": "volume.uk.gallon",
+            "To": "volume.liter",
+            "Factor": 4.54609188
+        },
+        /* mass */
+        {
+            "From": "mass.ton",
+            "To": "mass.kilogram",
+            "Factor": 1000
+        },
+        {
+            "From": "mass.kilogram",
+            "To": "mass.gram",
+            "Factor": 1000
+        },
+        {
+            "From": "mass.gram",
+            "To": "mass.milligram",
+            "Factor": 1000
+        },
+        {
+            "From": "mass.kilogram",
+            "To": "mass.pound",
+            "Factor": 2.20462234
+        },
+        {
+            "From": "mass.pound",
+            "To": "mass.ounce",
+            "Factor": 16
+        },
+        {
+            "From": "mass.carat",
+            "To": "mass.gram",
+            "Factor": 0.2
+        },
+        /* temperature */
+        {
+            "From": "temperature.kelvin",
+            "To": "temperature.celsius",
+            "Factor": 1.0,
+            "Offset": -273.15
+        },
+        {
+            "From": "temperature.celsius",
+            "To": "temperature.fahrenheit",
+            "Factor": 1.8,
+            "Offset": 32.0
         }
     ]
 }

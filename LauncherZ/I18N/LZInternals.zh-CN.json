@@ -1,0 +1,14 @@
+﻿{
+    /* the following items should match the attributes */
+    "PluginFriendlyName": "LauncherZ 内部组件",
+    "PluginDescription": "提供底层工具。",
+    /* en-US */
+    "AuthorSeparator": "， ",
+    "NoDescriptionGiven": "作者很懒，什么描述也没有留下= =",
+    "AboutCommandTitle": "关于 [LauncherZ]",
+    "AboutCommandDescription": "由 [{0}】 制作， 版本号 [{1}].",
+    "PluginCommandListTitle": "[{0}] ~作者 {1}~",
+    "PluginCommandListDescription": "{0}\n状态： [{1}]",
+    "PluginStatusActivated": "启用",
+    "PluginStatusDeactivated":  "禁用"
+}

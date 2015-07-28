@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.ComponentModel;
+using Newtonsoft.Json;
 
 namespace CorePlugins.UnitConverter
 {
@@ -7,16 +8,6 @@ namespace CorePlugins.UnitConverter
     {
         [JsonProperty(Required = Required.Always)]
         public int Version { get; set; }
-
-        [JsonProperty(Required = Required.Always)]
-        public ConversionGroup[] ConversionGroups { get; set; }
-    }
-
-    [JsonObject]
-    public class ConversionGroup
-    {
-        [JsonProperty(Required = Required.Always)]
-        public string Dimension { get; set; }
 
         [JsonProperty(Required = Required.Always)]
         public UnitDefinition[] Units { get; set; }
@@ -28,9 +19,23 @@ namespace CorePlugins.UnitConverter
     [JsonObject]
     public class UnitDefinition
     {
+        /// <summary>
+        /// Full name of the unit.
+        /// </summary>
         [JsonProperty(Required = Required.Always)]
         public string Name { get; set; }
 
+        /// <summary>
+        /// Optional abbreviation.
+        /// Also counts as an alias.
+        /// </summary>
+        public string Abbreviation { get; set; }
+
+        /// <summary>
+        /// Possible aliases, separated by "|".
+        /// Use "#" to specify unprefix unit name as an alias.
+        /// e.g., if unit name is "volume.us.gal", then "#" represents "gal".
+        /// </summary>
         [JsonProperty(Required = Required.Always)]
         public string Aliases { get; set; }
     }
@@ -47,29 +52,13 @@ namespace CorePlugins.UnitConverter
         [JsonProperty(Required = Required.Always)]
         public double Factor { get; set; }
 
-        protected bool Equals(ConversionDefinition other)
-        {
-            return string.Equals(From, other.From) && string.Equals(To, other.To) && Factor.Equals(other.Factor);
-        }
+        /// <summary>
+        /// Optional offset (e.g. temperature conversion)
+        /// Formula: To = Factor * From + Offset
+        /// </summary>
+        [DefaultValue(0.0)]
+        public double Offset { get; set; }
 
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((ConversionDefinition) obj);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                int hashCode = (From != null ? From.GetHashCode() : 0);
-                hashCode = (hashCode*397) ^ (To != null ? To.GetHashCode() : 0);
-                hashCode = (hashCode*397) ^ Factor.GetHashCode();
-                return hashCode;
-            }
-        }
     }
 
 }

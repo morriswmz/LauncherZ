@@ -153,6 +153,9 @@
     <Content Include="I18N\LZInternals.en-US.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="I18N\LZInternals.zh-CN.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="Themes\AboutThemes.txt" />
     <Content Include="Themes\TerminalTheme.xaml">
       <SubType>Designer</SubType>

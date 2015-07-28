@@ -46,6 +46,7 @@ namespace LauncherZLib.Launcher
             var resultsSync = new List<TaggedObject<LauncherData>>();
 #if DEBUG
             var sw = new Stopwatch();
+            var lastElapsedMilliseconds = 0L;
             sw.Start();
 #endif
             if (query.IsBroadcast)
@@ -66,6 +67,10 @@ namespace LauncherZLib.Launcher
                         _logger.Error("An exception occurred while query {0} with input {1}. Details:{2}{3}",
                             container, query.OriginalInput, Environment.NewLine, ex);
                     }
+#if DEBUG
+                    Trace.WriteLine(string.Format("Query Time [{0}]： {1}ms", container.PluginId, sw.ElapsedMilliseconds - lastElapsedMilliseconds));
+                    lastElapsedMilliseconds = sw.ElapsedMilliseconds;
+#endif
                 }
             }
             else

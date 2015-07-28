@@ -41,9 +41,6 @@
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp">
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
@@ -67,6 +64,7 @@
     <Compile Include="FormattedText\FormattedTextEngine.cs" />
     <Compile Include="FormattedText\TextFormat.cs" />
     <Compile Include="I18N\ILocalizationDictionary.cs" />
+    <Compile Include="I18N\LanguageFilesAttribute.cs" />
     <Compile Include="I18N\LocalizationHelper.cs" />
     <Compile Include="Icon\FileIconProvider.cs" />
     <Compile Include="Icon\IconAvailability.cs" />
